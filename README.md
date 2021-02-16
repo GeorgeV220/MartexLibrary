@@ -15,3 +15,7 @@
 [Lucko's helper](https://github.com/lucko/helper/):
 
 * Maven Helper (modified)
+
+[tchristofferson's Config-Updater](https://github.com/tchristofferson/Config-Updater/):
+
+* Config-Updater

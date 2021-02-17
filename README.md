@@ -11,7 +11,3 @@
     * ActionBar
 *
     * Title
-
-[Lucko's helper](https://github.com/lucko/helper/):
-
-* Maven Helper (modified)

@@ -1,28 +1,28 @@
-package com.georgev22.externals.utilities.maps;
+package com.georgev22.api.maps;
 
+import com.georgev22.api.utilities.Utils;
 import org.bukkit.Location;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static com.georgev22.externals.utilities.Assertions.notNull;
 import static java.lang.String.format;
 
-public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V> {
+public class ConcurrentObjectMap<K, V> extends ConcurrentHashMap<K, V> implements ObjectMap<K, V> {
 
     /**
-     * Creates an HashObjectMap instance.
+     * Creates an ConcurrentObjectMap instance.
      */
-    public HashObjectMap() {
+    public ConcurrentObjectMap() {
     }
 
     /**
-     * Creates a HashObjectMap instance initialized with the given map.
+     * Creates a ConcurrentObjectMap instance initialized with the given map.
      *
      * @param map initial map
      */
-    public HashObjectMap(final ObjectMap<K, V> map) {
+    public ConcurrentObjectMap(final ObjectMap<K, V> map) {
         putAll(map);
     }
 
@@ -46,7 +46,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
-     * Put/replace the given key/value pair into HashObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into ConcurrentObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>
@@ -165,6 +165,17 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
+     * Gets the value of the given key as a Location.
+     *
+     * @param key the key
+     * @return the value as a Location, which may be null
+     * @throws ClassCastException if the value is not a Location
+     */
+    public Location getLocation(final Object key) {
+        return (Location) get(key);
+    }
+
+    /**
      * Gets the value of the given key as a String.
      *
      * @param key the key
@@ -234,17 +245,6 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
-     * Gets the value of the given key as a Location.
-     *
-     * @param key the key
-     * @return the value as a Location, which may be null
-     * @throws ClassCastException if the value is not a Location
-     */
-    public Location getLocation(final Object key) {
-        return (Location) get(key);
-    }
-
-    /**
      * Gets the list value of the given key, casting the list elements to the given {@code Class<T>}.  This is useful to avoid having
      * casts in client code, though the effect is the same.
      *
@@ -270,7 +270,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
      * @throws ClassCastException if the value of the given key is not of type T
      */
     public <T> List<T> getList(final Object key, final Class<T> clazz, final List<T> defaultValue) {
-        notNull("clazz", clazz);
+        Utils.Assertions.notNull("clazz", clazz);
         List<T> value = get(key, List.class);
         if (value == null) {
             return defaultValue;
@@ -296,7 +296,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
      * @throws ClassCastException if the value of the given key is not of type T
      */
     public <T> T get(final Object key, final Class<T> clazz) {
-        notNull("clazz", clazz);
+        Utils.Assertions.notNull("clazz", clazz);
         return clazz.cast(get(key));
     }
 
@@ -311,7 +311,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
      * @throws ClassCastException if the value of the given key is not of type T
      */
     public <T> T get(final Object key, final T defaultValue) {
-        notNull("defaultValue", defaultValue);
+        Utils.Assertions.notNull("defaultValue", defaultValue);
         Object value = get(key);
         return value == null ? defaultValue : (T) value;
     }

@@ -92,17 +92,16 @@ public abstract class Database {
      * @throws SQLException           When something goes wrong
      * @throws ClassNotFoundException When class is not found
      */
-    public void createTable(String tableName, ObjectMap<String, ObjectMap<String, String>> objectMap) throws SQLException, ClassNotFoundException {
+    public void createTable(String tableName, ObjectMap<String, ObjectMap.Pair<String, String>> objectMap) throws SQLException, ClassNotFoundException {
         StringBuilder stringBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + tableName + "` (\n ");
         ObjectMap<String, String> tableMap = ObjectMap.newHashObjectMap();
-        for (Map.Entry<String, ObjectMap<String, String>> entry : objectMap.entrySet()) {
-            Iterator<Map.Entry<String, String>> iterator = entry.getValue().entrySet().iterator();
-            while (iterator.hasNext()) {
-                stringBuilder.append("`").append(entry.getKey()).append("` ").append(iterator.next().getKey()).append(" DEFAULT ").append(iterator.next().getValue());
-                if (iterator.hasNext()) {
-                    stringBuilder.append(",\n");
-                }
-                tableMap.append(entry.getKey(), iterator.next().getKey() + " DEFAULT " + iterator.next().getValue());
+        Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> iterator = objectMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, ObjectMap.Pair<String, String>> entry = iterator.next();
+            stringBuilder.append("`").append(entry.getKey()).append("` ").append(entry.getValue().getKey()).append(" DEFAULT ").append(entry.getValue().getValue());
+            tableMap.append(entry.getKey(), entry.getValue().getKey() + " DEFAULT " + entry.getValue().getValue());
+            if (iterator.hasNext()) {
+                stringBuilder.append(",\n");
             }
         }
         stringBuilder.append("\n)");

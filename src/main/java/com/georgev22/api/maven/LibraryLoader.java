@@ -25,7 +25,7 @@
 
 package com.georgev22.api.maven;
 
-import com.google.common.base.Suppliers;
+import com.georgev22.api.utilities.URLClassLoaderAccess;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -39,28 +39,30 @@ import java.util.logging.Logger;
 
 /**
  * Resolves {@link MavenLibrary} annotations for a class, and loads the dependency
- * into the classloader.
- *
- * @deprecated 1.16 and up provides a new way to load dependencies without shading to the plugin jar.
- * for versions bellow 1.16 LibraryLoader will be used.
+ * into the URLClassLoader.
  */
 @NotNull
-@Deprecated
 public final class LibraryLoader {
 
     private final Class<?> clazz;
-
+    private static URLClassLoaderAccess urlClassLoaderAccess;
     private final Logger logger;
 
     private final File dataFolder;
 
-    public LibraryLoader(Class<?> clazz, File dataFolder) {
+    public <T> LibraryLoader(Class<T> clazz, URLClassLoader classLoader, File dataFolder) {
         this.clazz = clazz;
+        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
         this.logger = Logger.getLogger(clazz.getName());
         this.dataFolder = dataFolder;
     }
 
-    //private final Supplier<URLClassLoaderAccess> URL_INJECTOR = Suppliers.memoize(() -> URLClassLoaderAccess.create((URLClassLoader) clazz.getClassLoader()));
+    public <T> LibraryLoader(Class<T> clazz, File dataFolder) {
+        this.clazz = clazz;
+        urlClassLoaderAccess = URLClassLoaderAccess.create(clazz.getClassLoader());
+        this.logger = Logger.getLogger(clazz.getName());
+        this.dataFolder = dataFolder;
+    }
 
     /**
      * Resolves all {@link MavenLibrary} annotations on the given object.
@@ -112,9 +114,9 @@ public final class LibraryLoader {
             String version = fileandversion[1];
             if (d.artifactId().equalsIgnoreCase(dependencyName)) {
                 if (!d.version().equalsIgnoreCase(version)) {
-                    logger.info("[" + clazz.getName() + "] An old version of the dependency exists. Attempting to delete...");
+                    logger.info("An old version of the dependency exists. Attempting to delete...");
                     if (file.delete()) {
-                        logger.info("[" + clazz.getName() + "] Dependency '" + dependencyName + "' with version '" + version + "' has been deleted!\nA new version will be downloaded.");
+                        logger.info("Dependency '" + dependencyName + "' with version '" + version + "' has been deleted!\nA new version will be downloaded.");
                     }
                 }
             }
@@ -126,7 +128,7 @@ public final class LibraryLoader {
         if (!saveLocation.exists()) {
 
             try {
-                logger.info("[" + clazz.getName() + "] Dependency '" + name + "' is not already in the libraries folder. Attempting to download...");
+                logger.info("Dependency '" + name + "' is not already in the libraries folder. Attempting to download...");
                 URL url = d.url();
 
                 try (InputStream is = url.openStream()) {
@@ -137,28 +139,32 @@ public final class LibraryLoader {
                 e.printStackTrace();
             }
 
-            logger.info("[" + clazz.getName() + "] Dependency '" + name + "' successfully downloaded.");
+            logger.info("Dependency '" + name + "' successfully downloaded.");
         }
 
         if (!saveLocation.exists()) {
-            throw new RuntimeException("[" + clazz.getName() + "] Unable to download dependency: " + d);
+            throw new RuntimeException("Unable to download dependency: " + d);
         }
 
         try {
-            Suppliers.memoize(() -> URLClassLoaderAccess.create((URLClassLoader) clazz.getClassLoader())).get().addURL(saveLocation.toURI().toURL());
+            urlClassLoaderAccess.addURL(saveLocation.toURI().toURL());
         } catch (Exception e) {
-            throw new RuntimeException("[" + clazz.getName() + "] Unable to load dependency: " + saveLocation, e);
+            throw new RuntimeException("Unable to load dependency: " + saveLocation, e);
         }
 
-        logger.info("[" + clazz.getName() + "] Loaded dependency '" + name + "' successfully.");
+        logger.info("Loaded dependency '" + name + "' successfully.");
     }
 
     private File getLibFolder() {
         File libs = new File(dataFolder, "libraries");
         if (libs.mkdirs()) {
-            logger.info("[" + clazz.getName() + "] libraries folder created!");
+            logger.info("libraries folder created!");
         }
         return libs;
+    }
+
+    public static URLClassLoaderAccess getURLClassLoaderAccess() {
+        return urlClassLoaderAccess;
     }
 
     @NotNull

@@ -5,6 +5,8 @@ import com.georgev22.api.maps.ObjectMap;
 import java.sql.*;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 public abstract class Database {
 
@@ -14,7 +16,7 @@ public abstract class Database {
         this.connection = null;
     }
 
-    public abstract Connection openConnection() throws SQLException, ClassNotFoundException;
+    public abstract Connection openConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException;
 
     public boolean isConnectionValid() {
         return connection != null;
@@ -36,7 +38,7 @@ public abstract class Database {
         return true;
     }
 
-    public ResultSet queryPreparedSQL(String query) throws SQLException, ClassNotFoundException {
+    public ResultSet queryPreparedSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (!isClosed()) {
             openConnection();
         }
@@ -44,7 +46,7 @@ public abstract class Database {
         return connection.prepareStatement(query).executeQuery();
     }
 
-    public int updatePreparedSQL(String query) throws SQLException, ClassNotFoundException {
+    public int updatePreparedSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (!isClosed()) {
             openConnection();
         }
@@ -52,7 +54,7 @@ public abstract class Database {
         return connection.prepareStatement(query).executeUpdate();
     }
 
-    public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException {
+    public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (!isClosed()) {
             openConnection();
         }
@@ -60,7 +62,7 @@ public abstract class Database {
         return connection.createStatement().executeQuery(query);
     }
 
-    public int updateSQL(String query) throws SQLException, ClassNotFoundException {
+    public int updateSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         if (!isClosed()) {
             openConnection();
         }
@@ -92,7 +94,7 @@ public abstract class Database {
      * @throws SQLException           When something goes wrong
      * @throws ClassNotFoundException When class is not found
      */
-    public void createTable(String tableName, ObjectMap<String, ObjectMap.Pair<String, String>> objectMap) throws SQLException, ClassNotFoundException {
+    public void createTable(String tableName, ObjectMap<String, ObjectMap.Pair<String, String>> objectMap) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         StringBuilder stringBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + tableName + "` (\n ");
         ObjectMap<String, String> tableMap = ObjectMap.newHashObjectMap();
         Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> iterator = objectMap.entrySet().iterator();
@@ -114,5 +116,42 @@ public abstract class Database {
                 exception.printStackTrace();
             }
         });
+    }
+
+    public static class DriverShim implements Driver {
+        private final Driver driver;
+
+        public DriverShim(Driver d) {
+            this.driver = d;
+        }
+
+        public boolean acceptsURL(String u) throws SQLException {
+            return this.driver.acceptsURL(u);
+        }
+
+        public Connection connect(String u, Properties p) throws SQLException {
+            return this.driver.connect(u, p);
+        }
+
+        public int getMajorVersion() {
+            return this.driver.getMajorVersion();
+        }
+
+        public int getMinorVersion() {
+            return this.driver.getMinorVersion();
+        }
+
+        public DriverPropertyInfo[] getPropertyInfo(String u, Properties p) throws SQLException {
+            return this.driver.getPropertyInfo(u, p);
+        }
+
+        public boolean jdbcCompliant() {
+            return this.driver.jdbcCompliant();
+        }
+
+        @Override
+        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            return this.driver.getParentLogger();
+        }
     }
 }

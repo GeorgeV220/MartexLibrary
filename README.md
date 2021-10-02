@@ -4,10 +4,10 @@
 
 ### Maven
 
-You can have your project depend on API as a dependency through the
-following code snippets:
+You can have your project depend on API as a dependency through the following code snippets:
 
 ```xml
+
 <project>
     <repositories>
         <repository>
@@ -15,16 +15,28 @@ following code snippets:
             <url>https://artifactory.georgev22.com/artifactory/georgev22/</url>
         </repository>
     </repositories>
-  
+
     <dependencies>
         <dependency>
             <groupId>com.georgev22</groupId>
             <artifactId>api</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
+```
+
+Is best to relocate api classes to your own package. Add this code snippet to your shade plugin configuration section:
+
+```xml
+
+<relocations>
+    <relocation>
+        <pattern>com.georgev22.api</pattern>
+        <shadedPattern>your_package.api</shadedPattern>
+    </relocation>
+</relocations>
 ```
 
 ### Gradle
@@ -39,6 +51,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.georgev22:api:1.7"
+    compileOnly "com.georgev22:api:1.8"
 }
 ```

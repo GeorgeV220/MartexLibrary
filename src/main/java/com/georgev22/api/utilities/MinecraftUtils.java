@@ -1,5 +1,7 @@
 package com.georgev22.api.utilities;
 
+import com.georgev22.api.colors.Color;
+import com.georgev22.api.maps.ObjectMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -336,6 +338,19 @@ public class MinecraftUtils {
      */
     public static String getDisallowLoginMessage() {
         return disableJoinMessage;
+    }
+
+    public static DiscordWebHook.EmbedObject buildFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+        return new DiscordWebHook.EmbedObject().setTitle(Utils.placeHolder(fileConfiguration.getString(path + ".title"), placeholders, true))
+                .setDescription(Utils.placeHolder(fileConfiguration.getString(path + ".description"), placeholders, true))
+                .setColor(Color.from(fileConfiguration.getString(path + ".color")))
+                .setThumbnail(fileConfiguration.getString(path + ".thumbnail url"))
+                .setFooter(Utils.placeHolder(fileConfiguration.getString(path + ".footer.message"), placeholders, true),
+                        fileConfiguration.getString(path + ".footer.icon url"))
+                .setImage(fileConfiguration.getString(path + ".image url"))
+                .setAuthor(fileConfiguration.getString(path + ".author.name"), fileConfiguration.getString(path + ".author.url"),
+                        fileConfiguration.getString(path + ".icon url"))
+                .setUrl(fileConfiguration.getString(path + ".url"));
     }
 
 

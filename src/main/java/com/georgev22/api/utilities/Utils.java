@@ -1,22 +1,17 @@
 package com.georgev22.api.utilities;
 
 import com.georgev22.api.maps.ObjectMap;
+import com.georgev22.api.maven.LibraryLoader;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.gson.Gson;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -30,10 +25,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public final class Utils {
-
-    private Utils() {
-        throw new AssertionError();
-    }
 
     public static String convertSeconds(long input, String secondInput, String secondsInput, String minuteInput,
                                         String minutesInput, String hourInput, String hoursInput, String dayInput, String daysInput,
@@ -114,23 +105,9 @@ public final class Utils {
         return Ints.tryParse(StringUtils.deleteWhitespace(input)) != null;
     }
 
-    /* ----------------------------------------------------------------- */
-
-    //
-
-    /* ----------------------------------------------------------------- */
     public static boolean isList(final Object obj) {
         return obj instanceof List;
     }
-
-    /* ----------------------------------------------------------------- */
-
-    //
-
-    /* ----------------------------------------------------------------- */
-
-
-    /* ----------------------------------------------------------------- */
 
     public static String placeHolder(String str, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(str, "The string can't be null!");
@@ -203,18 +180,6 @@ public final class Utils {
                 : coll.stream().map(str -> placeHolder(str, map, ignoreCase)).collect(Collectors.toList());
     }
 
-    /* ----------------------------------------------------------------- */
-
-    //
-
-    /* ----------------------------------------------------------------- */
-
-    /* ----------------------------------------------------------------- */
-
-    //
-
-    /* ----------------------------------------------------------------- */
-
     private static String formatNumber(Locale lang, double input) {
         Validate.notNull(lang);
         return NumberFormat.getInstance(lang).format(input);
@@ -254,7 +219,7 @@ public final class Utils {
         return result;
     }
 
-    public static String getArgs(String[] args, int num) {
+    public static String getArgumentsToString(String[] args, int num) {
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {
             sb.append(args[i]).append(" ");
@@ -262,13 +227,11 @@ public final class Utils {
         return sb.toString().trim();
     }
 
-    public static String[] getArguments(String[] args, int num) {
-
+    public static String[] getArgumentsToArray(String[] args, int num) {
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {
             sb.append(args[i]).append(" ");
         }
-
         return sb.toString().trim().split(" ");
     }
 
@@ -278,15 +241,6 @@ public final class Utils {
         return list.toArray(new String[0]);
     }
 
-    public static Object getPrivateField(Object object, String field) throws NoSuchFieldException, IllegalAccessException {
-        Class<?> clazz = object.getClass();
-        Field objectField = clazz.getDeclaredField(field);
-        objectField.setAccessible(true);
-        Object result = objectField.get(object);
-        objectField.setAccessible(false);
-        return result;
-    }
-
     /**
      * Serialize Object to string using google Gson
      *
@@ -294,13 +248,15 @@ public final class Utils {
      * @return string output of the serialized object
      * @since v5.0.1
      */
-    public static String serialize(Object object) {
+    public static <T> String serialize(Object object) {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
         GZIPOutputStream gzipOut = null;
         try {
-            gzipOut = new GZIPOutputStream(new Base64OutputStream(byteaOut));
-            gzipOut.write(new Gson().toJson(object).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
+            Class<T> Base64OutputStream = (Class<T>) Class.forName("org.apache.commons.codec.binary.Base64OutputStream", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
+            Class<T> Gson = (Class<T>) Class.forName("com.google.gson.Gson", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
+            gzipOut = new GZIPOutputStream((OutputStream) Base64OutputStream.getDeclaredConstructor(OutputStream.class).newInstance(byteaOut));
+            gzipOut.write(Gson.getDeclaredMethod("toJson", Object.class).invoke(Gson.newInstance(), object).toString().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         } finally {
             if (gzipOut != null) try {
@@ -321,15 +277,15 @@ public final class Utils {
      * @return the deserialized object
      * @since v5.0.1
      */
-    public static <T> T deserialize(String string, Type type) {
+    public static <T> T deserialize(String string, Type type) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
         GZIPInputStream gzipIn = null;
         try {
-            gzipIn = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))));
+            gzipIn = new GZIPInputStream((InputStream) Class.forName("org.apache.commons.codec.binary.Base64InputStream", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader()).getDeclaredConstructor(InputStream.class).newInstance(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))));
             for (int data; (data = gzipIn.read()) > -1; ) {
                 byteaOut.write(data);
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         } finally {
             if (gzipIn != null) try {
@@ -338,7 +294,9 @@ public final class Utils {
                 exception.printStackTrace();
             }
         }
-        return new Gson().fromJson(byteaOut.toString(), type);
+
+        Class<T> clazz = (Class<T>) Class.forName("com.google.gson.Gson", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
+        return (T) clazz.getMethod("fromJson", String.class, Type.class).invoke(clazz.newInstance(), byteaOut.toString(), type);
     }
 
     //====================
@@ -369,9 +327,9 @@ public final class Utils {
      * @param objectMap The {@link ObjectMap} to convert.
      * @return a String List with the {@link ObjectMap} contents.
      */
-    public static List<String> mapToStringList(ObjectMap<?, ?> objectMap) {
+    public static <K, V> List<String> mapToStringList(ObjectMap<K, V> objectMap) {
         List<String> stringList = Lists.newArrayList();
-        for (Entry<?, ?> entry : objectMap.entrySet()) {
+        for (Entry<K, V> entry : objectMap.entrySet()) {
             stringList.add(entry.getKey() + "=" + entry.getValue());
         }
         return stringList;
@@ -382,11 +340,13 @@ public final class Utils {
      *
      * @param stringList the String List to convert.
      * @param clazz      The class type of the value.
-     * @param <T>        Type of the key/value.
+     * @param <T>        The class type.
+     * @param <K>        Type of the key.
+     * @param <V>        Type of the value.
      * @return a {@link ObjectMap} with the String List contents.
      */
-    public static <T> @NotNull ObjectMap<T, T> stringListToObjectMap(List<String> stringList, final Class<T> clazz) {
-        ObjectMap<T, T> objectMap = ObjectMap.newHashObjectMap();
+    public static <K, V, T> @NotNull ObjectMap<K, V> stringListToObjectMap(List<String> stringList, final Class<T> clazz) {
+        ObjectMap<K, V> objectMap = ObjectMap.newHashObjectMap();
 
         if (stringList == null || stringList.isEmpty()) {
             return objectMap;
@@ -405,14 +365,14 @@ public final class Utils {
 
                 if (method != null) {
                     try {
-                        objectMap.append((T) entry[0], (T) method.invoke(null, entry[1]));
+                        objectMap.append((K) entry[0], (V) method.invoke(null, entry[1]));
                     } catch (InvocationTargetException | IllegalAccessException ex) {
                         ex.printStackTrace();
                         System.out.println("Failure: " + entry[1] + " is not of type " + clazz.getName());
                     }
                 }
             } else {
-                objectMap.append((T) entry[0], (T) entry[1]);
+                objectMap.append((K) entry[0], (V) entry[1]);
             }
 
         }

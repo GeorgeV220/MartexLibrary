@@ -23,7 +23,9 @@
  *  SOFTWARE.
  */
 
-package com.georgev22.api.maven;
+package com.georgev22.api.utilities;
+
+import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -43,11 +45,25 @@ public abstract class URLClassLoaderAccess {
      * @param classLoader the class loader
      * @return the access object
      */
-    static URLClassLoaderAccess create(URLClassLoader classLoader) {
-        if (Reflection.isSupported()) {
-            return new Reflection(classLoader);
-        } else if (Unsafe.isSupported()) {
-            return new Unsafe(classLoader);
+    public static URLClassLoaderAccess create(ClassLoader classLoader) {
+        if (classLoader instanceof URLClassLoader) {
+            return URLClassLoaderAccess.create((URLClassLoader) classLoader);
+        } else {
+            return URLClassLoaderAccess.create(URLClassLoader.newInstance(new URL[0], classLoader));
+        }
+    }
+
+    /**
+     * Creates a {@link URLClassLoaderAccess} for the given class loader.
+     *
+     * @param classLoader the class loader
+     * @return the access object
+     */
+    private static URLClassLoaderAccess create(URLClassLoader classLoader) {
+        if (ReflectionClassLoader.isSupported()) {
+            return new ReflectionClassLoader(classLoader);
+        } else if (UnsafeClassLoader.isSupported()) {
+            return new UnsafeClassLoader(classLoader);
         } else {
             return Noop.INSTANCE;
         }
@@ -59,6 +75,9 @@ public abstract class URLClassLoaderAccess {
         this.classLoader = classLoader;
     }
 
+    public URLClassLoader getClassLoader() {
+        return classLoader;
+    }
 
     /**
      * Adds the given URL to the class loader.
@@ -70,7 +89,7 @@ public abstract class URLClassLoaderAccess {
     /**
      * Accesses using reflection, not supported on Java 9+.
      */
-    private static class Reflection extends URLClassLoaderAccess {
+    private static class ReflectionClassLoader extends URLClassLoaderAccess {
         private static final Method ADD_URL_METHOD;
 
         static {
@@ -88,7 +107,7 @@ public abstract class URLClassLoaderAccess {
             return ADD_URL_METHOD != null;
         }
 
-        Reflection(URLClassLoader classLoader) {
+        ReflectionClassLoader(URLClassLoader classLoader) {
             super(classLoader);
         }
 
@@ -107,15 +126,15 @@ public abstract class URLClassLoaderAccess {
      *
      * @author Vaishnav Anil (https://github.com/slimjar/slimjar)
      */
-    private static class Unsafe extends URLClassLoaderAccess {
-        private static final sun.misc.Unsafe UNSAFE;
+    private static class UnsafeClassLoader extends URLClassLoaderAccess {
+        private static final Unsafe UNSAFE;
 
         static {
-            sun.misc.Unsafe unsafe;
+            Unsafe unsafe;
             try {
-                Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+                Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
                 unsafeField.setAccessible(true);
-                unsafe = (sun.misc.Unsafe) unsafeField.get(null);
+                unsafe = (Unsafe) unsafeField.get(null);
             } catch (Throwable t) {
                 unsafe = null;
             }
@@ -129,7 +148,7 @@ public abstract class URLClassLoaderAccess {
         private final Collection<URL> unopenedURLs;
         private final Collection<URL> pathURLs;
 
-        Unsafe(URLClassLoader classLoader) {
+        UnsafeClassLoader(URLClassLoader classLoader) {
             super(classLoader);
 
             Collection<URL> unopenedURLs;

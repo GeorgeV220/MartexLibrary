@@ -1,11 +1,13 @@
 package com.georgev22.api.utilities;
 
 import com.georgev22.api.maps.ObjectMap;
-import com.georgev22.api.maven.LibraryLoader;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.gson.Gson;
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
@@ -252,11 +254,9 @@ public final class Utils {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
         GZIPOutputStream gzipOut = null;
         try {
-            Class<T> Base64OutputStream = (Class<T>) Class.forName("org.apache.commons.codec.binary.Base64OutputStream", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
-            Class<T> Gson = (Class<T>) Class.forName("com.google.gson.Gson", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
-            gzipOut = new GZIPOutputStream((OutputStream) Base64OutputStream.getDeclaredConstructor(OutputStream.class).newInstance(byteaOut));
-            gzipOut.write(Gson.getDeclaredMethod("toJson", Object.class).invoke(Gson.newInstance(), object).toString().getBytes(StandardCharsets.UTF_8));
-        } catch (IOException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            gzipOut = new GZIPOutputStream(new Base64OutputStream(byteaOut));
+            gzipOut.write(new Gson().toJson(object).getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (gzipOut != null) try {
@@ -277,15 +277,15 @@ public final class Utils {
      * @return the deserialized object
      * @since v5.0.1
      */
-    public static <T> T deserialize(String string, Type type) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    public static <T> T deserialize(String string, Type type) {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
         GZIPInputStream gzipIn = null;
         try {
-            gzipIn = new GZIPInputStream((InputStream) Class.forName("org.apache.commons.codec.binary.Base64InputStream", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader()).getDeclaredConstructor(InputStream.class).newInstance(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))));
+            gzipIn = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))));
             for (int data; (data = gzipIn.read()) > -1; ) {
                 byteaOut.write(data);
             }
-        } catch (IOException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (gzipIn != null) try {
@@ -295,8 +295,7 @@ public final class Utils {
             }
         }
 
-        Class<T> clazz = (Class<T>) Class.forName("com.google.gson.Gson", true, LibraryLoader.getURLClassLoaderAccess() == null ? Utils.class.getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader());
-        return (T) clazz.getMethod("fromJson", String.class, Type.class).invoke(clazz.newInstance(), byteaOut.toString(), type);
+        return new Gson().fromJson(byteaOut.toString(), type);
     }
 
     //====================

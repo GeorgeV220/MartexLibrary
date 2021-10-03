@@ -1,10 +1,8 @@
 package com.georgev22.api.database.sql.mysql;
 
 import com.georgev22.api.database.Database;
-import com.georgev22.api.maven.LibraryLoader;
 
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -27,13 +25,12 @@ public class MySQL extends Database {
     }
 
     @Override
-    public Connection openConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public Connection openConnection() throws SQLException, ClassNotFoundException {
         if (isConnectionValid()) {
             if (!isClosed())
                 return connection;
         }
-        Driver d = (Driver) Class.forName("com.mysql.jdbc.Driver", true, LibraryLoader.getURLClassLoaderAccess() == null ? this.getClass().getClassLoader() : LibraryLoader.getURLClassLoaderAccess().getClassLoader()).newInstance();
-        DriverManager.registerDriver(new DriverShim(d));
+        Class.forName("com.mysql.jdbc.Driver");
         final Properties prop = new Properties();
         prop.setProperty("user", user);
         prop.setProperty("password", password);

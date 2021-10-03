@@ -29,6 +29,7 @@ import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -36,6 +37,7 @@ import java.util.Collection;
 
 /**
  * Provides access to {@link URLClassLoader}#addURL.
+ * Edited by GeorgeV22 (https://github.com/GeorgeV220) to work with {@link ClassLoader#getSystemClassLoader()}
  */
 public abstract class URLClassLoaderAccess {
 
@@ -48,8 +50,12 @@ public abstract class URLClassLoaderAccess {
     public static URLClassLoaderAccess create(ClassLoader classLoader) {
         if (classLoader instanceof URLClassLoader) {
             return URLClassLoaderAccess.create((URLClassLoader) classLoader);
+        } else if (ReflectionClassLoader.isSupported()) {
+            return new ReflectionClassLoader(classLoader);
+        } else if (UnsafeClassLoader.isSupported()) {
+            return new UnsafeClassLoader(classLoader);
         } else {
-            return URLClassLoaderAccess.create(URLClassLoader.newInstance(new URL[0], classLoader));
+            return Noop.INSTANCE;
         }
     }
 
@@ -69,13 +75,13 @@ public abstract class URLClassLoaderAccess {
         }
     }
 
-    private final URLClassLoader classLoader;
+    private final ClassLoader classLoader;
 
-    protected URLClassLoaderAccess(URLClassLoader classLoader) {
+    protected URLClassLoaderAccess(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
-    public URLClassLoader getClassLoader() {
+    public ClassLoader getClassLoader() {
         return classLoader;
     }
 
@@ -90,34 +96,65 @@ public abstract class URLClassLoaderAccess {
      * Accesses using reflection, not supported on Java 9+.
      */
     private static class ReflectionClassLoader extends URLClassLoaderAccess {
-        private static final Method ADD_URL_METHOD;
+        private Method ADD_URL_METHOD;
+        private Object UCP;
+        private Collection<URL> unopenedURLsCollection;
+        private Collection<URL> pathURLsCollection;
 
-        static {
+        private static boolean isSupported() {
+            try {
+                Object object = fetchField(ClassLoader.getSystemClassLoader().getClass().getSuperclass(), ClassLoader.getSystemClassLoader(), "ucp");
+                return true;
+            } catch (NoSuchFieldException | IllegalAccessException | InaccessibleObjectException e) {
+                return false;
+            }
+        }
+
+        ReflectionClassLoader(URLClassLoader classLoader) {
+            super(classLoader);
             Method addUrlMethod;
             try {
                 addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                 addUrlMethod.setAccessible(true);
-            } catch (Exception e) {
+            } catch (Exception e2) {
                 addUrlMethod = null;
             }
             ADD_URL_METHOD = addUrlMethod;
         }
 
-        private static boolean isSupported() {
-            return ADD_URL_METHOD != null;
-        }
-
-        ReflectionClassLoader(URLClassLoader classLoader) {
+        ReflectionClassLoader(ClassLoader classLoader) {
             super(classLoader);
+            Collection<URL> unopenedURLs;
+            Collection<URL> pathURLs;
+            Object ucp;
+            try {
+                ucp = fetchField(ClassLoader.getSystemClassLoader().getClass().getSuperclass(), ClassLoader.getSystemClassLoader(), "ucp");
+                unopenedURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "unopenedUrls");
+                pathURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "path");
+                unopenedURLsCollection = unopenedURLs;
+                pathURLsCollection = pathURLs;
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                unopenedURLsCollection = null;
+                pathURLsCollection = null;
+                e.printStackTrace();
+            }
+
         }
 
         @Override
         public void addURL(@Nonnull URL url) {
             try {
                 ADD_URL_METHOD.invoke(super.classLoader, url);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                unopenedURLsCollection.add(url);
+                pathURLsCollection.add(url);
             }
+        }
+
+        private static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException {
+            Field field = clazz.getDeclaredField(name);
+            field.setAccessible(true);
+            return field.get(object);
         }
     }
 
@@ -158,6 +195,23 @@ public abstract class URLClassLoaderAccess {
                 unopenedURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "unopenedUrls");
                 pathURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "path");
             } catch (Throwable e) {
+                unopenedURLs = null;
+                pathURLs = null;
+            }
+            this.unopenedURLs = unopenedURLs;
+            this.pathURLs = pathURLs;
+        }
+
+        UnsafeClassLoader(ClassLoader classLoader) {
+            super(classLoader);
+            Collection<URL> unopenedURLs;
+            Collection<URL> pathURLs;
+            try {
+                Object ucp = fetchField(ClassLoader.getSystemClassLoader().getClass().getSuperclass(), ClassLoader.getSystemClassLoader(), "ucp");
+                unopenedURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "unopenedUrls");
+                pathURLs = (Collection<URL>) fetchField(ucp.getClass(), ucp, "path");
+            } catch (Throwable e) {
+                e.printStackTrace();
                 unopenedURLs = null;
                 pathURLs = null;
             }

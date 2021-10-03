@@ -16,7 +16,7 @@ public abstract class Database {
         this.connection = null;
     }
 
-    public abstract Connection openConnection() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException;
+    public abstract Connection openConnection() throws SQLException, ClassNotFoundException;
 
     public boolean isConnectionValid() {
         return connection != null;
@@ -38,7 +38,7 @@ public abstract class Database {
         return true;
     }
 
-    public ResultSet queryPreparedSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public ResultSet queryPreparedSQL(String query) throws SQLException, ClassNotFoundException {
         if (!isClosed()) {
             openConnection();
         }
@@ -46,7 +46,7 @@ public abstract class Database {
         return connection.prepareStatement(query).executeQuery();
     }
 
-    public int updatePreparedSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public int updatePreparedSQL(String query) throws SQLException, ClassNotFoundException {
         if (!isClosed()) {
             openConnection();
         }
@@ -54,7 +54,7 @@ public abstract class Database {
         return connection.prepareStatement(query).executeUpdate();
     }
 
-    public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException {
         if (!isClosed()) {
             openConnection();
         }
@@ -62,7 +62,7 @@ public abstract class Database {
         return connection.createStatement().executeQuery(query);
     }
 
-    public int updateSQL(String query) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public int updateSQL(String query) throws SQLException, ClassNotFoundException {
         if (!isClosed()) {
             openConnection();
         }
@@ -94,7 +94,7 @@ public abstract class Database {
      * @throws SQLException           When something goes wrong
      * @throws ClassNotFoundException When class is not found
      */
-    public void createTable(String tableName, ObjectMap<String, ObjectMap.Pair<String, String>> objectMap) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public void createTable(String tableName, ObjectMap<String, ObjectMap.Pair<String, String>> objectMap) throws SQLException, ClassNotFoundException {
         StringBuilder stringBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + tableName + "` (\n ");
         ObjectMap<String, String> tableMap = ObjectMap.newHashObjectMap();
         Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> iterator = objectMap.entrySet().iterator();

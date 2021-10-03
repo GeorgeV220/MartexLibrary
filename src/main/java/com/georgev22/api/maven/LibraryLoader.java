@@ -27,8 +27,10 @@ package com.georgev22.api.maven;
 
 import com.georgev22.api.utilities.URLClassLoaderAccess;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,18 +52,42 @@ public final class LibraryLoader {
 
     private final File dataFolder;
 
-    public <T> LibraryLoader(Class<T> clazz, URLClassLoader classLoader, File dataFolder) {
+    public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder, @NotNull Logger logger) {
+        this.clazz = clazz;
+        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
+        this.logger = logger;
+        this.dataFolder = dataFolder;
+    }
+
+    public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
         urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
         this.logger = Logger.getLogger(clazz.getName());
         this.dataFolder = dataFolder;
     }
 
-    public <T> LibraryLoader(Class<T> clazz, File dataFolder) {
+    public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull ClassLoader classLoader, @NotNull File dataFolder) {
+        this.clazz = clazz;
+        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
+        this.logger = Logger.getLogger(clazz.getName());
+        this.dataFolder = dataFolder;
+    }
+
+    public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull File dataFolder) {
         this.clazz = clazz;
         urlClassLoaderAccess = URLClassLoaderAccess.create(clazz.getClassLoader());
         this.logger = Logger.getLogger(clazz.getName());
         this.dataFolder = dataFolder;
+    }
+
+    /**
+     * Resolves all {@link MavenLibrary} annotations on the Class.
+     */
+    public void loadAll() {
+        if (clazz == null) {
+            throw new RuntimeException("Class is null!");
+        }
+        loadAll(clazz);
     }
 
     /**
@@ -74,23 +100,11 @@ public final class LibraryLoader {
     }
 
     /**
-     * Resolves all {@link MavenLibrary} annotations on the Class.
-     *
-     * @see #LibraryLoader(Class, File)
-     */
-    public void loadAll() {
-        if (clazz == null) {
-            throw new RuntimeException("Class is null!");
-        }
-        loadAll(clazz);
-    }
-
-    /**
      * Resolves all {@link MavenLibrary} annotations on the given class.
      *
      * @param clazz the class to load libraries for.
      */
-    public void loadAll(Class<?> clazz) {
+    public <T> void loadAll(@NotNull Class<T> clazz) {
         MavenLibrary[] libs = clazz.getDeclaredAnnotationsByType(MavenLibrary.class);
         if (libs == null) {
             return;
@@ -105,8 +119,8 @@ public final class LibraryLoader {
         load(new Dependency(groupId, artifactId, version, repoUrl));
     }
 
-    public void load(Dependency d) {
-        logger.info(String.format("[" + clazz.getName() + "] Loading dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
+    private void load(@NotNull Dependency d) {
+        logger.info(String.format("Loading dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
 
         for (File file : getLibFolder().listFiles((dir, name) -> name.endsWith(".jar"))) {
             String[] fileandversion = file.getName().replace(".jar", "").split("_");
@@ -114,7 +128,7 @@ public final class LibraryLoader {
             String version = fileandversion[1];
             if (d.artifactId().equalsIgnoreCase(dependencyName)) {
                 if (!d.version().equalsIgnoreCase(version)) {
-                    logger.info("An old version of the dependency exists. Attempting to delete...");
+                    logger.info("A different version of the dependency exists. Attempting to delete...");
                     if (file.delete()) {
                         logger.info("Dependency '" + dependencyName + "' with version '" + version + "' has been deleted!\nA new version will be downloaded.");
                     }
@@ -135,7 +149,7 @@ public final class LibraryLoader {
                     Files.copy(is, saveLocation.toPath());
                 }
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -148,13 +162,14 @@ public final class LibraryLoader {
 
         try {
             urlClassLoaderAccess.addURL(saveLocation.toURI().toURL());
-        } catch (Exception e) {
+        } catch (MalformedURLException e) {
             throw new RuntimeException("Unable to load dependency: " + saveLocation, e);
         }
 
         logger.info("Loaded dependency '" + name + "' successfully.");
     }
 
+    @NotNull
     private File getLibFolder() {
         File libs = new File(dataFolder, "libraries");
         if (libs.mkdirs()) {
@@ -163,6 +178,7 @@ public final class LibraryLoader {
         return libs;
     }
 
+    @Nullable
     public static URLClassLoaderAccess getURLClassLoaderAccess() {
         return urlClassLoaderAccess;
     }

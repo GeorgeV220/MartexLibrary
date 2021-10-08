@@ -18,9 +18,9 @@
 
     <distributionManagement>
         <repository>
-            <id>central</id>
-            <name>georgev22</name>
-            <url>https://artifactory.georgev22.com/artifactory/georgev22</url>
+            <id>github</id>
+            <name>GitHub GeorgeV220 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/GeorgeV220/API</url>
         </repository>
     </distributionManagement>
 

@@ -97,13 +97,12 @@ public abstract class URLClassLoaderAccess {
      */
     private static class ReflectionClassLoader extends URLClassLoaderAccess {
         private Method ADD_URL_METHOD;
-        private Object UCP;
         private Collection<URL> unopenedURLsCollection;
         private Collection<URL> pathURLsCollection;
 
         private static boolean isSupported() {
             try {
-                Object object = fetchField(ClassLoader.getSystemClassLoader().getClass().getSuperclass(), ClassLoader.getSystemClassLoader(), "ucp");
+                fetchField(ClassLoader.getSystemClassLoader().getClass().getSuperclass(), ClassLoader.getSystemClassLoader(), "ucp");
                 return true;
             } catch (NoSuchFieldException | IllegalAccessException | InaccessibleObjectException e) {
                 return false;

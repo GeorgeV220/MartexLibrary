@@ -9,13 +9,6 @@ You can have your project depend on API as a dependency through the following co
 ```xml
 
 <project>
-    <repositories>
-        <repository>
-            <id>georgev22</id>
-            <url>https://artifactory.georgev22.com/artifactory/georgev22/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.georgev22</groupId>

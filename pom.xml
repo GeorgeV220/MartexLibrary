@@ -18,9 +18,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub GeorgeV220 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/GeorgeV220/API</url>
+            <id>central</id>
+            <name>Releases</name>
+            <url>https://maven.georgev22.com/repository/georgev22/</url>
         </repository>
     </distributionManagement>
 

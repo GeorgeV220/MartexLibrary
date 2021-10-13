@@ -9,6 +9,13 @@ You can have your project depend on API as a dependency through the following co
 ```xml
 
 <project>
+    <repositories>
+        <repository>
+            <id>georgev22</id>
+            <url>https://maven.georgev22.com/repository/georgev22/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.georgev22</groupId>
@@ -39,7 +46,7 @@ You can include API into your gradle project using the following lines:
 ```groovy
 repositories {
     maven {
-        url 'https://artifactory.georgev22.com/artifactory/georgev22/'
+        url 'https://maven.georgev22.com/repository/georgev22/'
     }
 }
 

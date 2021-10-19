@@ -128,6 +128,8 @@ public final class CFG {
         CFG other = (CFG) obj;
         if (fileName == null) {
             return other.fileName == null;
-        } else return fileName.equals(other.fileName);
+        } else {
+            return fileName.equals(other.fileName);
+        }
     }
 }

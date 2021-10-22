@@ -38,8 +38,10 @@ public abstract class PagedInventoryHandler {
         public boolean equals(Object obj) {
             if (obj == this)
                 return true;
-            if (!(obj instanceof Handler handler))
+            if (!(obj instanceof Handler))
                 return false;
+
+            Handler handler = (Handler) obj;
 
             return iPagedInventory.equals(handler.iPagedInventory)
                     && pageModifier.equals(handler.pageModifier)

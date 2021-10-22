@@ -7,7 +7,17 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
-public record CustomItemInventory(String inventoryName, ObjectMap<Integer, ItemStack> objectMap, int inventorySize) {
+public class CustomItemInventory {
+
+    private final String inventoryName;
+    private final ObjectMap<Integer, ItemStack> objectMap;
+    private final int inventorySize;
+
+    public CustomItemInventory(String inventoryName, ObjectMap<Integer, ItemStack> objectMap, int inventorySize) {
+        this.inventoryName = inventoryName;
+        this.objectMap = objectMap;
+        this.inventorySize = inventorySize;
+    }
 
     public Inventory getInventory() {
         Inventory inventory = Bukkit.createInventory(null, inventorySize, inventoryName);

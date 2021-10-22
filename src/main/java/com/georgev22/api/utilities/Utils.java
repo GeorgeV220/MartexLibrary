@@ -14,14 +14,16 @@ import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.*;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -460,6 +462,117 @@ public final class Utils {
         }
 
         private Assertions() {
+        }
+    }
+
+    public static class Reflection {
+
+        private static volatile Object theUnsafe;
+
+        static {
+            try {
+                synchronized (Reflection.class) {
+                    if (theUnsafe == null) {
+                        Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+                        Field theUnsafeField = unsafeClass.getDeclaredField("theUnsafe");
+                        theUnsafeField.setAccessible(true);
+                        theUnsafe = theUnsafeField.get(null);
+                    }
+                }
+            } catch (Exception e) {
+                theUnsafe = null;
+            }
+        }
+
+        public static boolean isUnsafeAvailable() {
+            return theUnsafe != null;
+        }
+
+        public static @NotNull Class<?> getClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
+            return Class.forName(className, true, classLoader);
+        }
+
+        public static Optional<Class<?>> getOptionalClass(String className, ClassLoader classLoader) {
+            return optionalClass(className, classLoader);
+        }
+
+        public static Optional<Class<?>> optionalClass(String className, ClassLoader classLoader) {
+            try {
+                return Optional.of(Class.forName(className, true, classLoader));
+            } catch (ClassNotFoundException e) {
+                return Optional.empty();
+            }
+        }
+
+        public static @NotNull Object enumValueOf(@NotNull Class<?> enumClass, String enumName) {
+            return Enum.valueOf(enumClass.asSubclass(Enum.class), enumName);
+        }
+
+        public static Object enumValueOf(Class<?> enumClass, String enumName, int fallbackOrdinal) {
+            try {
+                return enumValueOf(enumClass, enumName);
+            } catch (IllegalArgumentException e) {
+                Object[] constants = enumClass.getEnumConstants();
+                if (constants.length > fallbackOrdinal) {
+                    return constants[fallbackOrdinal];
+                }
+                throw e;
+            }
+        }
+
+        static Class<?> innerClass(@NotNull Class<?> parentClass, Predicate<Class<?>> classPredicate) throws ClassNotFoundException {
+            for (Class<?> innerClass : parentClass.getDeclaredClasses()) {
+                if (classPredicate.test(innerClass)) {
+                    return innerClass;
+                }
+            }
+            throw new ClassNotFoundException("No class in " + parentClass.getCanonicalName() + " matches the predicate.");
+        }
+
+        public static @NotNull Constructor findConstructor(Class<?> clazz, MethodHandles.@NotNull Lookup lookup) throws Exception {
+            if (isUnsafeAvailable()) {
+                MethodType allocateMethodType = MethodType.methodType(Object.class, Class.class);
+                MethodHandle allocateMethod = lookup.findVirtual(theUnsafe.getClass(), "allocateInstance", allocateMethodType);
+                return () -> allocateMethod.invoke(theUnsafe, clazz);
+            }
+            try {
+                MethodHandle constructor = lookup.findConstructor(clazz, MethodType.methodType(void.class));
+                return constructor::invoke;
+            } catch (NoSuchMethodException | IllegalAccessException e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        public static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            if (isUnsafeAvailable()) {
+                Field field = clazz.getDeclaredField(name);
+                long offset = (long) fetchMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                return fetchMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});
+            }
+            try {
+                Field field = clazz.getDeclaredField(name);
+                field.setAccessible(true);
+                return field.get(object);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        public static Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+            Method method = clazz.getDeclaredMethod(name, parameterTypes);
+            if (!isUnsafeAvailable()) {
+                method.setAccessible(true);
+            }
+            return method;
+        }
+
+        public static Object fetchMethodAndInvoke(final Class<?> clazz, final String name, Object obj, Object[] arguments, Class<?>[] parameterTypes) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            return fetchMethod(clazz, name, parameterTypes).invoke(obj, arguments);
+        }
+
+        @FunctionalInterface
+        interface Constructor {
+            Object invoke() throws Throwable;
         }
     }
 }

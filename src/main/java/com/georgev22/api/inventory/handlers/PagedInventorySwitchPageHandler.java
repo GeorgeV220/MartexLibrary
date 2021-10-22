@@ -23,8 +23,10 @@ public abstract class PagedInventorySwitchPageHandler extends PagedInventoryHand
         public boolean equals(Object obj) {
             if (obj == this)
                 return true;
-            if (!(obj instanceof SwitchHandler switchHandler))
+            if (!(obj instanceof SwitchHandler))
                 return false;
+
+            SwitchHandler switchHandler = (SwitchHandler) obj;
 
             return super.equals(switchHandler)
                     && pageAction == switchHandler.pageAction

@@ -17,8 +17,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-record PagedInventoryListener(Plugin plugin,
-                              InventoryRegistrar registrar) implements Listener {
+class PagedInventoryListener implements Listener {
+
+    private final Plugin plugin;
+    private final InventoryRegistrar registrar;
+
+    public PagedInventoryListener(Plugin plugin, InventoryRegistrar registrar) {
+        this.plugin = plugin;
+        this.registrar = registrar;
+    }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClickEvent(InventoryClickEvent event) {

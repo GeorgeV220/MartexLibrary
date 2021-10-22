@@ -25,7 +25,7 @@
 
 package com.georgev22.api.maven;
 
-import com.georgev22.api.utilities.URLClassLoaderAccess;
+import com.georgev22.api.utilities.ClassLoaderAccess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,36 +47,36 @@ import java.util.logging.Logger;
 public final class LibraryLoader {
 
     private final Class<?> clazz;
-    private static URLClassLoaderAccess urlClassLoaderAccess;
+    private static ClassLoaderAccess classLoaderAccess;
     private final Logger logger;
 
     private final File dataFolder;
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder, @NotNull Logger logger) {
         this.clazz = clazz;
-        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
+        classLoaderAccess = new ClassLoaderAccess(classLoader);
         this.logger = logger;
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
-        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
-        this.logger = Logger.getLogger(clazz.getName());
+        classLoaderAccess = new ClassLoaderAccess(classLoader);
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull ClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
-        urlClassLoaderAccess = URLClassLoaderAccess.create(classLoader);
-        this.logger = Logger.getLogger(clazz.getName());
+        classLoaderAccess = new ClassLoaderAccess(classLoader);
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull File dataFolder) {
         this.clazz = clazz;
-        urlClassLoaderAccess = URLClassLoaderAccess.create(clazz.getClassLoader());
-        this.logger = Logger.getLogger(clazz.getName());
+        classLoaderAccess = new ClassLoaderAccess(clazz.getClassLoader());
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
@@ -142,7 +142,7 @@ public final class LibraryLoader {
         if (!saveLocation.exists()) {
 
             try {
-                logger.info("Dependency '" + name + "' is not already in the libraries folder. Attempting to download...");
+                logger.info("Dependency '" + name + "' does not exist in the libraries folder. Attempting to download...");
                 URL url = d.url();
 
                 try (InputStream is = url.openStream()) {
@@ -157,13 +157,13 @@ public final class LibraryLoader {
         }
 
         if (!saveLocation.exists()) {
-            throw new RuntimeException("Unable to download dependency: " + d);
+            throw new RuntimeException("Unable to download '" + d + "' dependency.");
         }
 
         try {
-            urlClassLoaderAccess.addURL(saveLocation.toURI().toURL());
+            classLoaderAccess.add(saveLocation.toURI().toURL());
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to load dependency: " + saveLocation, e);
+            throw new RuntimeException("Unable to load '" + saveLocation + "' dependency.", e);
         }
 
         logger.info("Loaded dependency '" + name + "' successfully.");
@@ -179,13 +179,15 @@ public final class LibraryLoader {
     }
 
     @Nullable
-    public static URLClassLoaderAccess getURLClassLoaderAccess() {
-        return urlClassLoaderAccess;
+    public static ClassLoaderAccess getURLClassLoaderAccess() {
+        return classLoaderAccess;
     }
 
     @NotNull
-    private record Dependency(String groupId, String artifactId, String version,
-                              String repoUrl) {
+    private static class Dependency {
+
+        private final String groupId, artifactId, version, repoUrl;
+
         private Dependency(String groupId, String artifactId, String version, String repoUrl) {
             this.groupId = Objects.requireNonNull(groupId, "groupId");
             this.artifactId = Objects.requireNonNull(artifactId, "artifactId");
@@ -204,10 +206,27 @@ public final class LibraryLoader {
             return new URL(url);
         }
 
+        public String artifactId() {
+            return artifactId;
+        }
+
+        public String groupId() {
+            return groupId;
+        }
+
+        public String version() {
+            return version;
+        }
+
+        public String repoUrl() {
+            return repoUrl;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o == this) return true;
-            if (!(o instanceof final Dependency other)) return false;
+            if (!(o instanceof Dependency)) return false;
+            Dependency other = (Dependency) o;
             return this.groupId().equals(other.groupId()) &&
                     this.artifactId().equals(other.artifactId()) &&
                     this.version().equals(other.version()) &&

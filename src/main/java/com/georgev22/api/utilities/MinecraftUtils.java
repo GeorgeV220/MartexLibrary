@@ -15,12 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MinecraftUtils {
 
@@ -217,10 +216,18 @@ public class MinecraftUtils {
         final int progressBars = (int) (totalBars * percent);
         final int leftOver = totalBars - progressBars;
 
-        return colorize(completedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
-                colorize(notCompletedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, leftOver));
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(colorize(completedColor));
+        for (int i = 0; i < progressBars; i++) {
+            sb.append(symbol);
+        }
+
+        sb.append(colorize(notCompletedColor));
+        for (int i = 0; i < leftOver; i++) {
+            sb.append(symbol);
+        }
+        return sb.toString();
     }
 
     public static ItemStack resetItemMeta(final ItemStack item) {
@@ -340,7 +347,62 @@ public class MinecraftUtils {
         return disableJoinMessage;
     }
 
-    public static DiscordWebHook.EmbedObject buildFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+    /**
+     * Build a DiscordWebHook from a yaml file.
+     *
+     * @param fileConfiguration   The FileConfiguration instance of your config file.
+     * @param path                The path in the config.
+     * @param embedPlaceHolders   The placeholders of the embeds.
+     * @param messagePlaceHolders The placeholders of the message.
+     * @return {@link DiscordWebHook} instance.
+     */
+    public static DiscordWebHook buildDiscordWebHookFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> embedPlaceHolders, ObjectMap<String, String> messagePlaceHolders) {
+        return new DiscordWebHook(fileConfiguration.getString(path + ".webhook url")).setContent(Utils.placeHolder(fileConfiguration.getString(path + ".message"), messagePlaceHolders, true))
+                .setAvatarUrl(fileConfiguration.getString(path + ".avatar url"))
+                .setUsername(fileConfiguration.getString(path + ".username")).addEmbeds(buildEmbedsFromConfig(fileConfiguration, path + ".embeds", embedPlaceHolders).toArray(new DiscordWebHook.EmbedObject[0]));
+    }
+
+    /**
+     * Build DiscordWebHook Embeds from a yaml file.
+     *
+     * @param fileConfiguration The FileConfiguration instance of your config file.
+     * @param path              The path in the config.
+     * @param placeholders      The placeholders of the embeds.
+     * @return A list that contains {@link DiscordWebHook.EmbedObject} objects.
+     */
+    public static List<DiscordWebHook.EmbedObject> buildEmbedsFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+        List<DiscordWebHook.EmbedObject> embedObjects = Lists.newArrayList();
+        for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
+            embedObjects.add(buildEmbedFromConfig(fileConfiguration, path, placeholders));
+        }
+        return embedObjects;
+    }
+
+    /**
+     * Build DiscordWebHook Embed Fields from a yaml file.
+     *
+     * @param fileConfiguration The FileConfiguration instance of your config file.
+     * @param path              The path in the config.
+     * @param placeholders      The placeholders of the fields.
+     * @return A list that contains {@link DiscordWebHook.EmbedObject.Field} objects.
+     */
+    public static List<DiscordWebHook.EmbedObject.Field> buildFieldsFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+        List<DiscordWebHook.EmbedObject.Field> fields = Lists.newArrayList();
+        for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
+            fields.add(buildFieldFromConfig(fileConfiguration, path + "." + s, placeholders));
+        }
+        return fields;
+    }
+
+    /**
+     * Build DiscordWebHook Embed from a yaml file.
+     *
+     * @param fileConfiguration The FileConfiguration instance of your config file.
+     * @param path              The path in the config.
+     * @param placeholders      The placeholders of the embed.
+     * @return {@link DiscordWebHook.EmbedObject} instance.
+     */
+    public static DiscordWebHook.EmbedObject buildEmbedFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
         return new DiscordWebHook.EmbedObject().setTitle(Utils.placeHolder(fileConfiguration.getString(path + ".title"), placeholders, true))
                 .setDescription(Utils.placeHolder(fileConfiguration.getString(path + ".description"), placeholders, true))
                 .setColor(Color.from(fileConfiguration.getString(path + ".color")))
@@ -348,14 +410,33 @@ public class MinecraftUtils {
                 .setFooter(Utils.placeHolder(fileConfiguration.getString(path + ".footer.message"), placeholders, true),
                         fileConfiguration.getString(path + ".footer.icon url"))
                 .setImage(fileConfiguration.getString(path + ".image url"))
+                .addFields(buildFieldsFromConfig(fileConfiguration, path + ".fields.", placeholders).toArray(new DiscordWebHook.EmbedObject.Field[0]))
                 .setAuthor(fileConfiguration.getString(path + ".author.name"), fileConfiguration.getString(path + ".author.url"),
                         fileConfiguration.getString(path + ".icon url"))
                 .setUrl(fileConfiguration.getString(path + ".url"));
     }
 
+    /**
+     * Build DiscordWebHook Embed Field from a yaml file.
+     *
+     * @param fileConfiguration The FileConfiguration instance of your config file.
+     * @param path              The path in the config.
+     * @param placeholders      The placeholders of the field.
+     * @return {@link DiscordWebHook.EmbedObject.Field} instance.
+     */
+    public static DiscordWebHook.EmbedObject.Field buildFieldFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+        return new DiscordWebHook.EmbedObject.Field(
+                Utils.placeHolder(fileConfiguration.getString(path + ".name"), placeholders, true),
+                Utils.placeHolder(fileConfiguration.getString(path + ".message"), placeholders, true),
+                fileConfiguration.getBoolean(path + ".inline"));
+    }
 
     public enum MinecraftVersion {
         UNKNOWN,
+        V_1_7_R1,
+        V_1_7_R2,
+        V_1_7_R3,
+        V_1_7_R4,
         V1_8_R1,
         V1_8_R2,
         V1_8_R3,
@@ -375,24 +456,58 @@ public class MinecraftUtils {
 
         private static MinecraftVersion currentVersion;
 
-        public boolean isAboveOrEqual(MinecraftVersion minecraftVersion) {
+        /**
+         * Check if the version is above or equal.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is above or equal.
+         */
+        public boolean isAboveOrEqual(@NotNull MinecraftVersion minecraftVersion) {
             return this.ordinal() >= minecraftVersion.ordinal();
         }
 
-        public boolean isAbove(MinecraftVersion minecraftVersion) {
+        /**
+         * Check if the version is above.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is above.
+         */
+        public boolean isAbove(@NotNull MinecraftVersion minecraftVersion) {
             return this.ordinal() > minecraftVersion.ordinal();
         }
 
-        public boolean isBelowOrEqual(MinecraftVersion minecraftVersion) {
+        /**
+         * Check if the version is below or equal.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is below or equal.
+         */
+        public boolean isBelowOrEqual(@NotNull MinecraftVersion minecraftVersion) {
             return this.ordinal() <= minecraftVersion.ordinal();
         }
 
-        public boolean isBelow(MinecraftVersion minecraftVersion) {
+        /**
+         * Check if the version is below.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is below.
+         */
+        public boolean isBelow(@NotNull MinecraftVersion minecraftVersion) {
             return this.ordinal() < minecraftVersion.ordinal();
         }
 
+        /**
+         * Returns the current minecraft server version.
+         *
+         * @return the current minecraft server version.
+         */
         public static MinecraftVersion getCurrentVersion() {
             return currentVersion;
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String getCurrentVersionName() {
+            return currentVersion.name();
         }
 
         static {
@@ -402,6 +517,45 @@ public class MinecraftUtils {
                 currentVersion = UNKNOWN;
             }
 
+        }
+    }
+
+    public static class MinecraftReflection {
+
+        private static final String NET_MINECRAFT_PACKAGE = "net.minecraft";
+        public static final String ORG_BUKKIT_CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit";
+        public static final String NET_MINECRAFT_SERVER_PACKAGE = NET_MINECRAFT_PACKAGE + ".server";
+
+        private static volatile Object theUnsafe;
+
+        public static boolean isRepackaged() {
+            return MinecraftVersion.getCurrentVersion().isBelowOrEqual(MinecraftVersion.V1_17_R1);
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String getNMSClassName(String className) {
+            return NET_MINECRAFT_SERVER_PACKAGE + '.' + MinecraftVersion.getCurrentVersionName() + '.' + className;
+        }
+
+        public static @NotNull Class<?> getNMSClass(String className) throws ClassNotFoundException {
+            return Class.forName(getNMSClassName(className));
+        }
+
+        public static Optional<Class<?>> getNMSOptionalClass(String className) {
+            return Utils.Reflection.optionalClass(getNMSClassName(className), Bukkit.class.getClassLoader());
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String getOBCClassName(String className) {
+            return ORG_BUKKIT_CRAFTBUKKIT_PACKAGE + '.' + MinecraftVersion.getCurrentVersionName() + '.' + className;
+        }
+
+        public static @NotNull Class<?> getOBCClass(String className) throws ClassNotFoundException {
+            return Class.forName(getOBCClassName(className));
+        }
+
+        public static Optional<Class<?>> getOBCOptionalClass(String className) {
+            return Utils.Reflection.optionalClass(getOBCClassName(className), Bukkit.class.getClassLoader());
         }
     }
 }

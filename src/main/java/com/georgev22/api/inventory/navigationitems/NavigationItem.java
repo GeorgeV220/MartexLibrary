@@ -29,8 +29,10 @@ public abstract class NavigationItem {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (!(obj instanceof NavigationItem navigationItem))
+        if (!(obj instanceof NavigationItem))
             return false;
+
+        NavigationItem navigationItem = (NavigationItem) obj;
 
         return navigationItem.itemStack.equals(itemStack) && navigationItem.getNavigationType() == getNavigationType();
     }

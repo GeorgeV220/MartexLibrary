@@ -71,8 +71,10 @@ public final class PageModifier {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (!(obj instanceof PageModifier pageModifier))
+        if (!(obj instanceof PageModifier))
             return false;
+
+        PageModifier pageModifier = (PageModifier) obj;
 
         return pageModifier.modifiableSize == modifiableSize && pageModifier.inventory.equals(inventory);
     }

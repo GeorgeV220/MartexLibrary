@@ -1,5 +1,6 @@
 package com.georgev22.api.utilities;
 
+import com.georgev22.api.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
@@ -381,6 +382,22 @@ public final class Utils {
         return objectMap;
     }
 
+    public static List<Color> colorsStringListToColorList(List<String> result) {
+        List<Color> colorList = Lists.newArrayList();
+        for (String str : result) {
+            colorList.add(Color.from(str));
+        }
+        return colorList;
+    }
+
+    public static List<Color> colorsStringListToColorList(String... result) {
+        List<Color> colorList = Lists.newArrayList();
+        for (String str : result) {
+            colorList.add(Color.from(str));
+        }
+        return colorList;
+    }
+
     public static final class Assertions {
 
         /**
@@ -553,6 +570,22 @@ public final class Utils {
                 Field field = clazz.getDeclaredField(name);
                 field.setAccessible(true);
                 return field.get(object);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        public static void setFieldValue(final Class<?> clazz, final Object object, final String name, Object value) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+            if (isUnsafeAvailable()) {
+                Field field = clazz.getDeclaredField(name);
+                long offset = (long) fetchMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                fetchMethodAndInvoke(theUnsafe.getClass(), "putObject", theUnsafe, new Object[]{object, offset, value}, new Class[]{Object.class, long.class, Object.class});
+            }
+
+            try {
+                Field field = clazz.getDeclaredField(name);
+                field.setAccessible(true);
+                field.set(object, value);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new UnsupportedOperationException();
             }

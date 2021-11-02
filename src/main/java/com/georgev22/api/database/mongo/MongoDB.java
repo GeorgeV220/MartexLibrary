@@ -10,7 +10,19 @@ public class MongoDB {
 
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
-    private final MongoCollection<Document> collection;
+    private MongoCollection<Document> collection;
+
+    /**
+     * @param host         Host of the MongoDB (must contain port) format: localhost:27077
+     * @param port         MongoDB port
+     * @param username     MongoDB username
+     * @param password     User password
+     * @param databaseName database name (duh)
+     */
+    public MongoDB(String host, int port, String username, String password, String databaseName) {
+        mongoClient = MongoClients.create("mongodb://" + username + ":" + password + "@" + host + ":" + port + "/?authSource=" + databaseName);
+        mongoDatabase = mongoClient.getDatabase(databaseName);
+    }
 
     /**
      * @param host           Host of the MongoDB (must contain port) format: localhost:27077
@@ -24,6 +36,10 @@ public class MongoDB {
         mongoClient = MongoClients.create("mongodb://" + username + ":" + password + "@" + host + ":" + port + "/?authSource=" + databaseName);
         mongoDatabase = mongoClient.getDatabase(databaseName);
         collection = mongoDatabase.getCollection(collectionName);
+    }
+
+    public MongoCollection<Document> getCollection(String collectionName) {
+        return collection = mongoDatabase.getCollection(collectionName);
     }
 
     public MongoClient getMongoClient() {

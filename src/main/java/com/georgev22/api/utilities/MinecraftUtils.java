@@ -3,6 +3,7 @@ package com.georgev22.api.utilities;
 import com.georgev22.api.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,9 +16,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -430,6 +436,58 @@ public class MinecraftUtils {
                 Utils.placeHolder(fileConfiguration.getString(path + ".name"), placeholders, true),
                 Utils.placeHolder(fileConfiguration.getString(path + ".message"), placeholders, true),
                 fileConfiguration.getBoolean(path + ".inline"));
+    }
+
+    /**
+     * Gets a list of ItemStacks from Base64 string.
+     *
+     * @param data Base64 string to convert to ItemStack list.
+     * @return ItemStack list created from the Base64 string.
+     */
+    @Contract("null -> new")
+    public static @Nullable List<ItemStack> itemStackListFromBase64(String data) {
+        if (data == null || data.isEmpty()) {
+            return Lists.newArrayList();
+        }
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack[] items = new ItemStack[dataInput.readInt()];
+
+            for (int i = 0; i < items.length; i++) {
+                items[i] = (ItemStack) dataInput.readObject();
+            }
+
+            dataInput.close();
+            return Arrays.asList(items);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * A method to serialize an {@link ItemStack} list to Base64 String.
+     *
+     * @param items to turn into a Base64 String.
+     * @return Base64 string of the items.
+     */
+    public static @NotNull String itemStackListToBase64(List<ItemStack> items) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+
+            dataOutput.writeInt(items.size());
+
+            for (ItemStack item : items) {
+                dataOutput.writeObject(item);
+            }
+
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
     }
 
     public enum MinecraftVersion {

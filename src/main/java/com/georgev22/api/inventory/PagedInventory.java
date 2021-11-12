@@ -240,13 +240,15 @@ public class PagedInventory implements IPagedInventory {
 
                     if (!nbtItem.hasKey("frames")) continue;
 
-                    List<ItemBuilder> itemBuilders = Utils.deserialize(nbtItem.getString("frames"), new TypeToken<List<ItemBuilder>>() {
-                    }.getType());
+                    List<ItemStack> itemStacks = MinecraftUtils.itemStackListFromBase64(nbtItem.getString("frames"));
 
-                    int size = itemBuilders.size() - 1;
+                    int size = itemStacks.size() - 1;
                     if (size > 0 & slotFrame.get(i) <= size) {
-                        ItemBuilder item = itemBuilders.get(slotFrame.get(i));
-                        openInventory.setItem(i, item.build());
+                        ItemStack item = itemStacks.get(slotFrame.get(i));
+                        item.setItemMeta(itemStack.getItemMeta());
+                        NBTItem newNBTItem = new NBTItem(item, true);
+                        newNBTItem.setString("frames", nbtItem.getString("frames"));
+                        openInventory.setItem(i, item);
                         if (slotFrame.get(i) < size) {
                             slotFrame.append(i, slotFrame.get(i) + 1);
                         } else if (slotFrame.get(i) >= size) {

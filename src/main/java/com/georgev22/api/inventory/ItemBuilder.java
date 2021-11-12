@@ -120,23 +120,18 @@ public class ItemBuilder {
         return itemCommands;
     }
 
-    //NOT READY
-    private static @NotNull List<ItemBuilder> buildFramesFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
-        List<ItemBuilder> itemBuilders = Lists.newArrayList();
+    public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        List<ItemStack> itemStacks = Lists.newArrayList();
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return Lists.newArrayList(new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")));
+            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
         }
-        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty())
+        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
+            itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
             for (String b : fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false)) {
-                itemBuilders.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial())
-                        .amount(fileConfiguration.getInt(path + ".frames." + b + ".amount"))
-                        .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".frames." + b + ".title"), notNull("titleReplacements", titleReplacements), true)))
-                        .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".frames." + b + ".lores"), notNull("loresReplacements", loresReplacements), true)))
-                        .showAllAttributes(fileConfiguration.getBoolean(path + ".frames." + b + ".show all attributes"))
-                        .glow(fileConfiguration.getBoolean(path + ".frames." + b + ".glow"))
-                        .colors(fileConfiguration.getBoolean(path + ".frames." + b + ".animated") ? (fileConfiguration.getBoolean(path + "frames." + b + ".random colors") ? Utils.serialize(Utils.randomColors(3)) : Utils.serialize(fileConfiguration.getStringList(path + ".frames." + b + ".colors"))) : Utils.serialize(Lists.newArrayList())));
+                itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial()).build());
             }
-        return itemBuilders;
+        }
+        return itemStacks;
     }
 
     public ItemBuilder material(@NotNull XMaterial material) {
@@ -256,17 +251,17 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder frames(ItemBuilder... frames) {
+    public ItemBuilder frames(ItemStack... frames) {
         return frames(Arrays.asList(frames));
     }
 
-    public ItemBuilder frames(List<ItemBuilder> frames) {
-        this.nbtItem.setString("frames", Utils.serialize(frames));
+    public ItemBuilder frames(List<ItemStack> frames) {
+        this.nbtItem.setString("frames", MinecraftUtils.itemStackListToBase64(frames));
         return this;
     }
 
-    public <K, V> ItemBuilder customNBT(ObjectMap<String, String> objectMap) {
-        this.nbtItem.setString("itemBuilder", Utils.serialize(objectMap));
+    public ItemBuilder customNBT(ObjectMap.Pair<String, String> pairs) {
+        this.nbtItem.setString("itemBuilder", Utils.serialize(pairs));
         return this;
     }
 

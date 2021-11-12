@@ -140,7 +140,6 @@ public class DiscordWebHook {
             json.put("embeds", embedObjects.toArray());
         }
 
-        System.out.println(json);
         URL url = new URL(this.url);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.addRequestProperty("Content-Type", "application/json");

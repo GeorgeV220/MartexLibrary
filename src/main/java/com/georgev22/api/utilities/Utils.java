@@ -275,12 +275,12 @@ public final class Utils {
      * Deserialize a string back to object
      * see {@link #serialize(Object)}
      *
-     * @param string serialized string before the serialization
-     * @param <T>    the original object type (eg: {@code deserialize(stringToDeserialize, new TypeToken<ObjectMap<String, Integer>>(){}.getType());})
+     * @param string serialized string
+     * @param <T>    the original object type (eg: {@code deserialize(stringToDeserialize, new TypeToken<ObjectMap<String, Integer>>(){}.getType())})
      * @return the deserialized object
      * @since v5.0.1
      */
-    public static <T> T deserialize(String string, Type type) {
+    public static <T> T deserialize(@NotNull String string, @NotNull Type type) {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
         GZIPInputStream gzipIn = null;
         try {
@@ -301,15 +301,13 @@ public final class Utils {
         return new Gson().fromJson(byteaOut.toString(), type);
     }
 
-    //====================
-
     /**
      * Converts a string list to string.
      *
      * @param stringList The String List to convert.
      * @return a String that contains the String List contents.
      */
-    public static String stringListToString(List<String> stringList) {
+    public static @NotNull String stringListToString(@NotNull List<String> stringList) {
         return stringList.toString().replace("[", "").replace("]", "").replace(" ", "");
     }
 
@@ -319,7 +317,7 @@ public final class Utils {
      * @param string The string to convert.
      * @return a String List that contains the String contents.
      */
-    public static List<String> stringToStringList(String string) {
+    public static @NotNull List<String> stringToStringList(@NotNull String string) {
         return string.replace(" ", "").isEmpty() ? Lists.newArrayList() : new ArrayList<>(Arrays.asList(string.split(",")));
     }
 
@@ -329,7 +327,7 @@ public final class Utils {
      * @param objectMap The {@link ObjectMap} to convert.
      * @return a String List with the {@link ObjectMap} contents.
      */
-    public static <K, V> List<String> mapToStringList(ObjectMap<K, V> objectMap) {
+    public static <K, V> @NotNull List<String> mapToStringList(@NotNull ObjectMap<K, V> objectMap) {
         List<String> stringList = Lists.newArrayList();
         for (Entry<K, V> entry : objectMap.entrySet()) {
             stringList.add(entry.getKey() + "=" + entry.getValue());
@@ -382,7 +380,7 @@ public final class Utils {
         return objectMap;
     }
 
-    public static List<Color> colorsStringListToColorList(List<String> result) {
+    public static @NotNull List<Color> colorsStringListToColorList(@NotNull List<String> result) {
         List<Color> colorList = Lists.newArrayList();
         for (String str : result) {
             colorList.add(Color.from(str));
@@ -390,12 +388,20 @@ public final class Utils {
         return colorList;
     }
 
-    public static List<Color> colorsStringListToColorList(String... result) {
+    public static @NotNull List<Color> colorsStringListToColorList(String @NotNull ... result) {
         List<Color> colorList = Lists.newArrayList();
         for (String str : result) {
             colorList.add(Color.from(str));
         }
         return colorList;
+    }
+
+    public static @NotNull List<String> randomColors(int size) {
+        List<String> randomColorList = Lists.newArrayList();
+        for (int i = 0; i < size; i++) {
+            randomColorList.add(String.format("#%06x", new Random().nextInt(0xffffff + 1)));
+        }
+        return randomColorList;
     }
 
     public static final class Assertions {

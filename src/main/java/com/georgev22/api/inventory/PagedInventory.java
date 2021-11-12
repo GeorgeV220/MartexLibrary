@@ -1,5 +1,6 @@
 package com.georgev22.api.inventory;
 
+import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.utilities.Utils;
 import com.georgev22.api.colors.Animation;
 import com.georgev22.api.colors.Color;
@@ -13,6 +14,8 @@ import com.georgev22.api.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.api.inventory.utils.InventoryUtil;
 import com.georgev22.api.utilities.MinecraftUtils;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -144,7 +147,7 @@ public class PagedInventory implements IPagedInventory {
             return false;
 
         registrar.registerSwitch(player);
-        boolean success = open(player, index + 1, true, true);
+        boolean success = open(player, index + 1, true);
 
         if (success) {
             PagedInventorySwitchPageHandler.SwitchHandler switchHandler = new PagedInventorySwitchPageHandler.SwitchHandler(
@@ -166,7 +169,7 @@ public class PagedInventory implements IPagedInventory {
             return false;
 
         registrar.registerSwitch(player);
-        boolean success = open(player, index - 1, true, true);
+        boolean success = open(player, index - 1, true);
 
         if (success) {
             PagedInventorySwitchPageHandler.SwitchHandler switchHandler = new PagedInventorySwitchPageHandler.SwitchHandler(
@@ -185,7 +188,7 @@ public class PagedInventory implements IPagedInventory {
     public boolean open(Player player) {
         if (pages.isEmpty())
             return false;
-        return open(player, 0, false, true);
+        return open(player, 0, false);
     }
 
     /**
@@ -195,25 +198,68 @@ public class PagedInventory implements IPagedInventory {
     public boolean open(Player player, int index) {
         if (pages.isEmpty())
             return false;
-        return open(player, index, false, true);
+        return open(player, index, false);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean open(Player player, int index, boolean animated, boolean wave) {
+    public boolean open(Player player, int index, boolean animated) {
         if (pages.size() - 1 < index || index < 0)
             return false;
         Inventory openInventory = pages.get(index);
 
         player.openInventory(openInventory);
         registrar.register(player, this, openInventory);
+
+        ObjectMap<Integer, Integer> slotFrame = ObjectMap.newConcurrentObjectMap();
+
+        if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+            for (int slot = 0; slot < openInventory.getSize(); ++slot) {
+                ItemStack itemStack = openInventory.getItem(slot);
+
+                if (itemStack == null) continue;
+
+                NBTItem nbtItem = new NBTItem(itemStack);
+
+                if (!nbtItem.hasKey("frames")) continue;
+
+                slotFrame.append(slot, 0);
+            }
+        }
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
+            if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+                for (int i = 0; i < openInventory.getSize(); ++i) {
+
+                    ItemStack itemStack = openInventory.getItem(i);
+
+                    if (itemStack == null) continue;
+
+                    NBTItem nbtItem = new NBTItem(itemStack);
+
+                    if (!nbtItem.hasKey("frames")) continue;
+
+                    List<ItemBuilder> itemBuilders = Utils.deserialize(nbtItem.getString("frames"), new TypeToken<List<ItemBuilder>>() {
+                    }.getType());
+
+                    int size = itemBuilders.size() - 1;
+                    if (size > 0 & slotFrame.get(i) <= size) {
+                        ItemBuilder item = itemBuilders.get(slotFrame.get(i));
+                        openInventory.setItem(i, item.build());
+                        if (slotFrame.get(i) < size) {
+                            slotFrame.append(i, slotFrame.get(i) + 1);
+                        } else if (slotFrame.get(i) >= size) {
+                            slotFrame.append(i, 0);
+                        }
+                    }
+                }
+            }
+        }, 0L, 20L);
         if (animated) {
             Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
                 if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
                     for (int i = 0; i < openInventory.getSize(); i++) {
-
                         ItemStack itemStack = openInventory.getItem(i);
 
                         if (itemStack == null || !itemStack.hasItemMeta()) {
@@ -223,19 +269,22 @@ public class PagedInventory implements IPagedInventory {
                         ItemMeta itemMeta = itemStack.getItemMeta();
 
                         NBTItem nbtItem = new NBTItem(itemStack);
-                        if (!nbtItem.hasKey("colors"))
-                            continue;
 
-                        List<String> color = Utils.stringToStringList(nbtItem.getString("colors"));
-                        List<Color> colorsList = new ArrayList<>();
+                        if (!nbtItem.hasKey("colors") & !nbtItem.hasKey("animation")) continue;
+
+                        List<String> color = Utils.deserialize(nbtItem.getString("colors"), new TypeToken<List<String>>() {
+                        }.getType());
+
+                        if (color.isEmpty()) continue;
+                        List<Color> colorsList = Lists.newArrayList();
                         for (String s : color) {
                             colorsList.add(Color.from(s));
                         }
 
-                        if (wave)
-                            itemMeta.setDisplayName(Animation.wave(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList.toArray(new Color[0])));
+                        if (nbtItem.getString("animation").equalsIgnoreCase("wave"))
+                            itemMeta.setDisplayName(Animation.wave(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList));
                         else
-                            itemMeta.setDisplayName(Animation.fading(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList.toArray(new Color[0])));
+                            itemMeta.setDisplayName(Animation.fading(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList));
                         itemStack.setItemMeta(itemMeta);
                         openInventory.setItem(i, itemStack);
 
@@ -463,7 +512,7 @@ public class PagedInventory implements IPagedInventory {
             return;
         }
 
-        viewers.forEach(viewer -> open((Player) viewer, fallbackIndex, true, true));
+        viewers.forEach(viewer -> open((Player) viewer, fallbackIndex, true));
     }
 
     @Override

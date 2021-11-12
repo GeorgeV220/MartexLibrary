@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -34,13 +33,13 @@ public class ItemBuilder {
     private final ObjectMap<Enchantment, Integer> enchantments;
     private boolean unbreakable;
     private int customModelData;
-    private NBTItem nbtItem;
+    private final NBTItem nbtItem;
 
-    public ItemBuilder(XMaterial material) {
+    public ItemBuilder(@NotNull XMaterial material) {
         this(material.parseMaterial());
     }
 
-    public ItemBuilder(XMaterial material, boolean showAllAttributes) {
+    public ItemBuilder(@NotNull XMaterial material, boolean showAllAttributes) {
         this(material.parseMaterial(), showAllAttributes);
     }
 
@@ -58,7 +57,7 @@ public class ItemBuilder {
         Preconditions.checkArgument(material != null, "ItemStack cannot be null");
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
-        nbtItem = new NBTItem(itemStack, true);
+        this.nbtItem = new NBTItem(itemStack, true);
     }
 
     public ItemBuilder(ItemStack itemStack) {
@@ -75,27 +74,20 @@ public class ItemBuilder {
         Preconditions.checkArgument(itemStack != null, "ItemStack cannot be null");
         this.itemStack = itemStack;
         this.showAllAttributes(showAllAttributes);
+        this.nbtItem = new NBTItem(itemStack, true);
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
-        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap(), false);
-    }
-
-    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, boolean randomColors) {
-        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap(), randomColors);
+        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap());
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements) {
-        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap(), false);
+        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap());
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements, boolean randomColors) {
+    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid item!!"));
-        }
-        List<String> randomColorList = Lists.newArrayList();
-        for (int i = 0; i < 3; i++) {
-            randomColorList.add(String.format("#%06x", new Random().nextInt(0xffffff + 1)));
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"))
@@ -103,10 +95,51 @@ public class ItemBuilder {
                 .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
                 .glow(fileConfiguration.getBoolean(path + ".glow"))
-                .colors(fileConfiguration.getBoolean(path + ".animated") ? (randomColors ? Arrays.toString(randomColorList.toArray(new String[0])) : Arrays.toString(fileConfiguration.getStringList(path + ".colors").toArray(new String[0]))) : "");
+                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
+                .animation(fileConfiguration.getString(path + ".animation"))
+                .commands(buildItemCommandFromConfig(fileConfiguration, path))
+                .frames(buildFramesFromConfig(fileConfiguration, path, loresReplacements, titleReplacements));
     }
 
-    public ItemBuilder material(XMaterial material) {
+    private static @NotNull List<ItemCommand> buildItemCommandFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
+        List<ItemCommand> itemCommands = Lists.newArrayList();
+        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !fileConfiguration.getConfigurationSection(path + ".commands").getKeys(true).isEmpty()) {
+            if (fileConfiguration.getStringList(path + ".commands.RIGHT") != null && !fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.RIGHT, fileConfiguration.getInt(path + ".commands cooldown.RIGHT"), fileConfiguration.getStringList(path + ".commands.RIGHT"));
+                itemCommands.add(itemCommand);
+            }
+            if (fileConfiguration.getStringList(path + ".commands.LEFT") != null && !fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.LEFT, fileConfiguration.getInt(path + ".commands cooldown.LEFT"), fileConfiguration.getStringList(path + ".commands.LEFT"));
+                itemCommands.add(itemCommand);
+            }
+            if (fileConfiguration.getStringList(path + ".commands.MIDDLE") != null && !fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.MIDDLE, fileConfiguration.getInt(path + ".commands cooldown.MIDDLE"), fileConfiguration.getStringList(path + ".commands.MIDDLE"));
+                itemCommands.add(itemCommand);
+            }
+        }
+        return itemCommands;
+    }
+
+    //NOT READY
+    private static @NotNull List<ItemBuilder> buildFramesFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        List<ItemBuilder> itemBuilders = Lists.newArrayList();
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+            return Lists.newArrayList(new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")));
+        }
+        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty())
+            for (String b : fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false)) {
+                itemBuilders.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial())
+                        .amount(fileConfiguration.getInt(path + ".frames." + b + ".amount"))
+                        .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".frames." + b + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                        .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".frames." + b + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                        .showAllAttributes(fileConfiguration.getBoolean(path + ".frames." + b + ".show all attributes"))
+                        .glow(fileConfiguration.getBoolean(path + ".frames." + b + ".glow"))
+                        .colors(fileConfiguration.getBoolean(path + ".frames." + b + ".animated") ? (fileConfiguration.getBoolean(path + "frames." + b + ".random colors") ? Utils.serialize(Utils.randomColors(3)) : Utils.serialize(fileConfiguration.getStringList(path + ".frames." + b + ".colors"))) : Utils.serialize(Lists.newArrayList())));
+            }
+        return itemBuilders;
+    }
+
+    public ItemBuilder material(@NotNull XMaterial material) {
         this.material = material.parseMaterial();
         return this;
     }
@@ -146,12 +179,12 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder enchantment(XEnchantment enchantment, int level) {
+    public ItemBuilder enchantment(@NotNull XEnchantment enchantment, int level) {
         this.enchantment(enchantment.parseEnchantment(), level);
         return this;
     }
 
-    public ItemBuilder enchantment(XEnchantment enchantment) {
+    public ItemBuilder enchantment(@NotNull XEnchantment enchantment) {
         this.enchantment(enchantment.parseEnchantment());
         return this;
     }
@@ -196,10 +229,44 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder colors(String... colors) {
-        if (!(colors.length > 2)) {
-            nbtItem.setString("colors", Utils.stringListToString(Arrays.asList(colors)));
+    public ItemBuilder colors(@NotNull List<String> colors) {
+        if (colors.size() >= 2) {
+            this.nbtItem.setString("colors", Utils.serialize(colors));
         }
+        return this;
+    }
+
+    public ItemBuilder colors(String @NotNull ... colors) {
+        colors(Arrays.asList(colors));
+        return this;
+    }
+
+    public ItemBuilder commands(ItemCommand... itemCommands) {
+        commands(Arrays.asList(itemCommands));
+        return this;
+    }
+
+    public ItemBuilder commands(List<ItemCommand> itemCommands) {
+        this.nbtItem.setString("commands", Utils.serialize(itemCommands));
+        return this;
+    }
+
+    public ItemBuilder animation(String animation) {
+        this.nbtItem.setString("animation", animation);
+        return this;
+    }
+
+    public ItemBuilder frames(ItemBuilder... frames) {
+        return frames(Arrays.asList(frames));
+    }
+
+    public ItemBuilder frames(List<ItemBuilder> frames) {
+        this.nbtItem.setString("frames", Utils.serialize(frames));
+        return this;
+    }
+
+    public <K, V> ItemBuilder customNBT(ObjectMap<String, String> objectMap) {
+        this.nbtItem.setString("itemBuilder", Utils.serialize(objectMap));
         return this;
     }
 
@@ -272,5 +339,67 @@ public class ItemBuilder {
 
     public ItemBuilder clone() throws CloneNotSupportedException {
         return (ItemBuilder) super.clone();
+    }
+
+    @Override
+    public String toString() {
+        return "ItemBuilder{" +
+                "itemStack=" + itemStack +
+                ", material=" + material +
+                ", durability=" + durability +
+                ", title='" + title + '\'' +
+                ", amount=" + amount +
+                ", lores=" + lores +
+                ", flags=" + flags +
+                ", enchantments=" + enchantments +
+                ", unbreakable=" + unbreakable +
+                ", customModelData=" + customModelData +
+                ", nbtItem=" + nbtItem +
+                '}';
+    }
+
+    public enum ItemCommandType {
+        RIGHT,
+        LEFT,
+        MIDDLE,
+    }
+
+    public static class ItemCommand {
+        private final ItemCommandType type;
+        private final String[] commands;
+        private final int cooldown;
+
+        public ItemCommand(ItemCommandType type, int cooldown, List<String> commands) {
+            this.type = type;
+            this.cooldown = cooldown;
+            this.commands = commands.toArray(new String[0]);
+        }
+
+        public ItemCommand(ItemCommandType type, int cooldown, String... commands) {
+            this.type = type;
+            this.cooldown = cooldown;
+            this.commands = commands;
+        }
+
+        public ItemCommandType getType() {
+            return type;
+        }
+
+        public String[] getCommands() {
+            return commands;
+        }
+
+        public int getCooldown() {
+            return cooldown;
+        }
+
+        @Override
+        public String toString() {
+            return "ItemCommand{" +
+                    "type=" + type +
+                    ", commands=" + Arrays.toString(commands) +
+                    ", cooldown=" + cooldown +
+                    '}';
+        }
     }
 }

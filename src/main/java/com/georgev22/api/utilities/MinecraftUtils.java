@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MinecraftUtils {
@@ -558,4 +559,59 @@ public class MinecraftUtils {
             return Utils.Reflection.optionalClass(getOBCClassName(className), Bukkit.class.getClassLoader());
         }
     }
+
+    public static class Cooldown {
+        private static final ObjectMap<String, Cooldown> cooldownManagerObjectMap = ObjectMap.newHashObjectMap();
+        private long start;
+        private final int timeInSeconds;
+        private final UUID id;
+        private final String cooldownName;
+
+        public Cooldown(UUID id, String cooldownName, int timeInSeconds) {
+            this.id = id;
+            this.cooldownName = cooldownName;
+            this.timeInSeconds = timeInSeconds;
+        }
+
+        public static boolean isInCooldown(UUID id, String cooldownName) {
+            if (Cooldown.getTimeLeft(id, cooldownName) >= 1) {
+                return true;
+            }
+            Cooldown.stop(id, cooldownName);
+            return false;
+        }
+
+        private static void stop(UUID id, String cooldownName) {
+            cooldownManagerObjectMap.remove(id + cooldownName);
+        }
+
+        private static Cooldown getCooldown(UUID id, String cooldownName) {
+            return cooldownManagerObjectMap.get(id.toString() + cooldownName);
+        }
+
+        public static int getTimeLeft(UUID id, String cooldownName) {
+            Cooldown cooldown = Cooldown.getCooldown(id, cooldownName);
+            int f = -1;
+            if (cooldown != null) {
+                long now = System.currentTimeMillis();
+                long cooldownTime = cooldown.start;
+                int r = (int) (now - cooldownTime) / 1000;
+                f = (r - cooldown.timeInSeconds) * -1;
+            }
+            return f;
+        }
+
+        public void start() {
+            this.start = System.currentTimeMillis();
+            cooldownManagerObjectMap.put(this.id.toString() + this.cooldownName, this);
+        }
+
+        public static String getTimeLeft(int secondTime) {
+            TimeZone tz = Calendar.getInstance().getTimeZone();
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+            df.setTimeZone(tz);
+            return df.format(new Date(secondTime * 1000L));
+        }
+    }
+
 }

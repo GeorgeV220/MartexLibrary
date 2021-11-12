@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,13 +13,13 @@ public class Animation {
 
     private static final ObjectMap<String, List<String>> animationCache = ObjectMap.newHashObjectMap();
 
-    public static String wave(String string, Color... colors) {
+    public static String wave(String string, List<Color> colors) {
         return wave(string, true, 5, 10, colors);
     }
 
-    public static String wave(String string, boolean bold, int start, int end, Color... colors) {
-        Preconditions.checkArgument(colors.length > 1, "Not enough colors provided");
-        String str = "wave-" + string + "-" + bold + "-" + start + "-" + end + "-" + Arrays.stream(colors).map(Color::getColorCode).collect(Collectors.joining("-"));
+    public static String wave(String string, boolean bold, int start, int end, List<Color> colors) {
+        Preconditions.checkArgument(colors.size() > 1, "Not enough colors provided");
+        String str = "wave-" + string + "-" + bold + "-" + start + "-" + end + "-" + colors.stream().map(Color::getColorCode).collect(Collectors.joining("-"));
         if (animationCache.containsKey(str)) {
             return currentFrame(animationCache.get(str));
         } else {
@@ -28,7 +27,7 @@ public class Animation {
             int i = 0;
 
             for (Color color : colors) {
-                Color color2 = colors[colors.length == i + 1 ? 0 : i + 1];
+                Color color2 = colors.get(colors.size() == i + 1 ? 0 : i + 1);
                 frames.addAll(Collections.nCopies(start, color.getAppliedTag() + (bold ? "§l" : "") + string));
                 ArrayList<String> list = Lists.newArrayList();
                 list.addAll(Collections.nCopies(string.length(), color.getAppliedTag()));
@@ -58,13 +57,13 @@ public class Animation {
         }
     }
 
-    public static String fading(String string, Color... colors) {
+    public static String fading(String string, List<Color> colors) {
         return fading(string, true, 10, 20, colors);
     }
 
-    public static String fading(String string, boolean bold, int start, int end, Color... colors) {
-        Preconditions.checkArgument(colors.length > 1, "Not enough colors provided");
-        String str = "fading-" + string + "-" + bold + "-" + start + "-" + end + "-" + Arrays.stream(colors).map(Color::getColorCode).collect(Collectors.joining("-"));
+    public static String fading(String string, boolean bold, int start, int end, List<Color> colors) {
+        Preconditions.checkArgument(colors.size() > 1, "Not enough colors provided");
+        String str = "fading-" + string + "-" + bold + "-" + start + "-" + end + "-" + colors.stream().map(Color::getColorCode).collect(Collectors.joining("-"));
         if (animationCache.containsKey(str)) {
             return currentFrame(animationCache.get(str));
         } else {
@@ -72,7 +71,7 @@ public class Animation {
             int i = 0;
 
             for (Color color : colors) {
-                Color color2 = colors[colors.length == i + 1 ? 0 : i + 1];
+                Color color2 = colors.get(colors.size() == i + 1 ? 0 : i + 1);
                 frames.addAll(Collections.nCopies(start, color.getAppliedTag() + (bold ? "§l" : "") + string));
 
                 for (Color color3 : ColorCalculations.getColorsInBetween(color, color2, end)) {

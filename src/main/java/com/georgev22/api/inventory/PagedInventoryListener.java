@@ -30,13 +30,16 @@ class PagedInventoryListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClickEvent(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        Inventory inventory = event.getClickedInventory();
+        Inventory inventory = event.getInventory();
         if (inventory == null || !registrar.getOpenInventories().containsKey(player.getUniqueId()))
             return;
 
         event.setCancelled(true);
         IPagedInventory pagedInventory = registrar.getOpenPagedInventories().get(player.getUniqueId());
         ItemStack clicked = event.getCurrentItem();
+
+        if (!inventory.contains(clicked))
+            return;
 
         if (clicked != null) {
             NavigationItem navigationItem;
@@ -58,8 +61,6 @@ class PagedInventoryListener implements Listener {
                     CustomNavigationItem customNavigationItem = (CustomNavigationItem) navigationItem;
                     customNavigationItem.handleClick(new PagedInventoryCustomNavigationHandler(pagedInventory, event));
                 }
-
-                return;
             }
         }
 

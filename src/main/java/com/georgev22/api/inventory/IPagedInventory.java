@@ -112,10 +112,9 @@ public interface IPagedInventory {
      * @param player   The player opening the inventory
      * @param index    The index of the inventory to be opened
      * @param animated If you want animated display names
-     * @param wave     {@code true} if you want wave {@code false} for fading
      * @return {@code true} if successful, {@code false} otherwise
      */
-    boolean open(Player player, int index, boolean animated, boolean wave);
+    boolean open(Player player, int index, boolean animated);
 
     /**
      * Opens the next inventory of this paged inventory

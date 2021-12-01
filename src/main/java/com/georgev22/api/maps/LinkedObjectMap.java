@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.String.format;
 
@@ -23,6 +24,15 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
      * @param map initial map
      */
     public LinkedObjectMap(final ObjectMap<K, V> map) {
+        putAll(map);
+    }
+
+    /**
+     * Creates a LinkedObjectMap instance initialized with the given map.
+     *
+     * @param map initial map
+     */
+    public LinkedObjectMap(final Map<K, V> map) {
         putAll(map);
     }
 

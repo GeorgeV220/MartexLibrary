@@ -1,8 +1,11 @@
 package com.georgev22.api.colors;
 
 import com.georgev22.api.utilities.MinecraftUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Color {
@@ -13,16 +16,17 @@ public class Color {
     private final int b;
     private static java.awt.Color color;
 
-    public static Color from(String colorCode) {
+    @Contract("_ -> new")
+    public static @NotNull Color from(String colorCode) {
         return new Color(colorCode);
     }
 
-    public static Color from(int r, int g, int b) {
+    public static @NotNull Color from(int r, int g, int b) {
         color = new java.awt.Color(r, g, b);
         return from(Integer.toHexString(color.getRGB()).substring(2));
     }
 
-    private Color(String colorCode) {
+    private Color(@NotNull String colorCode) {
         this.colorCode = colorCode.replace("#", "");
         color = new java.awt.Color(Integer.parseInt(this.colorCode, 16));
         this.r = color.getRed();
@@ -63,11 +67,25 @@ public class Color {
         return "#" + this.colorCode;
     }
 
-    public static int difference(Color color1, Color color2) {
+    public static int difference(@NotNull Color color1, @NotNull Color color2) {
         return Math.abs(color1.r - color2.r) + Math.abs(color1.g - color2.g) + Math.abs(color1.b - color2.b);
     }
 
+    @Override
     public String toString() {
         return this.getAppliedTag();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Color)) return false;
+        Color color = (Color) o;
+        return r == color.r && g == color.g && b == color.b && Objects.equals(colorCode, color.colorCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(colorCode, r, g, b);
     }
 }

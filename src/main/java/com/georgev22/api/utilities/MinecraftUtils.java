@@ -30,7 +30,7 @@ import java.util.*;
 
 public class MinecraftUtils {
 
-    public static boolean isList(final FileConfiguration file, final String path) {
+    public static boolean isList(final @NotNull FileConfiguration file, final String path) {
         return Utils.isList(file.get(path));
     }
 
@@ -43,7 +43,7 @@ public class MinecraftUtils {
     }
 
 
-    public static void broadcastMsg(final List<String> input) {
+    public static void broadcastMsg(final @NotNull List<String> input) {
         input.forEach(MinecraftUtils::broadcastMsg);
     }
 
@@ -51,7 +51,7 @@ public class MinecraftUtils {
         broadcastMsg(String.valueOf(input));
     }
 
-    public static void printMsg(final List<String> input) {
+    public static void printMsg(final @NotNull List<String> input) {
         input.forEach(MinecraftUtils::printMsg);
     }
 
@@ -128,12 +128,12 @@ public class MinecraftUtils {
      * @param msg The message to be translated
      * @return A translated message
      */
-    public static String colorize(final String msg) {
+    public static @NotNull String colorize(final String msg) {
         Validate.notNull(msg, "The string can't be null!");
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
 
-    public static String unColorize(final String msg) {
+    public static String stripColor(final String msg) {
         Validate.notNull(msg, "The string can't be null!");
         return ChatColor.stripColor(msg);
     }
@@ -144,7 +144,7 @@ public class MinecraftUtils {
      * @param array Array of messages
      * @return A translated message array
      */
-    public static String[] colorize(final String... array) {
+    public static String @NotNull [] colorize(final String... array) {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
         final String[] newarr = Arrays.copyOf(array, array.length);
@@ -154,12 +154,12 @@ public class MinecraftUtils {
         return newarr;
     }
 
-    public static String[] unColorize(final String... array) {
+    public static String @NotNull [] stripColor(final String... array) {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
-            newarr[i] = unColorize(newarr[i]);
+            newarr[i] = stripColor(newarr[i]);
         }
         return newarr;
     }
@@ -170,7 +170,7 @@ public class MinecraftUtils {
      * @param coll The collection to be translated
      * @return A translated message
      */
-    public static List<String> colorize(final List<String> coll) {
+    public static @NotNull List<String> colorize(final List<String> coll) {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
@@ -178,15 +178,15 @@ public class MinecraftUtils {
         return newColl;
     }
 
-    public static List<String> unColorize(final List<String> coll) {
+    public static @NotNull List<String> stripColor(final List<String> coll) {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
-        newColl.replaceAll(MinecraftUtils::unColorize);
+        newColl.replaceAll(MinecraftUtils::stripColor);
         return newColl;
     }
 
-    public static void debug(final JavaPlugin plugin, final Map<String, String> map, String... messages) {
+    public static void debug(final JavaPlugin plugin, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
             MinecraftUtils.printMsg(Utils.placeHolder("[" + plugin.getDescription().getName() + "] [Debug] [Version: " + plugin.getDescription().getVersion() + "] " + msg, map, false));
         }
@@ -196,11 +196,11 @@ public class MinecraftUtils {
         debug(plugin, null, messages);
     }
 
-    public static void debug(final JavaPlugin plugin, List<String> messages) {
+    public static void debug(final JavaPlugin plugin, @NotNull List<String> messages) {
         debug(plugin, null, messages.toArray(new String[0]));
     }
 
-    public static ItemStack[] getItems(final ItemStack item, int amount) {
+    public static ItemStack @NotNull [] getItems(final @NotNull ItemStack item, int amount) {
 
         final int maxSize = item.getMaxStackSize();
         if (amount <= maxSize) {
@@ -217,8 +217,8 @@ public class MinecraftUtils {
     }
 
 
-    public static String getProgressBar(double current, double max, int totalBars, String symbol, String completedColor,
-                                        String notCompletedColor) {
+    public static @NotNull String getProgressBar(double current, double max, int totalBars, String symbol, String completedColor,
+                                                 String notCompletedColor) {
         final double percent = (float) Math.min(current, max) / max;
         final int progressBars = (int) (totalBars * percent);
         final int leftOver = totalBars - progressBars;
@@ -237,7 +237,7 @@ public class MinecraftUtils {
         return sb.toString();
     }
 
-    public static ItemStack resetItemMeta(final ItemStack item) {
+    public static @NotNull ItemStack resetItemMeta(final @NotNull ItemStack item) {
         final ItemStack copy = item.clone();
         copy.setItemMeta(Bukkit.getItemFactory().getItemMeta(copy.getType()));
         return copy;
@@ -248,7 +248,7 @@ public class MinecraftUtils {
      *
      * @param listeners Class that implements Listener interface
      */
-    public static void registerListeners(Plugin plugin, Listener... listeners) {
+    public static void registerListeners(Plugin plugin, Listener @NotNull ... listeners) {
         final PluginManager pm = Bukkit.getPluginManager();
         for (final Listener listener : listeners) {
             pm.registerEvents(listener, plugin);
@@ -280,15 +280,11 @@ public class MinecraftUtils {
      */
     public static void unRegisterCommand(String commandName) {
         try {
-            Field field1 = Bukkit.getServer().getPluginManager().getClass().getDeclaredField("commandMap");
-            field1.setAccessible(true);
-            Object result = field1.get(Bukkit.getServer().getPluginManager());
-            SimpleCommandMap commandMap = (SimpleCommandMap) result;
-            Field field = MinecraftVersion.getCurrentVersion().isBelowOrEqual(MinecraftVersion.V1_12_R1) ? commandMap.getClass().getDeclaredField("knownCommands") : commandMap.getClass().getSuperclass().getDeclaredField("knownCommands");
-            field.setAccessible(true);
-            Object map = field.get(commandMap);
+            Object result = Utils.Reflection.fetchField(Bukkit.getServer().getPluginManager().getClass(), Bukkit.getServer().getPluginManager(), "commandMap");
+            SimpleCommandMap simpleCommandMap = (SimpleCommandMap) result;
+            Object map = Utils.Reflection.fetchField(MinecraftVersion.getCurrentVersion().isBelowOrEqual(MinecraftVersion.V1_12_R1) ? simpleCommandMap.getClass() : simpleCommandMap.getClass().getSuperclass(), simpleCommandMap, "knownCommands");
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
-            Command command = commandMap.getCommand(commandName);
+            Command command = simpleCommandMap.getCommand(commandName);
             knownCommands.remove(command.getName());
             for (String alias : command.getAliases()) {
                 knownCommands.remove(alias);
@@ -363,7 +359,7 @@ public class MinecraftUtils {
      * @param messagePlaceHolders The placeholders of the message.
      * @return {@link DiscordWebHook} instance.
      */
-    public static DiscordWebHook buildDiscordWebHookFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> embedPlaceHolders, ObjectMap<String, String> messagePlaceHolders) {
+    public static DiscordWebHook buildDiscordWebHookFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> embedPlaceHolders, Map<String, String> messagePlaceHolders) {
         return new DiscordWebHook(fileConfiguration.getString(path + ".webhook url")).setContent(Utils.placeHolder(fileConfiguration.getString(path + ".message"), messagePlaceHolders, true))
                 .setAvatarUrl(fileConfiguration.getString(path + ".avatar url"))
                 .setUsername(fileConfiguration.getString(path + ".username")).addEmbeds(buildEmbedsFromConfig(fileConfiguration, path + ".embeds", embedPlaceHolders).toArray(new DiscordWebHook.EmbedObject[0]));
@@ -377,7 +373,7 @@ public class MinecraftUtils {
      * @param placeholders      The placeholders of the embeds.
      * @return A list that contains {@link DiscordWebHook.EmbedObject} objects.
      */
-    public static List<DiscordWebHook.EmbedObject> buildEmbedsFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+    public static @NotNull List<DiscordWebHook.EmbedObject> buildEmbedsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         List<DiscordWebHook.EmbedObject> embedObjects = Lists.newArrayList();
         for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
             embedObjects.add(buildEmbedFromConfig(fileConfiguration, path, placeholders));
@@ -393,7 +389,7 @@ public class MinecraftUtils {
      * @param placeholders      The placeholders of the fields.
      * @return A list that contains {@link DiscordWebHook.EmbedObject.Field} objects.
      */
-    public static List<DiscordWebHook.EmbedObject.Field> buildFieldsFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+    public static @NotNull List<DiscordWebHook.EmbedObject.Field> buildFieldsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         List<DiscordWebHook.EmbedObject.Field> fields = Lists.newArrayList();
         for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
             fields.add(buildFieldFromConfig(fileConfiguration, path + "." + s, placeholders));
@@ -409,7 +405,7 @@ public class MinecraftUtils {
      * @param placeholders      The placeholders of the embed.
      * @return {@link DiscordWebHook.EmbedObject} instance.
      */
-    public static DiscordWebHook.EmbedObject buildEmbedFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+    public static DiscordWebHook.EmbedObject buildEmbedFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         return new DiscordWebHook.EmbedObject().setTitle(Utils.placeHolder(fileConfiguration.getString(path + ".title"), placeholders, true))
                 .setDescription(Utils.placeHolder(fileConfiguration.getString(path + ".description"), placeholders, true))
                 .setColor(Color.from(fileConfiguration.getString(path + ".color")))
@@ -431,7 +427,8 @@ public class MinecraftUtils {
      * @param placeholders      The placeholders of the field.
      * @return {@link DiscordWebHook.EmbedObject.Field} instance.
      */
-    public static DiscordWebHook.EmbedObject.Field buildFieldFromConfig(FileConfiguration fileConfiguration, String path, ObjectMap<String, String> placeholders) {
+    @Contract("_, _, _ -> new")
+    public static DiscordWebHook.EmbedObject.@NotNull Field buildFieldFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         return new DiscordWebHook.EmbedObject.Field(
                 Utils.placeHolder(fileConfiguration.getString(path + ".name"), placeholders, true),
                 Utils.placeHolder(fileConfiguration.getString(path + ".message"), placeholders, true),
@@ -491,7 +488,6 @@ public class MinecraftUtils {
     }
 
     public enum MinecraftVersion {
-        UNKNOWN,
         V_1_7_R1,
         V_1_7_R2,
         V_1_7_R3,
@@ -511,7 +507,10 @@ public class MinecraftUtils {
         V1_16_R1,
         V1_16_R2,
         V1_16_R3,
-        V1_17_R1;
+        V1_17_R1,
+        V1_18_R1,
+        UNKNOWN,
+        ;
 
         private static MinecraftVersion currentVersion;
 
@@ -643,8 +642,8 @@ public class MinecraftUtils {
             cooldownManagerObjectMap.remove(id + cooldownName);
         }
 
-        private static Cooldown getCooldown(UUID id, String cooldownName) {
-            return cooldownManagerObjectMap.get(id.toString() + cooldownName);
+        private static Cooldown getCooldown(@NotNull UUID id, String cooldownName) {
+            return cooldownManagerObjectMap.get(id + cooldownName);
         }
 
         public static int getTimeLeft(UUID id, String cooldownName) {
@@ -664,7 +663,7 @@ public class MinecraftUtils {
             cooldownManagerObjectMap.put(this.id.toString() + this.cooldownName, this);
         }
 
-        public static String getTimeLeft(int secondTime) {
+        public static @NotNull String getTimeLeft(int secondTime) {
             TimeZone tz = Calendar.getInstance().getTimeZone();
             SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
             df.setTimeZone(tz);

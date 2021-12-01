@@ -5,9 +5,12 @@ import com.google.common.collect.Sets;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 
 public final class CFG {
@@ -111,23 +114,26 @@ public final class CFG {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        return result;
+        return Objects.hash(plugin, fileName, fileConfiguration, file, saveResource);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CFG other = (CFG) obj;
-        if (fileName == null) {
-            return other.fileName == null;
-        } else return fileName.equals(other.fileName);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CFG cfg = (CFG) o;
+        return saveResource == cfg.saveResource && Objects.equals(plugin, cfg.plugin) && Objects.equals(fileName, cfg.fileName) && Objects.equals(fileConfiguration, cfg.fileConfiguration) && Objects.equals(file, cfg.file);
+    }
+
+    @Contract(pure = true)
+    @Override
+    public @NotNull String toString() {
+        return "CFG{" +
+                "plugin=" + plugin +
+                ", fileName='" + fileName + '\'' +
+                ", fileConfiguration=" + fileConfiguration +
+                ", file=" + file +
+                ", saveResource=" + saveResource +
+                '}';
     }
 }

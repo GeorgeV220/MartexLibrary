@@ -1,6 +1,8 @@
 package com.georgev22.api.maps;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -14,7 +16,8 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      *
      * @return a new empty {@link LinkedObjectMap} instance.
      */
-    static ObjectMap newLinkedObjectMap() {
+    @Contract(" -> new")
+    static @NotNull LinkedObjectMap newLinkedObjectMap() {
         return new LinkedObjectMap();
     }
 
@@ -23,7 +26,8 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      *
      * @return a new empty {@link ConcurrentObjectMap} instance.
      */
-    static ObjectMap newConcurrentObjectMap() {
+    @Contract(" -> new")
+    static @NotNull ConcurrentObjectMap newConcurrentObjectMap() {
         return new ConcurrentObjectMap();
     }
 
@@ -32,8 +36,19 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      *
      * @return a new empty {@link HashObjectMap} instance.
      */
-    static ObjectMap newHashObjectMap() {
+    @Contract(" -> new")
+    static @NotNull HashObjectMap newHashObjectMap() {
         return new HashObjectMap();
+    }
+
+    /**
+     * Creates a new empty {@link TreeObjectMap} instance.
+     *
+     * @return a new empty {@link TreeObjectMap} instance.
+     */
+    @Contract(" -> new")
+    static @NotNull TreeObjectMap newTreeObjectMap() {
+        return new TreeObjectMap();
     }
 
     /**
@@ -42,7 +57,19 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @param map the mappings to be placed in the new map
      * @return a new {@link LinkedObjectMap#LinkedObjectMap(ObjectMap)} initialized with the mappings from {@code map}
      */
-    static ObjectMap newLinkedObjectMap(ObjectMap map) {
+    @Contract("_ -> new")
+    static @NotNull LinkedObjectMap newLinkedObjectMap(ObjectMap map) {
+        return new LinkedObjectMap(map);
+    }
+
+    /**
+     * Creates a {@link LinkedObjectMap} instance with the same mappings as the specified map.
+     *
+     * @param map the mappings to be placed in the new map
+     * @return a new {@link LinkedObjectMap#LinkedObjectMap(Map)} initialized with the mappings from {@code map}
+     */
+    @Contract("_ -> new")
+    static @NotNull LinkedObjectMap newLinkedObjectMap(Map map) {
         return new LinkedObjectMap(map);
     }
 
@@ -52,7 +79,19 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @param map the mappings to be placed in the new map
      * @return a new {@link ConcurrentObjectMap#ConcurrentObjectMap(ObjectMap)} initialized with the mappings from {@code map}
      */
-    static ObjectMap newConcurrentObjectMap(ObjectMap map) {
+    @Contract("_ -> new")
+    static @NotNull ConcurrentObjectMap newConcurrentObjectMap(ObjectMap map) {
+        return new ConcurrentObjectMap(map);
+    }
+
+    /**
+     * Creates a {@link ConcurrentObjectMap} instance with the same mappings as the specified map.
+     *
+     * @param map the mappings to be placed in the new map
+     * @return a new {@link ConcurrentObjectMap#ConcurrentObjectMap(Map)} initialized with the mappings from {@code map}
+     */
+    @Contract("_ -> new")
+    static @NotNull ConcurrentObjectMap newConcurrentObjectMap(Map map) {
         return new ConcurrentObjectMap(map);
     }
 
@@ -62,8 +101,42 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @param map the mappings to be placed in the new map
      * @return a new {@link HashObjectMap#HashObjectMap(ObjectMap)} initialized with the mappings from {@code map}
      */
-    static ObjectMap newHashObjectMap(ObjectMap map) {
+    @Contract("_ -> new")
+    static @NotNull HashObjectMap newHashObjectMap(ObjectMap map) {
         return new HashObjectMap(map);
+    }
+
+    /**
+     * Creates a {@link HashObjectMap} instance with the same mappings as the specified map.
+     *
+     * @param map the mappings to be placed in the new map
+     * @return a new {@link HashObjectMap#HashObjectMap(Map)} initialized with the mappings from {@code map}
+     */
+    @Contract("_ -> new")
+    static @NotNull HashObjectMap newHashObjectMap(Map map) {
+        return new HashObjectMap(map);
+    }
+
+    /**
+     * Creates a {@link TreeObjectMap} instance with the same mappings as the specified map.
+     *
+     * @param map the mappings to be placed in the new map
+     * @return a new {@link TreeObjectMap#TreeObjectMap(ObjectMap)} initialized with the mappings from {@code map}
+     */
+    @Contract("_ -> new")
+    static @NotNull TreeObjectMap newTreeObjectMap(ObjectMap map) {
+        return new TreeObjectMap(map);
+    }
+
+    /**
+     * Creates a {@link TreeObjectMap} instance with the same mappings as the specified map.
+     *
+     * @param map the mappings to be placed in the new map
+     * @return a new {@link TreeObjectMap#TreeObjectMap(Map)} initialized with the mappings from {@code map}
+     */
+    @Contract("_ -> new")
+    static @NotNull TreeObjectMap newTreeObjectMap(Map map) {
+        return new TreeObjectMap(map);
     }
 
 
@@ -318,7 +391,8 @@ public interface ObjectMap<K, V> extends Map<K, V> {
             return "Pair{" + key + " " + value + "}";
         }
 
-        public static <K, V> Pair<K, V> create(K key, V value) {
+        @Contract(value = "_, _ -> new", pure = true)
+        public static <K, V> @NotNull Pair<K, V> create(K key, V value) {
             return new Pair<>(key, value);
         }
     }

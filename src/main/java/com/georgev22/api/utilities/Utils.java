@@ -2,6 +2,7 @@ package com.georgev22.api.utilities;
 
 import com.georgev22.api.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
+import com.georgev22.api.maps.TreeObjectMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
@@ -12,6 +13,7 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -93,27 +95,59 @@ public final class Utils {
                 "invalid time");
     }
 
-    /* ----------------------------------------------------------------- */
-
-    //
-
-    /* ----------------------------------------------------------------- */
+    /**
+     * Checks if the input is of type long
+     *
+     * @param input input to check if it is long
+     * @return <code>true</code> if the input is long,
+     * <code>false</code> if it is not
+     */
     public static boolean isLong(final String input) {
         return Longs.tryParse(StringUtils.deleteWhitespace(input)) != null;
     }
 
+    /**
+     * Checks if the input is of type double
+     *
+     * @param input input to check if it is double
+     * @return <code>true</code> if the input is double,
+     * <code>false</code> if it is not
+     */
     public static boolean isDouble(final String input) {
         return Doubles.tryParse(StringUtils.deleteWhitespace(input)) != null;
     }
 
+    /**
+     * Checks if the input is of type int
+     *
+     * @param input input to check if it is int
+     * @return <code>true</code> if the input is int,
+     * <code>false</code> if it is not
+     */
     public static boolean isInt(final String input) {
         return Ints.tryParse(StringUtils.deleteWhitespace(input)) != null;
     }
 
-    public static boolean isList(final Object obj) {
-        return obj instanceof List;
+    /**
+     * Checks if the input is a List
+     *
+     * @param input input to check if it is a List
+     * @return <code>true</code> if the input is a List,
+     * <code>false</code> if it is not
+     */
+    public static boolean isList(final Object input) {
+        return input instanceof List;
     }
 
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param str        the input string to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string with the placeholders replaced
+     */
     public static String placeHolder(String str, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(str, "The string can't be null!");
         if (map == null) {
@@ -126,7 +160,15 @@ public final class Utils {
         return str;
     }
 
-    private static String replaceIgnoreCase(final String text, String searchString, final String replacement) {
+    /**
+     * Replaces a string, without distinguishing between lowercase and uppercase
+     *
+     * @param text         the input string
+     * @param searchString the string to be replaced
+     * @param replacement  the replacement of the string
+     * @return the new string with the replacement
+     */
+    public static String replaceIgnoreCase(final String text, String searchString, final String replacement) {
 
         if (text == null || text.length() == 0) {
             return text;
@@ -147,15 +189,15 @@ public final class Utils {
         if (end == -1) {
             return text;
         }
-        final int replLength = searchString.length();
-        int increase = replacement.length() - replLength;
+        final int replacementLength = searchString.length();
+        int increase = replacement.length() - replacementLength;
         increase = Math.max(increase, 0);
         increase *= 16;
 
         final StringBuilder buf = new StringBuilder(text.length() + increase);
         while (end != -1) {
             buf.append(text, start, end).append(replacement);
-            start = end + replLength;
+            start = end + replacementLength;
             if (--max == 0) {
                 break;
             }
@@ -164,19 +206,37 @@ public final class Utils {
         return buf.append(text, start, text.length()).toString();
     }
 
-    public static String[] placeHolder(final String[] array, final Map<String, String> map, final boolean ignoreCase) {
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param array      the input array of string to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string array with the placeholders replaced
+     */
+    public static String @NotNull [] placeHolder(final String[] array, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
-        final String[] newarr = Arrays.copyOf(array, array.length);
+        final String[] newArray = Arrays.copyOf(array, array.length);
         if (map == null) {
-            return newarr;
+            return newArray;
         }
-        for (int i = 0; i < newarr.length; i++) {
-            newarr[i] = placeHolder(newarr[i], map, ignoreCase);
+        for (int i = 0; i < newArray.length; i++) {
+            newArray[i] = placeHolder(newArray[i], map, ignoreCase);
         }
-        return newarr;
+        return newArray;
     }
 
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param coll       the input string list to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string list with the placeholders replaced
+     */
     public static List<String> placeHolder(final List<String> coll, final Map<String, String> map,
                                            final boolean ignoreCase) {
         Validate.notNull(coll, "The string collection can't be null!");
@@ -185,17 +245,30 @@ public final class Utils {
                 : coll.stream().map(str -> placeHolder(str, map, ignoreCase)).collect(Collectors.toList());
     }
 
-    private static String formatNumber(Locale lang, double input) {
+    /**
+     * Formats a number to a specific Locale
+     *
+     * @param lang  the desired locale
+     * @param input the input number
+     * @return the formatted String
+     */
+    public static String formatNumber(Locale lang, double input) {
         Validate.notNull(lang);
         return NumberFormat.getInstance(lang).format(input);
     }
 
+    /**
+     * Formats a number to the US Locale
+     *
+     * @param input the input number
+     * @return the formatted String
+     */
     public static String formatNumber(double input) {
         return formatNumber(Locale.US, input);
     }
 
     /**
-     * Get the greatest values in a map
+     * Finds and retrieves the greatest values of a map.
      *
      * @param map The map to get the greatest values
      * @param n   The number of values you want to get
@@ -203,7 +276,7 @@ public final class Utils {
      * @param <V> The map value
      * @return Map
      */
-    public static <K, V extends Comparable<? super V>> List<Entry<K, V>> findGreatest(Map<K, V> map, int n) {
+    public static <K, V extends Comparable<? super V>> @NotNull List<Entry<K, V>> findGreatest(@NotNull Map<K, V> map, int n) {
         Comparator<? super Entry<K, V>> comparator = (Comparator<Entry<K, V>>) (e0, e1) -> {
             V v0 = e0.getValue();
             V v1 = e1.getValue();
@@ -224,7 +297,7 @@ public final class Utils {
         return result;
     }
 
-    public static String getArgumentsToString(String[] args, int num) {
+    public static @NotNull String getArgumentsToString(String @NotNull [] args, int num) {
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {
             sb.append(args[i]).append(" ");
@@ -232,7 +305,7 @@ public final class Utils {
         return sb.toString().trim();
     }
 
-    public static String[] getArgumentsToArray(String[] args, int num) {
+    public static String @NotNull [] getArgumentsToArray(String @NotNull [] args, int num) {
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {
             sb.append(args[i]).append(" ");
@@ -240,7 +313,7 @@ public final class Utils {
         return sb.toString().trim().split(" ");
     }
 
-    public static String[] reverse(String[] a) {
+    public static String @NotNull [] reverse(String[] a) {
         List<String> list = Arrays.asList(a);
         Collections.reverse(list);
         return list.toArray(new String[0]);
@@ -327,9 +400,19 @@ public final class Utils {
      * @param objectMap The {@link ObjectMap} to convert.
      * @return a String List with the {@link ObjectMap} contents.
      */
-    public static <K, V> @NotNull List<String> mapToStringList(@NotNull ObjectMap<K, V> objectMap) {
+    public static <K, V> @NotNull List<String> objectMapToStringList(@NotNull ObjectMap<K, V> objectMap) {
+        return mapToStringList(objectMap);
+    }
+
+    /**
+     * Converts a map to string list.
+     *
+     * @param map The {@link Map} to convert.
+     * @return a String List with the {@link Map} contents.
+     */
+    public static <K, V> @NotNull List<String> mapToStringList(@NotNull Map<K, V> map) {
         List<String> stringList = Lists.newArrayList();
-        for (Entry<K, V> entry : objectMap.entrySet()) {
+        for (Entry<K, V> entry : map.entrySet()) {
             stringList.add(entry.getKey() + "=" + entry.getValue());
         }
         return stringList;
@@ -343,21 +426,50 @@ public final class Utils {
      * @param <T>        The class type.
      * @param <K>        Type of the key.
      * @param <V>        Type of the value.
-     * @return a {@link ObjectMap} with the String List contents.
+     * @return a {@link ObjectMap#newHashObjectMap(Map)} with the String List contents.
      */
     public static <K, V, T> @NotNull ObjectMap<K, V> stringListToObjectMap(List<String> stringList, final Class<T> clazz) {
-        ObjectMap<K, V> objectMap = ObjectMap.newHashObjectMap();
+        return ObjectMap.newHashObjectMap(stringListToHashMap(stringList, clazz));
+    }
+
+    /**
+     * Converts a String List to {@link HashMap}.
+     *
+     * @param stringList the String List to convert.
+     * @param clazz      The class type of the value.
+     * @param <T>        The class type.
+     * @param <K>        Type of the key.
+     * @param <V>        Type of the value.
+     * @return a {@link HashMap} with the String List contents.
+     */
+    public static <K, V, T> @NotNull Map<K, V> stringListToMap(List<String> stringList, final Class<T> clazz) {
+        return new HashMap<>(stringListToHashMap(stringList, clazz));
+    }
+
+    /**
+     * Converts a String List to {@link Map}.
+     *
+     * @param stringList the String List to convert.
+     * @param clazz      The class type of the value.
+     * @param <T>        The class type.
+     * @param <K>        Type of the key.
+     * @param <V>        Type of the value.
+     * @return a {@link HashMap} with the String List contents.
+     */
+    public static <K, V, T> @NotNull Map<K, V> stringListToHashMap(@NotNull List<String> stringList, final Class<T> clazz) {
+        Map<K, V> map = new HashMap<>();
 
         if (stringList == null || stringList.isEmpty()) {
-            return objectMap;
+            return map;
         }
 
         for (String string : stringList) {
-            String[] entry = string.split("=");
+            if (!string.contains("=")) continue;
+            String[] arguments = string.split("=");
             if (clazz != null) {
                 Method method;
                 try {
-                    method = clazz.getDeclaredMethod("valueOf", String.class);
+                    method = Reflection.fetchMethod(clazz, "valueOf", String.class);
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                     continue;
@@ -365,43 +477,87 @@ public final class Utils {
 
                 if (method != null) {
                     try {
-                        objectMap.append((K) entry[0], (V) method.invoke(null, entry[1]));
+                        map.put((K) arguments[0], (V) method.invoke(null, arguments[1]));
                     } catch (InvocationTargetException | IllegalAccessException ex) {
                         ex.printStackTrace();
-                        System.out.println("Failure: " + entry[1] + " is not of type " + clazz.getName());
+                        System.out.println("Failure: " + arguments[1] + " is not of type " + clazz.getName());
                     }
                 }
             } else {
-                objectMap.append((K) entry[0], (V) entry[1]);
+                map.put((K) arguments[0], (V) arguments[1]);
             }
 
         }
 
-        return objectMap;
+        return map;
     }
 
-    public static @NotNull List<Color> colorsStringListToColorList(@NotNull List<String> result) {
+    /**
+     * Converts a String List that contains color codes to Color List
+     *
+     * @param list the String List that contains the color codes
+     * @return the new Color List with the colors of the input Color String List
+     */
+    public static @NotNull List<Color> colorsStringListToColorList(@NotNull List<String> list) {
+        return colorsStringListToColorList(list.toArray(new String[0]));
+    }
+
+    /**
+     * Converts a String Array that contains color codes to Color List
+     *
+     * @param array the String Array that contains the color codes
+     * @return the new Color List with the colors of the input Color String Array
+     */
+    public static @NotNull List<Color> colorsStringListToColorList(String @NotNull ... array) {
         List<Color> colorList = Lists.newArrayList();
-        for (String str : result) {
+        for (String str : array) {
             colorList.add(Color.from(str));
         }
         return colorList;
     }
 
-    public static @NotNull List<Color> colorsStringListToColorList(String @NotNull ... result) {
-        List<Color> colorList = Lists.newArrayList();
-        for (String str : result) {
-            colorList.add(Color.from(str));
-        }
-        return colorList;
-    }
-
-    public static @NotNull List<String> randomColors(int size) {
+    /**
+     * Generates a specific amount of random HEX colors
+     *
+     * @param amount the amount of the colors to be generated
+     * @return a String List that contains the generated color codes
+     */
+    public static @NotNull List<String> randomColors(int amount) {
         List<String> randomColorList = Lists.newArrayList();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < amount; i++) {
             randomColorList.add(String.format("#%06x", new Random().nextInt(0xffffff + 1)));
         }
         return randomColorList;
+    }
+
+    /**
+     * Converts a number to Roman Number format
+     *
+     * @param number number to convert
+     * @return a string of the number at Roman Number format
+     */
+    public static String toRoman(int number) {
+        TreeObjectMap<Integer, String> map = ObjectMap.newTreeObjectMap();
+        map
+                .append(1000, "M")
+                .append(900, "CM")
+                .append(500, "D")
+                .append(400, "CD")
+                .append(100, "C")
+                .append(90, "XC")
+                .append(50, "L")
+                .append(40, "XL")
+                .append(10, "X")
+                .append(9, "IX")
+                .append(5, "V")
+                .append(4, "IV")
+                .append(1, "I")
+        ;
+        int l = map.floorKey(number);
+        if (number == l) {
+            return map.get(number);
+        }
+        return map.get(l) + toRoman(number - l);
     }
 
     public static final class Assertions {
@@ -415,7 +571,8 @@ public final class Utils {
          * @return the value
          * @throws IllegalArgumentException if value is null
          */
-        public static <T> T notNull(final String name, final T value) {
+        @Contract(value = "_, null -> fail; _, !null -> param2", pure = true)
+        public static <T> @NotNull T notNull(final String name, final T value) {
             if (value == null) {
                 throw new IllegalArgumentException(name + " can not be null");
             }
@@ -477,7 +634,7 @@ public final class Utils {
          * @return value cast to clazz
          * @throws IllegalArgumentException if value is not assignable to clazz
          */
-        public static <T> T convertToType(final Class<T> clazz, final Object value, final String errorMessage) {
+        public static <T> @NotNull T convertToType(final @NotNull Class<T> clazz, final @NotNull Object value, final String errorMessage) {
             if (!clazz.isAssignableFrom(value.getClass())) {
                 throw new IllegalArgumentException(errorMessage);
             }
@@ -511,17 +668,53 @@ public final class Utils {
             return theUnsafe != null;
         }
 
-        public static @NotNull Class<?> getClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
-            return Class.forName(className, true, classLoader);
+        /**
+         * Returns the {@link Class} object associated with the class or
+         * interface with the given string name, using the given class loader.
+         * Given the fully qualified name for a class or interface (in the same
+         * format returned by {@link Class#getName}) this method attempts to
+         * locate, load, and link the class or interface.  The specified class
+         * loader is used to load the class or interface.  If the parameter
+         * {@code loader} is null, the class is loaded through the bootstrap
+         * class loader.  The class is initialized only if it has
+         * not been initialized earlier.
+         *
+         * @param name   fully qualified name of the desired class
+         * @param loader class loader from which the class must be loaded
+         * @return class object representing the desired class
+         * @throws LinkageError                if the linkage fails
+         * @throws ExceptionInInitializerError if the initialization provoked
+         *                                     by this method fails
+         * @throws ClassNotFoundException      if the class cannot be located by
+         *                                     the specified class loader
+         * @see java.lang.Class#forName(String)
+         * @see java.lang.ClassLoader
+         */
+        public static @NotNull Class<?> getClass(String name, ClassLoader loader) throws ClassNotFoundException {
+            return Class.forName(name, true, loader);
         }
 
-        public static Optional<Class<?>> getOptionalClass(String className, ClassLoader classLoader) {
-            return optionalClass(className, classLoader);
-        }
-
-        public static Optional<Class<?>> optionalClass(String className, ClassLoader classLoader) {
+        /**
+         * Returns the {@link Class} object associated with the class or
+         * interface with the given string name, using the given class loader.
+         * Given the fully qualified name for a class or interface (in the same
+         * format returned by {@link Class#getName}) this method attempts to
+         * locate, load, and link the class or interface.  The specified class
+         * loader is used to load the class or interface.  If the parameter
+         * {@code loader} is null, the class is loaded through the bootstrap
+         * class loader.  The class is initialized only if it has
+         * not been initialized earlier.
+         *
+         * @param name   fully qualified name of the desired class
+         * @param loader class loader from which the class must be loaded
+         * @return class object representing the desired class,
+         * If a {@link ClassNotFoundException} occurs the return value is {@link Optional#empty()}
+         * @see java.lang.Class#forName(String)
+         * @see java.lang.ClassLoader
+         */
+        public static Optional<Class<?>> optionalClass(String name, ClassLoader loader) {
             try {
-                return Optional.of(Class.forName(className, true, classLoader));
+                return Optional.of(Class.forName(name, true, loader));
             } catch (ClassNotFoundException e) {
                 return Optional.empty();
             }
@@ -543,6 +736,15 @@ public final class Utils {
             }
         }
 
+        /**
+         * Returns the inner-{@link Class} object associated with the class or
+         * interface with the given parent class, using the given class predicate.
+         *
+         * @param parentClass    the parent class
+         * @param classPredicate the class predicate to test for the inner class
+         * @return class object representing the desired inner-class,
+         * @throws ClassNotFoundException if the inner-class does not exist
+         */
         static Class<?> innerClass(@NotNull Class<?> parentClass, Predicate<Class<?>> classPredicate) throws ClassNotFoundException {
             for (Class<?> innerClass : parentClass.getDeclaredClasses()) {
                 if (classPredicate.test(innerClass)) {
@@ -552,7 +754,7 @@ public final class Utils {
             throw new ClassNotFoundException("No class in " + parentClass.getCanonicalName() + " matches the predicate.");
         }
 
-        public static @NotNull Constructor findConstructor(Class<?> clazz, MethodHandles.@NotNull Lookup lookup) throws Exception {
+        public static @NotNull Constructor findConstructor(Class<?> clazz, MethodHandles.@NotNull Lookup lookup) throws NoSuchMethodException, IllegalAccessException {
             if (isUnsafeAvailable()) {
                 MethodType allocateMethodType = MethodType.methodType(Object.class, Class.class);
                 MethodHandle allocateMethod = lookup.findVirtual(theUnsafe.getClass(), "allocateInstance", allocateMethodType);
@@ -566,6 +768,56 @@ public final class Utils {
             }
         }
 
+        /**
+         * Returns the value of the field represented by this {@code Field}, on
+         * the specified object. The value is automatically wrapped in an
+         * object if it has a primitive type.
+         *
+         * <p>The underlying field's value is obtained as follows:
+         *
+         * <p>If the underlying field is a static field, the {@code object} argument
+         * is ignored; it may be null.
+         *
+         * <p>Otherwise, the underlying field is an instance field.  If the
+         * specified {@code object} argument is null, the method throws a
+         * {@code NullPointerException}. If the specified object is not an
+         * instance of the class or interface declaring the underlying
+         * field, the method throws an {@code IllegalArgumentException}.
+         *
+         * <p>If this {@code Field} object is enforcing Java language access control, and
+         * the underlying field is inaccessible, the method throws an
+         * {@code IllegalAccessException}.
+         * If the underlying field is static, the class that declared the
+         * field is initialized if it has not already been initialized.
+         *
+         * <p>Otherwise, the value is retrieved from the underlying instance
+         * or static field.  If the field has a primitive type, the value
+         * is wrapped in an object before being returned, otherwise it is
+         * returned as is.
+         *
+         * <p>If the field is hidden in the type of {@code object},
+         * the field's value is obtained according to the preceding rules.
+         *
+         * @param clazz  class that contains the field
+         * @param object object from which the represented field's value is
+         *               to be extracted
+         * @param name   field name
+         * @return the value of the represented field in object
+         * {@code object}; primitive values are wrapped in an appropriate
+         * object before being returned
+         * @throws IllegalAccessException      if this {@code Field} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     field is inaccessible.
+         * @throws IllegalArgumentException    if the specified object is not an
+         *                                     instance of the class or interface declaring the underlying
+         *                                     field (or a subclass or implementor thereof).
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the field is an instance field.
+         * @throws ExceptionInInitializerError if the initialization provoked
+         *                                     by this method fails.
+         */
         public static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
             if (isUnsafeAvailable()) {
                 Field field = clazz.getDeclaredField(name);
@@ -581,6 +833,75 @@ public final class Utils {
             }
         }
 
+        /**
+         * Sets the field represented by this {@code Field} object on the
+         * specified object argument to the specified new value. The new
+         * value is automatically unwrapped if the underlying field has a
+         * primitive type.
+         *
+         * <p>The operation proceeds as follows:
+         *
+         * <p>If the underlying field is static, the {@code object} argument is
+         * ignored; it may be null.
+         *
+         * <p>Otherwise the underlying field is an instance field.  If the
+         * specified object argument is null, the method throws a
+         * {@code NullPointerException}.  If the specified object argument is not
+         * an instance of the class or interface declaring the underlying
+         * field, the method throws an {@code IllegalArgumentException}.
+         *
+         * <p>If this {@code Field} object is enforcing Java language access control, and
+         * the underlying field is inaccessible, the method throws an
+         * {@code IllegalAccessException}.
+         *
+         * <p>If the underlying field is final, the method throws an
+         * {@code IllegalAccessException} unless {@code setAccessible(true)}
+         * has succeeded for this {@code Field} object
+         * and the field is non-static. Setting a final field in this way
+         * is meaningful only during deserialization or reconstruction of
+         * instances of classes with blank final fields, before they are
+         * made available for access by other parts of a program. Use in
+         * any other context may have unpredictable effects, including cases
+         * in which other parts of a program continue to use the original
+         * value of this field.
+         *
+         * <p>If the underlying field is of a primitive type, an unwrapping
+         * conversion is attempted to convert the new value to a value of
+         * a primitive type.  If this attempt fails, the method throws an
+         * {@code IllegalArgumentException}.
+         *
+         * <p>If, after possible unwrapping, the new value cannot be
+         * converted to the type of the underlying field by an identity or
+         * widening conversion, the method throws an
+         * {@code IllegalArgumentException}.
+         *
+         * <p>If the underlying field is static, the class that declared the
+         * field is initialized if it has not already been initialized.
+         *
+         * <p>The field is set to the possibly unwrapped and widened new value.
+         *
+         * <p>If the field is hidden in the type of {@code object},
+         * the field's value is set according to the preceding rules.
+         *
+         * @param clazz  class that contains the specific field
+         * @param object object whose field should be modified
+         * @param name   field name
+         * @param value  new value for the field of {@code object}
+         *               being modified
+         * @throws IllegalAccessException      if this {@code Field} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     field is either inaccessible or final.
+         * @throws IllegalArgumentException    if the specified object is not an
+         *                                     instance of the class or interface declaring the underlying
+         *                                     field (or a subclass or implementor thereof),
+         *                                     or if an unwrapping conversion fails.
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the field is an instance field.
+         * @throws ExceptionInInitializerError if the initialization provoked
+         *                                     by this method fails.
+         */
         public static void setFieldValue(final Class<?> clazz, final Object object, final String name, Object value) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
             if (isUnsafeAvailable()) {
                 Field field = clazz.getDeclaredField(name);
@@ -597,7 +918,51 @@ public final class Utils {
             }
         }
 
-        public static Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+        /**
+         * Returns a {@code Method} object that reflects the specified
+         * declared method of the class or interface represented by this
+         * {@code Class} object. The {@code name} parameter is a
+         * {@code String} that specifies the simple name of the desired
+         * method, and the {@code parameterTypes} parameter is an array of
+         * {@code Class} objects that identify the method's formal parameter
+         * types, in declared order.  If more than one method with the same
+         * parameter types is declared in a class, and one of these methods has a
+         * return type that is more specific than any of the others, that method is
+         * returned; otherwise one of the methods is chosen arbitrarily.  If the
+         * name is "&lt;init&gt;"or "&lt;clinit&gt;" a {@code NoSuchMethodException}
+         * is raised.
+         *
+         * <p> If this {@code Class} object represents an array type, then this
+         * method does not find the {@code clone()} method.
+         *
+         * @param clazz          the class that contains the method
+         * @param name           the name of the method
+         * @param parameterTypes the parameter array
+         * @return the {@code Method} object for the method of this class
+         * matching the specified name and parameters
+         * @throws NoSuchMethodException if a matching method is not found.
+         * @throws NullPointerException  if {@code name} is {@code null}
+         * @throws SecurityException     If a security manager, <i>s</i>, is present and any of the
+         *                               following conditions is met:
+         *
+         *                               <ul>
+         *
+         *                               <li> the caller's class loader is not the same as the
+         *                               class loader of this class and invocation of
+         *                               {@link SecurityManager#checkPermission
+         *                               s.checkPermission} method with
+         *                               {@code RuntimePermission("accessDeclaredMembers")}
+         *                               denies access to the declared method
+         *
+         *                               <li> the caller's class loader is not the same as or an
+         *                               ancestor of the class loader for the current class and
+         *                               invocation of {@link SecurityManager#checkPackageAccess
+         *                               s.checkPackageAccess()} denies access to the package
+         *                               of this class
+         *
+         *                               </ul>
+         */
+        public static @NotNull Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
             Method method = clazz.getDeclaredMethod(name, parameterTypes);
             if (!isUnsafeAvailable()) {
                 method.setAccessible(true);
@@ -605,6 +970,67 @@ public final class Utils {
             return method;
         }
 
+        /**
+         * Check {@link Reflection#fetchMethod(Class, String, Class...)} for
+         * the fetch method.
+         * Invokes the underlying method represented by this {@code Method}
+         * object, on the specified object with the specified parameters.
+         * Individual parameters are automatically unwrapped to match
+         * primitive formal parameters, and both primitive and reference
+         * parameters are subject to method invocation conversions as
+         * necessary.
+         *
+         * <p>If the underlying method is static, then the specified {@code obj}
+         * argument is ignored. It may be null.
+         *
+         * <p>If the number of formal parameters required by the underlying method is
+         * 0, the supplied {@code args} array may be of length 0 or null.
+         *
+         * <p>If the underlying method is an instance method, it is invoked
+         * using dynamic method lookup as documented in The Java Language
+         * Specification, Second Edition, section 15.12.4.4; in particular,
+         * overriding based on the runtime type of the target object will occur.
+         *
+         * <p>If the underlying method is static, the class that declared
+         * the method is initialized if it has not already been initialized.
+         *
+         * <p>If the method completes normally, the value it returns is
+         * returned to the caller of invoke; if the value has a primitive
+         * type, it is first appropriately wrapped in an object. However,
+         * if the value has the type of array of a primitive type, the
+         * elements of the array are <i>not</i> wrapped in objects; in
+         * other words, an array of primitive type is returned.  If the
+         * underlying method return type is void, the invocation returns
+         * null.
+         *
+         * @param clazz          the class that contains the method
+         * @param name           the name of the method
+         * @param parameterTypes the parameter array
+         * @param obj            the object the underlying method is invoked from
+         * @param arguments      the arguments used for the method call
+         * @return the result of dispatching the method represented by
+         * this object on {@code obj} with parameters
+         * {@code args}
+         * @throws IllegalAccessException      if this {@code Method} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     method is inaccessible.
+         * @throws IllegalArgumentException    if the method is an
+         *                                     instance method and the specified object argument
+         *                                     is not an instance of the class or interface
+         *                                     declaring the underlying method (or of a subclass
+         *                                     or implementor thereof); if the number of actual
+         *                                     and formal parameters differ; if an unwrapping
+         *                                     conversion for primitive arguments fails; or if,
+         *                                     after possible unwrapping, a parameter value
+         *                                     cannot be converted to the corresponding formal
+         *                                     parameter type by a method invocation conversion.
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the method is an instance method.
+         * @throws ExceptionInInitializerError if the initialization
+         *                                     provoked by this method fails.
+         */
         public static Object fetchMethodAndInvoke(final Class<?> clazz, final String name, Object obj, Object[] arguments, Class<?>[] parameterTypes) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
             return fetchMethod(clazz, name, parameterTypes).invoke(obj, arguments);
         }

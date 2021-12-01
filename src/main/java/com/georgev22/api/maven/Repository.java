@@ -25,7 +25,8 @@
 
 package com.georgev22.api.maven;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.*;
 
 /**
@@ -41,7 +42,7 @@ public @interface Repository {
      *
      * @return the base url of the repository
      */
-    @Nonnull
+    @NotNull
     String url();
 
 }

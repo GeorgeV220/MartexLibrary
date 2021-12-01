@@ -26,6 +26,7 @@
 package com.georgev22.api.maven;
 
 import com.georgev22.api.utilities.ClassLoaderAccess;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +39,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
 /**
  * Resolves {@link MavenLibrary} annotations for a class, and loads the dependency
@@ -184,15 +187,15 @@ public final class LibraryLoader {
     }
 
     @NotNull
-    private static class Dependency {
+    public static class Dependency {
 
         private final String groupId, artifactId, version, repoUrl;
 
         private Dependency(String groupId, String artifactId, String version, String repoUrl) {
-            this.groupId = Objects.requireNonNull(groupId, "groupId");
-            this.artifactId = Objects.requireNonNull(artifactId, "artifactId");
-            this.version = Objects.requireNonNull(version, "version");
-            this.repoUrl = Objects.requireNonNull(repoUrl, "repoUrl");
+            this.groupId = notNull("groupId", groupId);
+            this.artifactId = notNull("artifactId", artifactId);
+            this.version = notNull("version", version);
+            this.repoUrl = notNull("repoUrl", repoUrl);
         }
 
         public URL url() throws MalformedURLException {
@@ -224,24 +227,15 @@ public final class LibraryLoader {
 
         @Override
         public boolean equals(Object o) {
-            if (o == this) return true;
+            if (this == o) return true;
             if (!(o instanceof Dependency)) return false;
-            Dependency other = (Dependency) o;
-            return this.groupId().equals(other.groupId()) &&
-                    this.artifactId().equals(other.artifactId()) &&
-                    this.version().equals(other.version()) &&
-                    this.repoUrl().equals(other.repoUrl());
+            Dependency that = (Dependency) o;
+            return groupId.equals(that.groupId) && artifactId.equals(that.artifactId) && version.equals(that.version) && repoUrl.equals(that.repoUrl);
         }
 
         @Override
         public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            result = result * PRIME + this.groupId().hashCode();
-            result = result * PRIME + this.artifactId().hashCode();
-            result = result * PRIME + this.version().hashCode();
-            result = result * PRIME + this.repoUrl().hashCode();
-            return result;
+            return Objects.hash(groupId, artifactId, version, repoUrl);
         }
 
         @Override
@@ -254,5 +248,25 @@ public final class LibraryLoader {
         }
     }
 
+    @Contract(pure = true)
+    @Override
+    public @NotNull String toString() {
+        return "LibraryLoader{" +
+                "clazz=" + clazz +
+                ", dataFolder=" + dataFolder +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LibraryLoader)) return false;
+        LibraryLoader that = (LibraryLoader) o;
+        return clazz.equals(that.clazz) && logger.equals(that.logger) && dataFolder.equals(that.dataFolder);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, logger, dataFolder);
+    }
 }

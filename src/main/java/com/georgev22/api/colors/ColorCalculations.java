@@ -1,13 +1,14 @@
 package com.georgev22.api.colors;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ColorCalculations {
 
-    public static List<Color> getColorsInBetween(Color color, Color color2, int n) {
+    public static @NotNull List<Color> getColorsInBetween(@NotNull Color color, @NotNull Color color2, int n) {
         double n2 = (double) (color2.getRed() - color.getRed()) / (double) n;
         double n3 = (double) (color2.getGreen() - color.getGreen()) / (double) n;
         double n4 = (double) (color2.getBlue() - color.getBlue()) / (double) n;

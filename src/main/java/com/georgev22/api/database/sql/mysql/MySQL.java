@@ -5,6 +5,7 @@ import com.georgev22.api.database.Database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
 import java.util.Properties;
 
 public class MySQL extends Database {
@@ -24,6 +25,26 @@ public class MySQL extends Database {
         this.password = password;
     }
 
+    /**
+     * Attempts to establish a connection to the given database URL.
+     * The <code>DriverManager</code> attempts to select an appropriate driver from
+     * the set of registered JDBC drivers.
+     * <p>
+     * <B>Note:</B> If a property is specified as part of the {@code url} and
+     * is also specified in the {@code Properties} object, it is
+     * implementation-defined as to which value will take precedence.
+     * For maximum portability, an application should only specify a
+     * property once.
+     *
+     * @return a Connection to the URL
+     * @throws SQLException           if a database access error occurs or the url is
+     *                                {@code null}
+     * @throws SQLTimeoutException    when the driver has determined that the
+     *                                timeout value specified by the {@code setLoginTimeout} method
+     *                                has been exceeded and has at least tried to cancel the
+     *                                current database connection attempt
+     * @throws ClassNotFoundException if the driver class does not exist
+     */
     @Override
     public Connection openConnection() throws SQLException, ClassNotFoundException {
         if (isConnectionValid()) {

@@ -83,4 +83,20 @@ public class ClassLoaderAccess {
         this.unopenedURLs.add(url);
         this.pathURLs.add(url);
     }
+
+    public Collection<URL> getPathURLs() {
+        return pathURLs;
+    }
+
+    public Collection<URL> getUnopenedURLs() {
+        return unopenedURLs;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassLoaderAccess{" +
+                "unopenedURLs=" + unopenedURLs +
+                ", pathURLs=" + pathURLs +
+                '}';
+    }
 }

@@ -1,6 +1,8 @@
 package com.georgev22.api.utilities;
 
 import com.georgev22.api.colors.Color;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -357,7 +359,7 @@ public class DiscordWebHook {
         }
 
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             StringBuilder builder = new StringBuilder();
             Set<Map.Entry<String, Object>> entrySet = map.entrySet();
             builder.append("{");
@@ -390,10 +392,34 @@ public class DiscordWebHook {
             return builder.toString();
         }
 
-        private String quote(String string) {
+        @Contract(pure = true)
+        private @NotNull String quote(String string) {
             return "\"" + string + "\"";
         }
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DiscordWebHook)) return false;
+        DiscordWebHook that = (DiscordWebHook) o;
+        return url.equals(that.url) && content.equals(that.content) && username.equals(that.username) && avatarUrl.equals(that.avatarUrl) && embeds.equals(that.embeds);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, content, username, avatarUrl, embeds);
+    }
+
+    @Override
+    public String toString() {
+        return "DiscordWebHook{" +
+                "url='" + url + '\'' +
+                ", content='" + content + '\'' +
+                ", username='" + username + '\'' +
+                ", avatarUrl='" + avatarUrl + '\'' +
+                ", embeds=" + embeds +
+                '}';
+    }
 }

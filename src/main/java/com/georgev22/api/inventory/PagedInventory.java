@@ -283,10 +283,7 @@ public class PagedInventory implements IPagedInventory {
                             colorsList.add(Color.from(s));
                         }
 
-                        if (nbtItem.getString("animation").equalsIgnoreCase("wave"))
-                            itemMeta.setDisplayName(Animation.wave(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList));
-                        else
-                            itemMeta.setDisplayName(Animation.fading(MinecraftUtils.unColorize(itemMeta.getDisplayName()), colorsList));
+                        itemMeta.setDisplayName(nbtItem.getString("animation").equalsIgnoreCase("wave") ? Animation.wave(MinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList) : Animation.fading(MinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList));
                         itemStack.setItemMeta(itemMeta);
                         openInventory.setItem(i, itemStack);
 

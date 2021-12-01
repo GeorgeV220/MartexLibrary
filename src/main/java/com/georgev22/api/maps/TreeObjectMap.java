@@ -4,35 +4,35 @@ import com.georgev22.api.utilities.Utils;
 import org.bukkit.Location;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static java.lang.String.format;
 
-public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V> {
+public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V> {
 
     /**
-     * Creates an HashObjectMap instance.
+     * Creates an TreeObjectMap instance.
      */
-    public HashObjectMap() {
+    public TreeObjectMap() {
     }
 
     /**
-     * Creates a HashObjectMap instance initialized with the given map.
+     * Creates a TreeObjectMap instance initialized with the given map.
      *
      * @param map initial map
      */
-    public HashObjectMap(final ObjectMap<K, V> map) {
+    public TreeObjectMap(final ObjectMap<K, V> map) {
         putAll(map);
     }
 
     /**
-     * Creates a HashObjectMap instance initialized with the given map.
+     * Creates a TreeObjectMap instance initialized with the given map.
      *
      * @param map initial map
      */
-    public HashObjectMap(final Map<K, V> map) {
+    public TreeObjectMap(final Map<K, V> map) {
         putAll(map);
     }
 
@@ -56,7 +56,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
-     * Put/replace the given key/value pair into HashObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>
@@ -186,6 +186,17 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
+     * Gets the value of the given key as a Location.
+     *
+     * @param key the key
+     * @return the value as a Location, which may be null
+     * @throws ClassCastException if the value is not a Location
+     */
+    public Location getLocation(final Object key) {
+        return (Location) get(key);
+    }
+
+    /**
      * Gets the value of the given key as a String.
      *
      * @param key          the key
@@ -241,17 +252,6 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
      */
     public Date getDate(final Object key, final Date defaultValue) {
         return get(key, defaultValue);
-    }
-
-    /**
-     * Gets the value of the given key as a Location.
-     *
-     * @param key the key
-     * @return the value as a Location, which may be null
-     * @throws ClassCastException if the value is not a Location
-     */
-    public Location getLocation(final Object key) {
-        return (Location) get(key);
     }
 
     /**

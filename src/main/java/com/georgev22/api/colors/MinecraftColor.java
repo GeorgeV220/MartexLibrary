@@ -1,5 +1,8 @@
 package com.georgev22.api.colors;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 public enum MinecraftColor {
 
     DARK_RED("&4", "#AA0000"),
@@ -43,7 +46,7 @@ public enum MinecraftColor {
         this.color = Color.from(hexColor);
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return this.name().toLowerCase();
     }
 
@@ -55,11 +58,14 @@ public enum MinecraftColor {
         return this.chatColor;
     }
 
-    public String getAppliedTag() {
+    @Contract(pure = true)
+    public @NotNull String getAppliedTag() {
         return this.chatColor.replace("&", "§");
     }
 
-    public String toString() {
+    @Contract(pure = true)
+    @Override
+    public @NotNull String toString() {
         return this.getAppliedTag();
     }
 }

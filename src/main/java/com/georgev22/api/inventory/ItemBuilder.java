@@ -32,7 +32,6 @@ public class ItemBuilder {
     private final List<ItemFlag> flags;
     private final ObjectMap<Enchantment, Integer> enchantments;
     private boolean unbreakable;
-    private int customModelData;
     private final NBTItem nbtItem;
 
     public ItemBuilder(@NotNull XMaterial material) {
@@ -53,7 +52,6 @@ public class ItemBuilder {
         this.flags = Lists.newArrayList();
         this.enchantments = ObjectMap.newHashObjectMap();
         this.unbreakable = false;
-        this.customModelData = -1;
         Preconditions.checkArgument(material != null, "ItemStack cannot be null");
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
@@ -70,7 +68,6 @@ public class ItemBuilder {
         this.flags = Lists.newArrayList();
         this.enchantments = ObjectMap.newHashObjectMap();
         this.unbreakable = false;
-        this.customModelData = -1;
         Preconditions.checkArgument(itemStack != null, "ItemStack cannot be null");
         this.itemStack = itemStack;
         this.showAllAttributes(showAllAttributes);
@@ -209,11 +206,6 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder customModelData(int value) {
-        this.customModelData = value;
-        return this;
-    }
-
     public ItemBuilder skull(String owner) {
         if (this.itemStack.getItemMeta() != null && this.itemStack.getItemMeta() instanceof SkullMeta) {
             SkullMeta skullMeta = (SkullMeta) this.itemStack.getItemMeta();
@@ -324,10 +316,6 @@ public class ItemBuilder {
             meta.addItemFlags(this.flags.toArray(new ItemFlag[0]));
         }
 
-        if (this.customModelData > -1) {
-            meta.setCustomModelData(this.customModelData);
-        }
-
         itemStack.setItemMeta(meta);
         return itemStack;
     }
@@ -348,7 +336,6 @@ public class ItemBuilder {
                 ", flags=" + flags +
                 ", enchantments=" + enchantments +
                 ", unbreakable=" + unbreakable +
-                ", customModelData=" + customModelData +
                 ", nbtItem=" + nbtItem +
                 '}';
     }

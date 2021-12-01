@@ -25,7 +25,8 @@
 
 package com.georgev22.api.maven;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.annotation.*;
 
 /**
@@ -36,7 +37,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MavenLibraries {
 
-    @Nonnull
+    @NotNull
     MavenLibrary[] value() default {};
 
 }

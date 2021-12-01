@@ -5,6 +5,7 @@ import org.bukkit.Location;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.String.format;
@@ -23,6 +24,15 @@ public class ConcurrentObjectMap<K, V> extends ConcurrentHashMap<K, V> implement
      * @param map initial map
      */
     public ConcurrentObjectMap(final ObjectMap<K, V> map) {
+        putAll(map);
+    }
+
+    /**
+     * Creates a ConcurrentObjectMap instance initialized with the given map.
+     *
+     * @param map initial map
+     */
+    public ConcurrentObjectMap(final Map<K, V> map) {
         putAll(map);
     }
 

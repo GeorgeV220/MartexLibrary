@@ -20,7 +20,7 @@ You can have your project depend on API as a dependency through the following co
         <dependency>
             <groupId>com.georgev22</groupId>
             <artifactId>api</artifactId>
-            <version>2.0</version>
+            <version>2.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -51,6 +51,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.georgev22:api:2.0"
+    compileOnly "com.georgev22:api:2.2"
 }
 ```

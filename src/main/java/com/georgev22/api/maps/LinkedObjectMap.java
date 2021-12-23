@@ -2,6 +2,7 @@ package com.georgev22.api.maps;
 
 import com.georgev22.api.utilities.Utils;
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -55,8 +56,24 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
         return this;
     }
 
+    @Override
+    public ObjectMap<K, V> append(@NotNull Map<K, V> map) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            append(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    @Override
+    public ObjectMap<K, V> append(@NotNull ObjectMap<K, V> map) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            append(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
     /**
-     * Put/replace the given key/value pair into ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into ConcurrentObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>
@@ -68,11 +85,7 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
      */
     public ObjectMap<K, V> appendIfTrue(final K key, final V value, boolean ifTrue) {
         if (ifTrue)
-            if (containsKey(key)) {
-                replace(key, value);
-            } else {
-                put(key, value);
-            }
+            append(key, value);
         return this;
     }
 
@@ -90,17 +103,87 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
      */
     public ObjectMap<K, V> appendIfTrue(final K key, final V valueIfTrue, final V valueIfFalse, boolean ifTrue) {
         if (ifTrue) {
-            if (containsKey(key)) {
-                replace(key, valueIfTrue);
-            } else {
-                put(key, valueIfTrue);
-            }
+            append(key, valueIfTrue);
         } else {
-            if (containsKey(key)) {
-                replace(key, valueIfFalse);
-            } else {
-                put(key, valueIfFalse);
-            }
+            append(key, valueIfFalse);
+        }
+        return this;
+    }
+
+    /**
+     * Put/replace a given map into this ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, check1).appendIfTrue(map, check2)}
+     * </pre>
+     *
+     * @param map    key
+     * @param ifTrue ifTrue
+     * @return this
+     */
+    @Override
+    public ObjectMap<K, V> appendIfTrue(@NotNull Map<K, V> map, boolean ifTrue) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            appendIfTrue(entry.getKey(), entry.getValue(), ifTrue);
+        }
+        return this;
+    }
+
+    /**
+     * Put/replace the given key/value pair into ObjectMap if boolean is true or not and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, 2, check1).appendIfTrue(map1, map2, check2)}
+     * </pre>
+     *
+     * @param mapIfTrue  the map if the ifTrue is true
+     * @param mapIfFalse the map if the ifTrue is false
+     * @param ifTrue     ifTrue
+     * @return this
+     */
+    @Override
+    public ObjectMap<K, V> appendIfTrue(Map<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
+        if (ifTrue) {
+            append(mapIfTrue);
+        } else {
+            append(mapIfFalse);
+        }
+        return this;
+    }
+
+    /**
+     * Put/replace a given map into this ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, check1).appendIfTrue(map, check2)}
+     * </pre>
+     *
+     * @param map    key
+     * @param ifTrue ifTrue
+     * @return this
+     */
+    @Override
+    public ObjectMap<K, V> appendIfTrue(@NotNull ObjectMap<K, V> map, boolean ifTrue) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            appendIfTrue(entry.getKey(), entry.getValue(), ifTrue);
+        }
+        return this;
+    }
+
+    /**
+     * Put/replace the given key/value pair into ObjectMap if boolean is true or not and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, 2, check1).appendIfTrue(map1, map2, check2)}
+     * </pre>
+     *
+     * @param mapIfTrue  the map if the ifTrue is true
+     * @param mapIfFalse the map if the ifTrue is false
+     * @param ifTrue     ifTrue
+     * @return this
+     */
+    @Override
+    public ObjectMap<K, V> appendIfTrue(ObjectMap<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
+        if (ifTrue) {
+            append(mapIfTrue);
+        } else {
+            append(mapIfFalse);
         }
         return this;
     }

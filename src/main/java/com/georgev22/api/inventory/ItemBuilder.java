@@ -2,6 +2,8 @@ package com.georgev22.api.inventory;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.georgev22.api.inventory.utils.actions.Action;
+import com.georgev22.api.inventory.utils.actions.ActionManager;
 import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.utilities.MinecraftUtils;
 import com.georgev22.api.utilities.Utils;
@@ -17,8 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -98,6 +102,28 @@ public class ItemBuilder {
                 .frames(buildFramesFromConfig(fileConfiguration, path, loresReplacements, titleReplacements));
     }
 
+    public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+        }
+        return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
+                .amount(fileConfiguration.getInt(path + ".amount"));
+    }
+
+    public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+        }
+        if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
+            return buildSimpleItemFromConfig(fileConfiguration, path);
+        return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
+                .amount(fileConfiguration.getInt(path + ".amount"))
+                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .enchantment(fileConfiguration.getStringList(path + ".enchantments"))
+                ;
+    }
+
     private static @NotNull List<ItemCommand> buildItemCommandFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
         List<ItemCommand> itemCommands = Lists.newArrayList();
         if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !fileConfiguration.getConfigurationSection(path + ".commands").getKeys(true).isEmpty()) {
@@ -129,6 +155,21 @@ public class ItemBuilder {
             }
         }
         return itemStacks;
+    }
+
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<Action> actions = Lists.newArrayList();
+        if (fileConfiguration == null || fileConfiguration.get(path) == null) {
+            return actions;
+        }
+
+        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false).isEmpty()) {
+            for (String key : fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false)) {
+                actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
+            }
+        }
+
+        return actions;
     }
 
     public ItemBuilder material(@NotNull XMaterial material) {
@@ -188,6 +229,27 @@ public class ItemBuilder {
 
     public ItemBuilder enchantment(Enchantment enchantment) {
         this.enchantment(enchantment, 1);
+        return this;
+    }
+
+    public ItemBuilder enchantment0(@NotNull ObjectMap<Enchantment, Integer> enchantments) {
+        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+            this.enchantment(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    public ItemBuilder enchantment(@NotNull ObjectMap<XEnchantment, Integer> enchantments) {
+        for (Map.Entry<XEnchantment, Integer> entry : enchantments.entrySet()) {
+            this.enchantment(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    public ItemBuilder enchantment(@NotNull List<String> enchantments) {
+        for (String enchantment : enchantments) {
+            this.enchantment(XEnchantment.valueOf(enchantment));
+        }
         return this;
     }
 
@@ -252,8 +314,8 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder customNBT(ObjectMap.Pair<String, String> pairs) {
-        this.nbtItem.setString("itemBuilder", Utils.serialize(pairs));
+    public ItemBuilder customNBT(String key, Object value) {
+        this.nbtItem.setString(key, Utils.serialize(value));
         return this;
     }
 
@@ -351,7 +413,7 @@ public class ItemBuilder {
         private final String[] commands;
         private final int cooldown;
 
-        public ItemCommand(ItemCommandType type, int cooldown, List<String> commands) {
+        public ItemCommand(ItemCommandType type, int cooldown, @NotNull List<String> commands) {
             this.type = type;
             this.cooldown = cooldown;
             this.commands = commands.toArray(new String[0]);

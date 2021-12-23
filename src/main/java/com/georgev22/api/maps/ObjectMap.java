@@ -141,7 +141,7 @@ public interface ObjectMap<K, V> extends Map<K, V> {
 
 
     /**
-     * Put/replace the given key/value pair into this User and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into this ObjectMap and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1).append("b", 2)}
      * </pre>
@@ -151,6 +151,28 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @return this
      */
     ObjectMap<K, V> append(final K key, final V value);
+
+    /**
+     * Put/replace a given map into this ObjectMap and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.append("a", 1).append(map)}
+     * </pre>
+     *
+     * @param map the map to append to the current one
+     * @return this
+     */
+    ObjectMap<K, V> append(final Map<K, V> map);
+
+    /**
+     * Put/replace a given map into this ObjectMap and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.append("a", 1).append(map)}
+     * </pre>
+     *
+     * @param map the map to append to the current one
+     * @return this
+     */
+    ObjectMap<K, V> append(final ObjectMap<K, V> map);
 
     /**
      * Put/replace the given key/value pair into ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
@@ -178,6 +200,56 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @return this
      */
     ObjectMap<K, V> appendIfTrue(final K key, final V valueIfTrue, final V valueIfFalse, boolean ifTrue);
+
+    /**
+     * Put/replace a given map into this ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, check1).appendIfTrue(map, check2)}
+     * </pre>
+     *
+     * @param map    key
+     * @param ifTrue ifTrue
+     * @return this
+     */
+    ObjectMap<K, V> appendIfTrue(final Map<K, V> map, boolean ifTrue);
+
+    /**
+     * Put/replace the given key/value pair into ObjectMap if boolean is true or not and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, 2, check1).appendIfTrue(map1, map2, check2)}
+     * </pre>
+     *
+     * @param mapIfTrue  the map if the ifTrue is true
+     * @param mapIfFalse the map if the ifTrue is false
+     * @param ifTrue     ifTrue
+     * @return this
+     */
+    ObjectMap<K, V> appendIfTrue(final Map<K, V> mapIfTrue, final Map<K, V> mapIfFalse, boolean ifTrue);
+
+    /**
+     * Put/replace a given map into this ObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, check1).appendIfTrue(map, check2)}
+     * </pre>
+     *
+     * @param map    key
+     * @param ifTrue ifTrue
+     * @return this
+     */
+    ObjectMap<K, V> appendIfTrue(final ObjectMap<K, V> map, boolean ifTrue);
+
+    /**
+     * Put/replace the given key/value pair into ObjectMap if boolean is true or not and return this.  Useful for chaining puts in a single expression, e.g.
+     * <pre>
+     * user.appendIfTrue("a", 1, 2, check1).appendIfTrue(map1, map2, check2)}
+     * </pre>
+     *
+     * @param mapIfTrue  the map if the ifTrue is true
+     * @param mapIfFalse the map if the ifTrue is false
+     * @param ifTrue     ifTrue
+     * @return this
+     */
+    ObjectMap<K, V> appendIfTrue(final ObjectMap<K, V> mapIfTrue, final Map<K, V> mapIfFalse, boolean ifTrue);
 
     /**
      * Gets the value of the given key as an Integer.

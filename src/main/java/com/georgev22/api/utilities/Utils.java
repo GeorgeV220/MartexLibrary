@@ -23,6 +23,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.*;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -537,6 +538,9 @@ public final class Utils {
      * @return a string of the number at Roman Number format
      */
     public static String toRoman(int number) {
+        if (number <= 0) {
+            return String.valueOf(number);
+        }
         TreeObjectMap<Integer, String> map = ObjectMap.newTreeObjectMap();
         map
                 .append(1000, "M")
@@ -558,6 +562,48 @@ public final class Utils {
             return map.get(number);
         }
         return map.get(l) + toRoman(number - l);
+    }
+
+    /**
+     * Returns element closest to target in arr[]
+     */
+    public static int findClosest(@NotNull List<Integer> list, int target) {
+        Integer[] arr = list.toArray(new Integer[0]);
+        int n = arr.length;
+        if (target <= arr[0])
+            return arr[0];
+        if (target >= arr[n - 1])
+            return arr[n - 1];
+        int i = 0, j = n, mid = 0;
+        while (i < j) {
+            mid = (i + j) / 2;
+            if (arr[mid] == target)
+                return arr[mid];
+            if (target < arr[mid]) {
+                if (mid > 0 && target > arr[mid - 1])
+                    return getClosest(arr[mid - 1],
+                            arr[mid], target);
+                j = mid;
+            } else {
+                if (mid < n - 1 && target < arr[mid + 1])
+                    return getClosest(arr[mid],
+                            arr[mid + 1], target);
+                i = mid + 1;
+            }
+        }
+
+        return arr[mid];
+    }
+
+    /**
+     * Method to compare which one is the more close
+     */
+    public static int getClosest(int val1, int val2,
+                                 int target) {
+        if (target - val1 >= val2 - target)
+            return val2;
+        else
+            return val1;
     }
 
     public static final class Assertions {
@@ -1039,5 +1085,75 @@ public final class Utils {
         interface Constructor {
             Object invoke() throws Throwable;
         }
+    }
+
+    public static class Cooldown {
+        private static final ObjectMap<String, Cooldown> cooldownManagerObjectMap = ObjectMap.newHashObjectMap();
+        private long start;
+        private final int timeInSeconds;
+        private final UUID id;
+        private final String cooldownName;
+
+        public Cooldown(UUID id, String cooldownName, int timeInSeconds) {
+            this.id = id;
+            this.cooldownName = cooldownName;
+            this.timeInSeconds = timeInSeconds;
+        }
+
+        public static boolean isInCooldown(UUID id, String cooldownName) {
+            if (Cooldown.getTimeLeft(id, cooldownName) >= 1) {
+                return true;
+            }
+            Cooldown.stop(id, cooldownName);
+            return false;
+        }
+
+        private static void stop(UUID id, String cooldownName) {
+            cooldownManagerObjectMap.remove(id + cooldownName);
+        }
+
+        private static Cooldown getCooldown(@NotNull UUID id, String cooldownName) {
+            return cooldownManagerObjectMap.get(id + cooldownName);
+        }
+
+        public static int getTimeLeft(UUID id, String cooldownName) {
+            Cooldown cooldown = Cooldown.getCooldown(id, cooldownName);
+            int f = -1;
+            if (cooldown != null) {
+                long now = System.currentTimeMillis();
+                long cooldownTime = cooldown.start;
+                int r = (int) (now - cooldownTime) / 1000;
+                f = (r - cooldown.timeInSeconds) * -1;
+            }
+            return f;
+        }
+
+        public void start() {
+            this.start = System.currentTimeMillis();
+            cooldownManagerObjectMap.put(this.id.toString() + this.cooldownName, this);
+        }
+
+        public static @NotNull String getTimeLeft(int secondTime) {
+            TimeZone tz = Calendar.getInstance().getTimeZone();
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+            df.setTimeZone(tz);
+            return df.format(new Date(secondTime * 1000L));
+        }
+
+        public static ObjectMap<String, Cooldown> getCooldowns() {
+            return cooldownManagerObjectMap;
+        }
+
+        public static ObjectMap<String, Cooldown> appendToCooldowns(ObjectMap<String, Cooldown> cooldownObjectMap) {
+            return cooldownManagerObjectMap.append(cooldownObjectMap);
+        }
+
+    }
+
+    public static abstract class Callback {
+
+        public abstract void onSuccess();
+
+        public abstract void onFailure(Throwable throwable);
     }
 }

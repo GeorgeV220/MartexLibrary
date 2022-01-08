@@ -213,12 +213,12 @@ public class ItemBuilder {
     }
 
     public ItemBuilder enchantment(@NotNull XEnchantment enchantment, int level) {
-        this.enchantment(enchantment.parseEnchantment(), level);
+        this.enchantment(enchantment.getEnchant(), level);
         return this;
     }
 
     public ItemBuilder enchantment(@NotNull XEnchantment enchantment) {
-        this.enchantment(enchantment.parseEnchantment());
+        this.enchantment(enchantment.getEnchant());
         return this;
     }
 

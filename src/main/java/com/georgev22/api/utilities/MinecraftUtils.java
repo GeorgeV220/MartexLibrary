@@ -1,7 +1,6 @@
 package com.georgev22.api.utilities;
 
 import com.georgev22.api.colors.Color;
-import com.georgev22.api.maps.ObjectMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.Validate;
@@ -25,7 +24,6 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MinecraftUtils {

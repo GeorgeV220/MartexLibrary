@@ -1,6 +1,6 @@
 package com.georgev22.api.utilities;
 
-import com.georgev22.api.colors.Color;
+import com.georgev22.api.minecraft.colors.Color;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

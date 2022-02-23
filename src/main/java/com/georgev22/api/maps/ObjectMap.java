@@ -1,6 +1,5 @@
 package com.georgev22.api.maps;
 
-import org.bukkit.Location;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -364,15 +363,6 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      * @throws ClassCastException if the value is not a Date
      */
     Date getDate(final Object key, final Date defaultValue);
-
-    /**
-     * Gets the value of the given key as a Location.
-     *
-     * @param key the key
-     * @return the value as a Location, which may be null
-     * @throws ClassCastException if the value is not a Location
-     */
-    Location getLocation(final Object key);
 
     /**
      * Gets the list value of the given key, casting the list elements to the given {@code Class<T>}.  This is useful to avoid having

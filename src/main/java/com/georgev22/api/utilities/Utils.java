@@ -1,6 +1,6 @@
 package com.georgev22.api.utilities;
 
-import com.georgev22.api.colors.Color;
+import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.maps.TreeObjectMap;
 import com.google.common.collect.Lists;

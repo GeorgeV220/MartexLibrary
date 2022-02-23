@@ -1,7 +1,6 @@
 package com.georgev22.api.maps;
 
 import com.georgev22.api.utilities.Utils;
-import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
@@ -255,17 +254,6 @@ public class ConcurrentObjectMap<K, V> extends ConcurrentHashMap<K, V> implement
      */
     public Double getDouble(final Object key, final double defaultValue) {
         return get(key, defaultValue);
-    }
-
-    /**
-     * Gets the value of the given key as a Location.
-     *
-     * @param key the key
-     * @return the value as a Location, which may be null
-     * @throws ClassCastException if the value is not a Location
-     */
-    public Location getLocation(final Object key) {
-        return (Location) get(key);
     }
 
     /**

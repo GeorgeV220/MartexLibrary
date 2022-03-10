@@ -10,8 +10,6 @@ import java.sql.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -228,9 +226,8 @@ public abstract class Database {
      * @param type      The column type
      * @throws SQLException if a database access error occurs
      */
-    public void checkColumn(@NotNull String tableName, @NotNull String column, @NotNull String type) throws SQLException {
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM `" + notNull("tableName", tableName) + "`;");
+    public void checkColumn(@NotNull String tableName, @NotNull String column, @NotNull String type) throws SQLException, ClassNotFoundException {
+        ResultSet resultSet = querySQL("SELECT * FROM `" + notNull("tableName", tableName) + "`;");
         ResultSetMetaData metaData = resultSet.getMetaData();
         int rowCount = metaData.getColumnCount();
 
@@ -246,16 +243,24 @@ public abstract class Database {
         }
 
         if (!isMyColumnPresent) {
-            statement.executeUpdate("ALTER TABLE `" + notNull("tableName", tableName) + "` ADD `" + column + "` " + notNull("type", type) + ";");
+            updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` ADD `" + column + "` " + notNull("type", type) + ";");
         } else {
             if (!isMyColumnTypeCorrect) {
-                if (this instanceof SQLite) {
-                    System.out.println("SQLite does not support operations such as 'ALTER COLUMN' and 'ADD CONSTRAINT'");
-                    return;
-                }
-                statement.executeUpdate("ALTER TABLE `" + notNull("tableName", tableName) + "` MODIFY COLUMN `" + column + "` " + notNull("type", type) + ";");
+                updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` MODIFY COLUMN `" + column + "` " + notNull("type", type) + ";");
             }
         }
+    }
+
+    /**
+     * Renames a table.
+     *
+     * @param oldTableName The old name of the table
+     * @param newTableName The new name of the table
+     * @throws SQLException           if a database access error occurs
+     * @throws ClassNotFoundException if the driver class does not exist
+     */
+    public boolean renameTable(@NotNull String oldTableName, @NotNull String newTableName) throws SQLException, ClassNotFoundException {
+        return updateSQL("ALTER TABLE " + oldTableName + " RENAME TO " + newTableName + ";") == 1;
     }
 
     /**
@@ -283,8 +288,9 @@ public abstract class Database {
 
         tableMap.forEach((columnName, type) -> {
             try {
-                checkColumn(notNull("tableName", tableName), columnName, type);
-            } catch (SQLException exception) {
+                if (!(this instanceof SQLite))
+                    checkColumn(notNull("tableName", tableName), columnName, type);
+            } catch (SQLException | ClassNotFoundException exception) {
                 exception.printStackTrace();
             }
         });
@@ -310,40 +316,4 @@ public abstract class Database {
                 '}';
     }
 
-    public static class DriverShim implements Driver {
-        private final Driver driver;
-
-        public DriverShim(Driver d) {
-            this.driver = d;
-        }
-
-        public boolean acceptsURL(String u) throws SQLException {
-            return this.driver.acceptsURL(u);
-        }
-
-        public Connection connect(String u, Properties p) throws SQLException {
-            return this.driver.connect(u, p);
-        }
-
-        public int getMajorVersion() {
-            return this.driver.getMajorVersion();
-        }
-
-        public int getMinorVersion() {
-            return this.driver.getMinorVersion();
-        }
-
-        public DriverPropertyInfo[] getPropertyInfo(String u, Properties p) throws SQLException {
-            return this.driver.getPropertyInfo(u, p);
-        }
-
-        public boolean jdbcCompliant() {
-            return this.driver.jdbcCompliant();
-        }
-
-        @Override
-        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-            return this.driver.getParentLogger();
-        }
-    }
 }

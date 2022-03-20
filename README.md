@@ -11,17 +11,16 @@ You can have your project depend on API as a dependency through the following co
 <project>
     <repositories>
         <repository>
-            <id>georgev22</id>
-            <url>https://maven.georgev22.com/repository/georgev22/</url>
+            <id>Jitpack</id>
+            <url>https://jitpack.io/</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.georgev22</groupId>
-            <artifactId>api</artifactId>
-            <version>2.2</version>
-            <scope>compile</scope>
+            <groupId>com.github.GeorgeV220</groupId>
+            <artifactId>API</artifactId>
+            <version>master-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
@@ -45,12 +44,10 @@ You can include API into your gradle project using the following lines:
 
 ```groovy
 repositories {
-    maven {
-        url 'https://maven.georgev22.com/repository/georgev22/'
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    compileOnly "com.georgev22:api:2.2"
+    implementation 'com.github.GeorgeV220:API:master-SNAPSHOT'
 }
 ```

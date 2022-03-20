@@ -509,6 +509,7 @@ public class MinecraftUtils {
         V1_16_R3,
         V1_17_R1,
         V1_18_R1,
+        V1_18_R2,
         UNKNOWN,
         ;
 

@@ -26,6 +26,8 @@
 package com.georgev22.api.maven;
 
 import com.georgev22.api.utilities.ClassLoaderAccess;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +40,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -62,24 +63,31 @@ public final class LibraryLoader {
         this.dataFolder = dataFolder;
     }
 
+    public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull ClassLoader classLoader, @NotNull File dataFolder, @NotNull Logger logger) {
+        this.clazz = clazz;
+        classLoaderAccess = new ClassLoaderAccess(classLoader);
+        this.logger = logger;
+        this.dataFolder = dataFolder;
+    }
+
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(classLoader);
-        this.logger = Logger.getLogger(clazz.getSimpleName());
+        this.logger = LogManager.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull ClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(classLoader);
-        this.logger = Logger.getLogger(clazz.getSimpleName());
+        this.logger = LogManager.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(clazz.getClassLoader());
-        this.logger = Logger.getLogger(clazz.getSimpleName());
+        this.logger = LogManager.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 

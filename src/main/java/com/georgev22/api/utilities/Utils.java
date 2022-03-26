@@ -309,7 +309,7 @@ public final class Utils {
 
     public static String @NotNull [] getArgumentsToArray(String @NotNull [] args, int num) {
         if (args.length == 0) {
-            return new String[0];
+            return new String[]{};
         }
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {

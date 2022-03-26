@@ -1,5 +1,6 @@
 package com.georgev22.api.utilities;
 
+import com.georgev22.api.maps.HashObjectMap;
 import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.maps.TreeObjectMap;
@@ -307,6 +308,9 @@ public final class Utils {
     }
 
     public static String @NotNull [] getArgumentsToArray(String @NotNull [] args, int num) {
+        if (args.length == 0) {
+            return new String[0];
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = num; i < args.length; i++) {
             sb.append(args[i]).append(" ");
@@ -430,7 +434,7 @@ public final class Utils {
      * @return a {@link ObjectMap#newHashObjectMap(Map)} with the String List contents.
      */
     public static <K, V, T> @NotNull ObjectMap<K, V> stringListToObjectMap(List<String> stringList, final Class<T> clazz) {
-        return ObjectMap.newHashObjectMap(stringListToHashMap(stringList, clazz));
+        return new HashObjectMap<>(stringListToHashMap(stringList, clazz));
     }
 
     /**
@@ -460,7 +464,7 @@ public final class Utils {
     public static <K, V, T> @NotNull Map<K, V> stringListToHashMap(@NotNull List<String> stringList, final Class<T> clazz) {
         Map<K, V> map = new HashMap<>();
 
-        if (stringList == null || stringList.isEmpty()) {
+        if (stringList.isEmpty()) {
             return map;
         }
 
@@ -476,13 +480,11 @@ public final class Utils {
                     continue;
                 }
 
-                if (method != null) {
-                    try {
-                        map.put((K) arguments[0], (V) method.invoke(null, arguments[1]));
-                    } catch (InvocationTargetException | IllegalAccessException ex) {
-                        ex.printStackTrace();
-                        System.out.println("Failure: " + arguments[1] + " is not of type " + clazz.getName());
-                    }
+                try {
+                    map.put((K) arguments[0], (V) method.invoke(null, arguments[1]));
+                } catch (InvocationTargetException | IllegalAccessException ex) {
+                    ex.printStackTrace();
+                    System.out.println("Failure: " + arguments[1] + " is not of type " + clazz.getName());
                 }
             } else {
                 map.put((K) arguments[0], (V) arguments[1]);

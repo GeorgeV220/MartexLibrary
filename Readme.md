@@ -20,7 +20,7 @@ You can have your project depend on API as a dependency through the following co
         <dependency>
             <groupId>com.github.GeorgeV220</groupId>
             <artifactId>API</artifactId>
-            <version>v2.3.6</version>
+            <version>v3.0.0</version>
         </dependency>
     </dependencies>
 </project>
@@ -48,6 +48,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.GeorgeV220:API:v2.3.6'
+    implementation 'com.github.GeorgeV220:API:v3.0.0'
 }
 ```

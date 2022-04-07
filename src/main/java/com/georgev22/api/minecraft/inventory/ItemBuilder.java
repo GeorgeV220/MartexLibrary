@@ -9,7 +9,7 @@ import com.georgev22.api.minecraft.MinecraftUtils;
 import com.georgev22.api.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;

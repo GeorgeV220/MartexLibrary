@@ -1,0 +1,99 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+    id 'kr.entree.spigradle' version '2.2.4'
+    id 'io.freefair.lombok' version '6.3.0'
+    id 'java'
+    id 'jacoco'
+    id 'idea'
+}
+
+apply from: "$rootDir/gradle/jacoco.gradle"
+apply from: "$rootDir/gradle/publish.gradle"
+
+if (project.hasProperty("local_script")) {
+    apply from: file(local_script + "/build.local.gradle")
+}
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+ext {
+    mcVersion = project.property("mcVersion")
+}
+
+group project.property("group")
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ["-parameters"]
+    options.fork = true
+    options.forkOptions.executable = 'javac'
+}
+
+archivesBaseName = project.property("pluginName")
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    spigot()
+    maven { url = 'https://repo.codemc.org/repository/maven-public/' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://repo.aikar.co/content/groups/aikar/' }
+    maven { url = 'https://repo.dmulloy2.net/repository/public/' }
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/public/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
+
+dependencies {
+    implementation spigot(mcVersion)
+
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'commons-codec:commons-codec:1.15'
+    compileOnly 'commons-io:commons-io:2.11.0'
+    compileOnly 'org.mongodb:mongodb-driver:3.12.10'
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
+    compileOnly 'com.mojang:authlib:1.11'
+    compileOnly 'de.tr7zw:item-nbt-api-plugin:2.9.2'
+    compileOnly 'com.github.cryptomorin:XSeries:8.7.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    testImplementation 'org.mockito:mockito-core:4.3.1'
+    testImplementation 'com.github.seeseemelk:MockBukkit-v1.17:1.13.0'
+    testImplementation 'org.assertj:assertj-core:3.22.0'
+}
+
+shadowJar {
+}
+
+tasks.build.dependsOn(shadowJar)
+tasks.publish.dependsOn(shadowJar)
+tasks.prepareSpigotPlugins.dependsOn(shadowJar)
+tasks.generateSpigotDescription.enabled = false
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "skipped", "failed"
+    }
+    ignoreFailures = false
+}
+
+processResources {
+    project.properties.put("version", this.version)
+    expand project.properties
+}
+
+tasks.withType(Javadoc) {
+    failOnError false
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+defaultTasks 'build'

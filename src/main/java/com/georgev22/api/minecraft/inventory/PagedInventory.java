@@ -16,7 +16,7 @@ import com.georgev22.api.minecraft.MinecraftUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;

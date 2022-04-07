@@ -1,3 +1,13 @@
+# 1.0.0 (2022-04-07)
+
+
+* chore(MinecraftUtils) ([615dca0](https://github.com/GeorgeV220/API/commit/615dca02530d0916567f52372eeb2fd9cfd0f885))
+
+
+### BREAKING CHANGES
+
+* changed to Java 17 (forgot to add to previous commit)
+
 ## [4.5.2](https://github.com/Silthus/spigot-plugin-template/compare/v4.5.1...v4.5.2) (2021-11-20)
 
 

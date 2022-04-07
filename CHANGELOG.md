@@ -1,3 +1,13 @@
+# [3.0.0](https://github.com/GeorgeV220/API/compare/v2.3.6...v3.0.0) (2022-04-07)
+
+
+* fix(version) ([e90c167](https://github.com/GeorgeV220/API/commit/e90c167fe9c69175d622ae871601f4f980db9718))
+
+
+### BREAKING CHANGES
+
+* version??
+
 # 1.0.0 (2022-04-07)
 
 

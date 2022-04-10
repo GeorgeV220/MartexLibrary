@@ -1,6 +1,7 @@
 package com.georgev22.api.database;
 
 import com.georgev22.api.database.sql.sqlite.SQLite;
+import com.georgev22.api.maps.HashObjectMap;
 import com.georgev22.api.maps.ObjectMap;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -273,7 +274,7 @@ public abstract class Database {
      */
     public void createTable(@NotNull String tableName, @NotNull ObjectMap<String, ObjectMap.Pair<String, String>> columnsMap) throws SQLException, ClassNotFoundException {
         StringBuilder stringBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + notNull("tableName", tableName) + "` (\n ");
-        ObjectMap<String, String> tableMap = ObjectMap.newHashObjectMap();
+        ObjectMap<String, String> tableMap = new HashObjectMap<>();
         Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> columnIterator = notNull("columnsMap", columnsMap).entrySet().iterator();
         while (columnIterator.hasNext()) {
             Map.Entry<String, ObjectMap.Pair<String, String>> entry = columnIterator.next();
@@ -299,8 +300,7 @@ public abstract class Database {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Database)) return false;
-        Database database = (Database) o;
+        if (!(o instanceof Database database)) return false;
         return Objects.equals(connection, database.connection);
     }
 

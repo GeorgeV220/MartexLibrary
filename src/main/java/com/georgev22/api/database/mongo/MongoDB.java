@@ -35,7 +35,7 @@ public class MongoDB {
      * @param collectionName collection name
      * @deprecated for removal on feature release
      */
-    @Deprecated
+    @Deprecated(since = "3.0.0", forRemoval = true)
     public MongoDB(String host, int port, String username, String password, String databaseName, String collectionName) {
         mongoClient = MongoClients.create("mongodb://" + username + ":" + password + "@" + host + ":" + port + "/?authSource=" + databaseName);
         mongoDatabase = mongoClient.getDatabase(databaseName);
@@ -78,8 +78,7 @@ public class MongoDB {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MongoDB)) return false;
-        MongoDB mongoDB = (MongoDB) o;
+        if (!(o instanceof MongoDB mongoDB)) return false;
         return Objects.equals(mongoClient, mongoDB.mongoClient) && Objects.equals(mongoDatabase, mongoDB.mongoDatabase) && Objects.equals(collection, mongoDB.collection);
     }
 

@@ -60,4 +60,15 @@ public class MySQL extends Database {
         prop.setProperty("connectTimeout", String.valueOf(Integer.MAX_VALUE));
         return connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database, prop);
     }
+
+    @Override
+    public String toString() {
+        return "MySQL{" +
+                "user='" + user + '\'' +
+                ", password='" + password + '\'' +
+                ", database='" + database + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", port=" + port +
+                '}';
+    }
 }

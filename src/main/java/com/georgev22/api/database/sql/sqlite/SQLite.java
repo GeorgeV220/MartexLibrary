@@ -50,4 +50,12 @@ public class SQLite extends Database {
         connection.createStatement().setQueryTimeout(Integer.MAX_VALUE);
         return connection;
     }
+
+    @Override
+    public String toString() {
+        return "SQLite{" +
+                "fileName='" + fileName + '\'' +
+                ", path=" + path +
+                '}';
+    }
 }

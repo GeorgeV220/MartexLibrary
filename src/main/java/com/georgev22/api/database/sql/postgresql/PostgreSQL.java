@@ -59,4 +59,15 @@ public class PostgreSQL extends Database {
         prop.setProperty("autosave", "always");
         return connection = DriverManager.getConnection("jdbc:postgresql://" + this.hostname + ":" + this.port + "/" + this.database, prop);
     }
+
+    @Override
+    public String toString() {
+        return "PostgreSQL{" +
+                "user='" + user + '\'' +
+                ", password='" + password + '\'' +
+                ", database='" + database + '\'' +
+                ", hostname='" + hostname + '\'' +
+                ", port=" + port +
+                '}';
+    }
 }

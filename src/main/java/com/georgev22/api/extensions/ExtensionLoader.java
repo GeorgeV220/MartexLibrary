@@ -11,46 +11,49 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
-public record ExtensionLoader(File dataFolder, Logger logger, File jarFile) {
+public record ExtensionLoader(File dataFolder, Logger logger) {
 
     public void load() throws Exception {
-        Utils.Assertions.notNull("File cannot be null", jarFile);
+        File[] jarFiles = getDataFolder().listFiles((dir, name) -> name.endsWith(".jar"));
+        if (jarFiles != null) {
+            for (File jarFile : jarFiles) {
+                Utils.Assertions.notNull("File cannot be null", jarFile);
 
-        JarFile jar = null;
-        InputStream stream = null;
+                JarFile jar = null;
+                InputStream stream = null;
 
-        try {
-            jar = new JarFile(jarFile);
-            JarEntry entry = jar.getJarEntry("extension.yml");
-
-            if (entry == null) {
-                throw new FileNotFoundException("Jar does not contain extension.yml");
-            }
-
-            stream = jar.getInputStream(entry);
-
-        } catch (IOException | YAMLException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (jar != null) {
                 try {
-                    jar.close();
-                } catch (IOException ignored) {
+                    jar = new JarFile(jarFile);
+                    JarEntry entry = jar.getJarEntry("extension.yml");
+
+                    if (entry == null) {
+                        throw new FileNotFoundException("Jar does not contain extension.yml");
+                    }
+
+                    stream = jar.getInputStream(entry);
+
+                } catch (IOException | YAMLException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    if (jar != null) {
+                        try {
+                            jar.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
+                    if (stream != null) {
+                        try {
+                            stream.close();
+                        } catch (IOException ignored) {
+                        }
+                    }
                 }
-            }
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ignored) {
+                if (stream != null) {
+                    ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
+                    extensionClassLoader.initialize(extensionClassLoader.extension);
                 }
             }
         }
-        if (stream != null) {
-            FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(stream));
-            ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(fileConfiguration), getDataFolder(), jarFile, logger);
-            extensionClassLoader.initialize(extensionClassLoader.extension);
-        }
-
     }
 
     @NotNull

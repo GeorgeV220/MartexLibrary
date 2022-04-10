@@ -1,3 +1,10 @@
+# [3.2.0-alpha.1](https://github.com/GeorgeV220/API/compare/v3.1.1...v3.2.0-alpha.1) (2022-04-10)
+
+
+### Features
+
+* **extensions:** Added extensions. ([1c418ab](https://github.com/GeorgeV220/API/commit/1c418ab49dccd30135cb7f47eb0078857af2c34d))
+
 ## [3.1.1](https://github.com/GeorgeV220/API/compare/v3.1.0...v3.1.1) (2022-04-10)
 
 

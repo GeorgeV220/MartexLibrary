@@ -2,8 +2,13 @@ package com.georgev22.api.extensions;
 
 import com.georgev22.api.extensions.exceptions.InvalidDescriptionException;
 import com.georgev22.api.extensions.exceptions.InvalidExtensionException;
+import com.georgev22.api.maps.ConcurrentObjectMap;
+import com.georgev22.api.maps.ObjectMap;
+import com.georgev22.api.maps.UnmodifiableObjectMap;
 import org.apache.commons.lang.Validate;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
@@ -24,6 +29,7 @@ import java.util.regex.Pattern;
 public final class JavaExtensionLoader implements ExtensionLoader {
     private final Pattern[] fileFilters = new Pattern[]{Pattern.compile("\\.jar$")};
     private final List<ExtensionClassLoader> loaders = new CopyOnWriteArrayList<>();
+    private final ObjectMap<String, Extension> extensionObjectMap = new ConcurrentObjectMap<>();
     private final Logger logger;
 
     /**
@@ -88,11 +94,15 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         }
 
         for (final String extensionName : description.getDepend()) {
-            Extension current = ExtensionManager.getExtension(extensionName);
+            Extension current = extensionObjectMap.get(extensionName);
 
             if (current == null) {
                 throw new InvalidExtensionException("Unknown dependency " + extensionName + ". Please download and install " + extensionName + " to run this extension.");
             }
+        }
+
+        if (extensionObjectMap.containsKey(description.getName())) {
+            throw new InvalidExtensionException("Extension " + description.getName() + " is already loaded.");
         }
 
         final ExtensionClassLoader loader;
@@ -104,7 +114,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
         loaders.add(loader);
 
-        return loader.extension;
+        return extensionObjectMap.append(description.getName(), loader.extension).get(description.getName());
     }
 
     @Override
@@ -197,5 +207,10 @@ public final class JavaExtensionLoader implements ExtensionLoader {
                 }
             }
         }
+    }
+
+    @Contract(" -> new")
+    public @NotNull @UnmodifiableView ObjectMap<String, Extension> getExtensions() {
+        return new UnmodifiableObjectMap<>(extensionObjectMap);
     }
 }

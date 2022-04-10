@@ -10,7 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
 
@@ -53,7 +56,8 @@ public final class ExtensionClassLoader extends URLClassLoader {
             try {
                 extensionClass = jarClass.asSubclass(Extension.class);
             } catch (ClassCastException ex) {
-                throw new Exception("main class `" + extensionDescriptionFile.getMain() + "' does not extend Extension", ex);
+
+                throw new Exception("main class `" + extensionDescriptionFile.getMain() + "' does not extend " + Extension.class.getName() + " (" + jarClass.getSuperclass().getName() + ")", ex);
             }
 
             extension = extensionClass.newInstance();
@@ -72,6 +76,11 @@ public final class ExtensionClassLoader extends URLClassLoader {
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
         return findResources(name);
+    }
+
+    @Override
+    public void addURL(URL url) {
+        super.addURL(url);
     }
 
     @Override

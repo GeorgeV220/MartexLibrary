@@ -1,3 +1,10 @@
+# [3.2.0-alpha.8](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.7...v3.2.0-alpha.8) (2022-04-10)
+
+
+### Features
+
+* **Extensions:** addURL and getExtensions ([500a37c](https://github.com/GeorgeV220/API/commit/500a37c2cb116814f4fb95d9c3013d33b8b65eba))
+
 # [3.2.0-alpha.7](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.6...v3.2.0-alpha.7) (2022-04-10)
 
 

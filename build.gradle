@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    implementation spigot(mcVersion)
+    compileOnly spigot(mcVersion)
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
     compileOnly 'commons-codec:commons-codec:1.15'
@@ -70,6 +70,10 @@ dependencies {
 
 shadowJar {
     classifier = ''
+    exclude("de/tr7zw/nbtapi/plugin/**")
+    exclude("plugin.yml")
+    relocate 'de.tr7zw', 'com.georgev22.api.minecraft.nbt'
+    relocate 'com.cryptomorin.xseries', 'com.georgev22.api.minecraft.xseries'
 }
 
 tasks.build.dependsOn(shadowJar)

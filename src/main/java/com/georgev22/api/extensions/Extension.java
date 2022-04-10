@@ -3,10 +3,7 @@ package com.georgev22.api.extensions;
 import com.georgev22.api.utilities.Utils;
 import com.georgev22.api.yaml.file.FileConfiguration;
 import com.georgev22.api.yaml.file.YamlConfiguration;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
+import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +11,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class Extension {
     private boolean isEnabled = false;
@@ -33,13 +32,13 @@ public abstract class Extension {
         ((ExtensionClassLoader) classLoader).initialize(this);
     }
 
-    protected Extension(@NotNull final File dataFolder, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File file) {
+    protected Extension(@NotNull final File dataFolder, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File file, @NotNull Logger logger) {
         final ClassLoader classLoader = this.getClass().getClassLoader();
         if (classLoader instanceof ExtensionClassLoader) {
             throw new IllegalStateException("Cannot use initialization constructor at runtime");
         }
         this.extensionDescriptionFile = extensionDescriptionFile;
-        init(dataFolder, extensionDescriptionFile, file, classLoader);
+        init(dataFolder, extensionDescriptionFile, file, classLoader, logger);
     }
 
     /**
@@ -114,7 +113,7 @@ public abstract class Extension {
         try {
             getConfig().save(configFile);
         } catch (IOException ex) {
-            logger.error("Could not save config to " + configFile, ex);
+            logger.log(Level.SEVERE, "Could not save config to " + configFile, ex);
         }
     }
 
@@ -154,10 +153,10 @@ public abstract class Extension {
                 out.close();
                 in.close();
             } else {
-                logger.warn("Could not save " + outFile.getName() + " to " + outFile + " because " + outFile.getName() + " already exists.");
+                logger.warning("Could not save " + outFile.getName() + " to " + outFile + " because " + outFile.getName() + " already exists.");
             }
         } catch (IOException ex) {
-            logger.error("Could not save " + outFile.getName() + " to " + outFile, ex);
+            logger.log(Level.SEVERE, "Could not save " + outFile.getName() + " to " + outFile, ex);
         }
     }
 
@@ -209,13 +208,12 @@ public abstract class Extension {
         }
     }
 
-    final void init(@NotNull File dataFolder, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull File file, @NotNull ClassLoader classLoader) {
+    final void init(@NotNull File dataFolder, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull File file, @NotNull ClassLoader classLoader, @NotNull Logger logger) {
         this.file = file;
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
         this.configFile = new File(dataFolder, "config.yml");
-        Configurator.setRootLevel(Level.ALL);
-        this.logger = LogManager.getLogger(getName());
+        this.logger = logger;
         this.extensionDescriptionFile = extensionDescriptionFile;
         try {
             ExtensionManager.load(this);

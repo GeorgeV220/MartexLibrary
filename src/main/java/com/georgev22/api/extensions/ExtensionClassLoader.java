@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
 /**
  * A ClassLoader for extensions, to allow shared classes across multiple extensions
@@ -25,18 +26,20 @@ public final class ExtensionClassLoader extends URLClassLoader {
     final Extension extension;
     private Extension extensionInit;
     private IllegalStateException extensionState;
+    private final Logger logger;
     private final Set<String> seenIllegalAccess = Collections.newSetFromMap(new ConcurrentObjectMap<>());
 
     static {
         ClassLoader.registerAsParallelCapable();
     }
 
-    public ExtensionClassLoader(@Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file) throws Exception {
+    public ExtensionClassLoader(@Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file, @NotNull Logger logger) throws Exception {
         super(new URL[]{file.toURI().toURL()}, parent);
         this.dataFolder = dataFolder;
         this.file = file;
         this.jar = new JarFile(file);
         this.extensionDescriptionFile = extensionDescriptionFile;
+        this.logger = logger;
 
         try {
             Class<?> jarClass;
@@ -95,6 +98,6 @@ public final class ExtensionClassLoader extends URLClassLoader {
         extensionState = new IllegalStateException("Initial initialization");
         this.extensionInit = extension;
 
-        extension.init(dataFolder, extensionDescriptionFile, file, this);
+        extension.init(dataFolder, extensionDescriptionFile, file, this, logger);
     }
 }

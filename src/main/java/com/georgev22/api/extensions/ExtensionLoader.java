@@ -9,17 +9,18 @@ import org.yaml.snakeyaml.error.YAMLException;
 import java.io.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 
-public record ExtensionLoader(File dataFolder) {
+public record ExtensionLoader(File dataFolder, Logger logger, File jarFile) {
 
-    public void load(File file) throws Exception {
-        Utils.Assertions.notNull("File cannot be null", file);
+    public void load() throws Exception {
+        Utils.Assertions.notNull("File cannot be null", jarFile);
 
         JarFile jar = null;
         InputStream stream = null;
 
         try {
-            jar = new JarFile(file);
+            jar = new JarFile(jarFile);
             JarEntry entry = jar.getJarEntry("extension.yml");
 
             if (entry == null) {
@@ -46,7 +47,7 @@ public record ExtensionLoader(File dataFolder) {
         }
         if (stream != null) {
             FileConfiguration fileConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(stream));
-            ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(fileConfiguration), getDataFolder(), file);
+            ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(fileConfiguration), getDataFolder(), jarFile, logger);
             extensionClassLoader.initialize(extensionClassLoader.extension);
         }
 
@@ -55,7 +56,9 @@ public record ExtensionLoader(File dataFolder) {
     @NotNull
     private File getDataFolder() {
         File libs = new File(dataFolder, "extensions");
-        libs.mkdirs();//logger.info("libraries folder created!");
+        if (libs.mkdirs()) {
+            logger.info("extensions folder created!");
+        }
         return libs;
     }
 

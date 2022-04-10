@@ -1,7 +1,6 @@
 package com.georgev22.api.extensions;
 
 import com.georgev22.api.utilities.Utils;
-import com.georgev22.api.yaml.file.FileConfiguration;
 import com.georgev22.api.yaml.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -19,36 +18,18 @@ public record ExtensionLoader(File dataFolder, Logger logger) {
             for (File jarFile : jarFiles) {
                 Utils.Assertions.notNull("File cannot be null", jarFile);
 
-                JarFile jar = null;
-                InputStream stream = null;
-
-                try {
-                    jar = new JarFile(jarFile);
+                try (JarFile jar = new JarFile(jarFile)) {
                     JarEntry entry = jar.getJarEntry("extension.yml");
 
                     if (entry == null) {
                         throw new FileNotFoundException("Jar does not contain extension.yml");
                     }
 
-                    stream = jar.getInputStream(entry);
-
+                    InputStream stream = jar.getInputStream(entry);
+                    ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
+                    extensionClassLoader.initialize(extensionClassLoader.extension);
                 } catch (IOException | YAMLException ex) {
                     ex.printStackTrace();
-                } finally {
-                    if (jar != null) {
-                        try {
-                            jar.close();
-                        } catch (IOException ignored) {
-                        }
-                    }
-                    if (stream != null) {
-                        try {
-                            ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
-                            extensionClassLoader.initialize(extensionClassLoader.extension);
-                            stream.close();
-                        } catch (IOException ignored) {
-                        }
-                    }
                 }
             }
         }

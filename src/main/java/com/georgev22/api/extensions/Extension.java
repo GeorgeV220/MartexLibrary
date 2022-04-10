@@ -214,13 +214,7 @@ public abstract class Extension {
         this.configFile = new File(dataFolder, "config.yml");
         this.logger = logger;
         this.extensionDescriptionFile = extensionDescriptionFile;
-        try {
-            ExtensionManager.load(this);
-            ExtensionManager.enable(this);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            ExtensionManager.disable(this);
-        }
+        onLoad();
     }
 
     public void onLoad() {

@@ -1,7 +1,5 @@
 package com.georgev22.api.extensions.exceptions;
 
-import java.io.Serial;
-
 /**
  * Thrown when attempting to load an invalid Extension file
  */

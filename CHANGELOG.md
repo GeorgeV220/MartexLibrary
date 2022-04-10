@@ -1,3 +1,10 @@
+# [3.2.0-alpha.7](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.6...v3.2.0-alpha.7) (2022-04-10)
+
+
+### Bug Fixes
+
+* **Extension:** Exceptions and changes ([a75f466](https://github.com/GeorgeV220/API/commit/a75f4663b5daaf0cf0380cf76b2b0d51e599d035))
+
 # [3.2.0-alpha.6](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.5...v3.2.0-alpha.6) (2022-04-10)
 
 

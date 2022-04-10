@@ -28,7 +28,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build shadowJar -x test
+        run: ./gradlew build -x test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

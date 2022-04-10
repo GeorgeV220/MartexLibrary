@@ -69,6 +69,7 @@ dependencies {
 }
 
 shadowJar {
+    classifier = ''
 }
 
 tasks.build.dependsOn(shadowJar)

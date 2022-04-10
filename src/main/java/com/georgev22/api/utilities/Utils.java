@@ -747,18 +747,16 @@ public final class Utils {
                 if (((Collection<?>) object).isEmpty()) {
                     throw new IllegalArgumentException(message);
                 }
-            }
-            if (object instanceof Map<?, ?>) {
+            } else if (object instanceof Map<?, ?>) {
                 if (((Map<?, ?>) object).isEmpty()) {
                     throw new IllegalArgumentException(message);
                 }
-            }
-            if (object instanceof String) {
+            } else if (object instanceof String) {
                 if (((String) object).isEmpty()) {
                     throw new IllegalArgumentException(message);
                 }
-            }
-            throw new IllegalArgumentException("Object must be a Collection, Map or String");
+            } else
+                throw new IllegalArgumentException("Object must be a Collection, Map or String");
         }
 
         private Assertions() {

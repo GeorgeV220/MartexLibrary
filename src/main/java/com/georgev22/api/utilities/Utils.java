@@ -1,7 +1,6 @@
 package com.georgev22.api.utilities;
 
 import com.georgev22.api.maps.HashObjectMap;
-import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.maps.TreeObjectMap;
 import com.google.common.collect.Lists;
@@ -548,30 +547,6 @@ public final class Utils {
         }
 
         return map;
-    }
-
-    /**
-     * Converts a String List that contains color codes to Color List
-     *
-     * @param list the String List that contains the color codes
-     * @return the new Color List with the colors of the input Color String List
-     */
-    public static @NotNull List<Color> colorsStringListToColorList(@NotNull List<String> list) {
-        return colorsStringListToColorList(list.toArray(new String[0]));
-    }
-
-    /**
-     * Converts a String Array that contains color codes to Color List
-     *
-     * @param array the String Array that contains the color codes
-     * @return the new Color List with the colors of the input Color String Array
-     */
-    public static @NotNull List<Color> colorsStringListToColorList(String @NotNull ... array) {
-        List<Color> colorList = Lists.newArrayList();
-        for (String str : array) {
-            colorList.add(Color.from(str));
-        }
-        return colorList;
     }
 
     /**

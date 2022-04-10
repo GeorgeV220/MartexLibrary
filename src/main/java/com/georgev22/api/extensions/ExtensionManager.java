@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
@@ -61,5 +62,9 @@ public class ExtensionManager {
     @Contract(pure = true)
     public static @NotNull @UnmodifiableView List<Extension> getExtensions() {
         return Collections.unmodifiableList(extensionList);
+    }
+
+    public static @Nullable Extension getExtension(String extensionName) {
+        return extensionList.stream().filter(extension -> extension.getName().equalsIgnoreCase(extensionName)).findFirst().get();
     }
 }

@@ -1,47 +1,59 @@
 package com.georgev22.api.extensions;
 
-import com.georgev22.api.utilities.Utils;
-import com.georgev22.api.yaml.file.YamlConfiguration;
+import com.georgev22.api.extensions.exceptions.InvalidDescriptionException;
+import com.georgev22.api.extensions.exceptions.InvalidExtensionException;
 import org.jetbrains.annotations.NotNull;
-import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import java.util.logging.Logger;
+import java.io.File;
+import java.util.regex.Pattern;
 
-public record ExtensionLoader(File dataFolder, Logger logger) {
+/**
+ * Represents a extension loader, which handles direct access to specific types
+ * of extensions
+ */
+public interface ExtensionLoader {
 
-    public void load() throws Exception {
-        File[] jarFiles = getDataFolder().listFiles((dir, name) -> name.endsWith(".jar"));
-        if (jarFiles != null) {
-            for (File jarFile : jarFiles) {
-                Utils.Assertions.notNull("File cannot be null", jarFile);
+    /**
+     * Loads the extension contained in the specified file
+     *
+     * @param file File to attempt to load
+     * @return Extension that was contained in the specified file, or null if
+     * unsuccessful
+     */
+    @NotNull Extension loadExtension(@NotNull File file) throws InvalidExtensionException;
 
-                try (JarFile jar = new JarFile(jarFile)) {
-                    JarEntry entry = jar.getJarEntry("extension.yml");
+    /**
+     * Loads a ExtensionDescriptionFile from the specified file
+     *
+     * @param file File to attempt to load from
+     * @return A new ExtensionDescriptionFile loaded from the extension.yml in the
+     * specified file
+     */
+    @NotNull ExtensionDescriptionFile getExtensionDescription(@NotNull File file) throws InvalidDescriptionException;
 
-                    if (entry == null) {
-                        throw new FileNotFoundException("Jar does not contain extension.yml");
-                    }
+    /**
+     * Returns a list of all filename filters expected by this ExtensionLoader
+     *
+     * @return The filters
+     */
+    @NotNull Pattern[] getExtensionFileFilters();
 
-                    InputStream stream = jar.getInputStream(entry);
-                    ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
-                    extensionClassLoader.initialize(extensionClassLoader.extension);
-                } catch (IOException | YAMLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
+    /**
+     * Enables the specified extension
+     * <p>
+     * Attempting to enable a extension that is already enabled will have no
+     * effect
+     *
+     * @param extension Extension to enable
+     */
+    void enableExtension(@NotNull Extension extension);
 
-    @NotNull
-    private File getDataFolder() {
-        File libs = new File(dataFolder, "extensions");
-        if (libs.mkdirs()) {
-            logger.info("extensions folder created!");
-        }
-        return libs;
-    }
-
+    /**
+     * Disables the specified extension
+     * <p>
+     * Attempting to disable a extension that is not enabled will have no effect
+     *
+     * @param extension Extension to disable
+     */
+    void disableExtension(@NotNull Extension extension);
 }

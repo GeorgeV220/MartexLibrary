@@ -3,7 +3,6 @@ package com.georgev22.api.extensions;
 import com.georgev22.api.utilities.Utils;
 import com.georgev22.api.yaml.file.FileConfiguration;
 import com.georgev22.api.yaml.file.YamlConfiguration;
-import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -311,4 +310,8 @@ public abstract class Extension {
     }
 
     public abstract String getName();
+
+    public ExtensionDescriptionFile getDescription() {
+        return extensionDescriptionFile;
+    }
 }

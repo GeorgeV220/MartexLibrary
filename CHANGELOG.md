@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/GeorgeV220/API/compare/v3.1.0...v3.1.1) (2022-04-10)
+
+
+### Bug Fixes
+
+* **gradle:** Fixed gradle workflow and build.gradle ([4ac20e7](https://github.com/GeorgeV220/API/commit/4ac20e7cb045d3f542903c642de6846cd80b169e))
+
 # [3.1.0](https://github.com/GeorgeV220/API/compare/v3.0.0...v3.1.0) (2022-04-10)
 
 

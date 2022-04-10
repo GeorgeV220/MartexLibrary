@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/GeorgeV220/API/compare/v3.0.0...v3.1.0) (2022-04-10)
+
+
+### Features
+
+* **Yaml:** Bukkit Yaml Configuration implementation. ([43ec2e0](https://github.com/GeorgeV220/API/commit/43ec2e0e00bdbdd739fecde840313239d1c3105d))
+
 # [3.0.0](https://github.com/GeorgeV220/API/compare/v2.3.6...v3.0.0) (2022-04-07)
 
 

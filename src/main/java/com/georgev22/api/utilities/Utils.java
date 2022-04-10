@@ -142,6 +142,61 @@ public final class Utils {
     }
 
     /**
+     * Converts an object to int
+     *
+     * @param object Object to convert.
+     * @return the converted object as int.
+     */
+    public static int toInt(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).intValue();
+        }
+
+        try {
+            return Integer.parseInt(object.toString());
+        } catch (NumberFormatException | NullPointerException ignored) {
+        }
+        return 0;
+    }
+
+    /**
+     * Converts an object to double
+     *
+     * @param object Object to convert.
+     * @return the converted object as double.
+     */
+    public static double toDouble(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).doubleValue();
+        }
+
+        try {
+            return Double.parseDouble(object.toString());
+        } catch (NumberFormatException | NullPointerException ignored) {
+        }
+
+        return 0;
+    }
+
+    /**
+     * Converts an object to long
+     *
+     * @param object Object to convert.
+     * @return the converted object as long.
+     */
+    public static long toLong(Object object) {
+        if (object instanceof Number) {
+            return ((Number) object).longValue();
+        }
+
+        try {
+            return Long.parseLong(object.toString());
+        } catch (NumberFormatException | NullPointerException ignored) {
+        }
+        return 0;
+    }
+
+    /**
      * Translates all the placeholders of the string from the map
      *
      * @param str        the input string to translate the placeholders on
@@ -710,6 +765,25 @@ public final class Utils {
                 throw new IllegalArgumentException(errorMessage);
             }
             return (T) value;
+        }
+
+        public static void notEmpty(Object object, String message) {
+            if (object instanceof Collection<?>) {
+                if (((Collection<?>) object).isEmpty()) {
+                    throw new IllegalArgumentException(message);
+                }
+            }
+            if (object instanceof Map<?, ?>) {
+                if (((Map<?, ?>) object).isEmpty()) {
+                    throw new IllegalArgumentException(message);
+                }
+            }
+            if (object instanceof String) {
+                if (((String) object).isEmpty()) {
+                    throw new IllegalArgumentException(message);
+                }
+            }
+            throw new IllegalArgumentException("Object must be a Collection, Map or String");
         }
 
         private Assertions() {

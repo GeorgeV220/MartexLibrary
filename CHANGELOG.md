@@ -1,3 +1,10 @@
+# [3.2.0-alpha.2](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.1...v3.2.0-alpha.2) (2022-04-10)
+
+
+### Bug Fixes
+
+* **gradle:** fixed build.gradle ([f3d1dc3](https://github.com/GeorgeV220/API/commit/f3d1dc372f992cf9381ea6d1335a36e14e7f6ae1))
+
 # [3.2.0-alpha.1](https://github.com/GeorgeV220/API/compare/v3.1.1...v3.2.0-alpha.1) (2022-04-10)
 
 

@@ -1,3 +1,10 @@
+# [3.2.0-alpha.3](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.2...v3.2.0-alpha.3) (2022-04-10)
+
+
+### Bug Fixes
+
+* **ExtensionLoader:** Record constructor ([0e0fb92](https://github.com/GeorgeV220/API/commit/0e0fb925787b4542c23d6705ed06cc40c7474882))
+
 # [3.2.0-alpha.2](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.1...v3.2.0-alpha.2) (2022-04-10)
 
 

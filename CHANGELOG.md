@@ -1,3 +1,10 @@
+# [3.2.0-alpha.6](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.5...v3.2.0-alpha.6) (2022-04-10)
+
+
+### Bug Fixes
+
+* **Utils:** Fixed Utils.Assertions.notEmpty ([e465113](https://github.com/GeorgeV220/API/commit/e465113a3869a016a6d56b26b27280aa03b70dd6))
+
 # [3.2.0-alpha.5](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.4...v3.2.0-alpha.5) (2022-04-10)
 
 

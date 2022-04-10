@@ -1,3 +1,10 @@
+# [3.2.0-alpha.4](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.3...v3.2.0-alpha.4) (2022-04-10)
+
+
+### Bug Fixes
+
+* **ExtensionLoader:** Stream closed ([3d25d07](https://github.com/GeorgeV220/API/commit/3d25d0782a223c4fa726bdf9a3c6394efc6029a4))
+
 # [3.2.0-alpha.3](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.2...v3.2.0-alpha.3) (2022-04-10)
 
 

@@ -1,9 +1,58 @@
-## [3.1.2](https://github.com/GeorgeV220/API/compare/v3.1.1...v3.1.2) (2022-04-10)
+# [3.2.0-alpha.8](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.7...v3.2.0-alpha.8) (2022-04-10)
+
+
+### Features
+
+* **Extensions:** addURL and getExtensions ([500a37c](https://github.com/GeorgeV220/API/commit/500a37c2cb116814f4fb95d9c3013d33b8b65eba))
+
+# [3.2.0-alpha.7](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.6...v3.2.0-alpha.7) (2022-04-10)
+
+
+### Bug Fixes
+
+* **Extension:** Exceptions and changes ([a75f466](https://github.com/GeorgeV220/API/commit/a75f4663b5daaf0cf0380cf76b2b0d51e599d035))
+
+# [3.2.0-alpha.6](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.5...v3.2.0-alpha.6) (2022-04-10)
+
+
+### Bug Fixes
+
+* **Utils:** Fixed Utils.Assertions.notEmpty ([e465113](https://github.com/GeorgeV220/API/commit/e465113a3869a016a6d56b26b27280aa03b70dd6))
+
+# [3.2.0-alpha.5](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.4...v3.2.0-alpha.5) (2022-04-10)
+
+
+### Bug Fixes
+
+* **ExtensionLoader:** Removed stream.close() ([367e660](https://github.com/GeorgeV220/API/commit/367e6600349150152c909e1ef0fbe65333b04e5c))
+
+# [3.2.0-alpha.4](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.3...v3.2.0-alpha.4) (2022-04-10)
+
+
+### Bug Fixes
+
+* **ExtensionLoader:** Stream closed ([3d25d07](https://github.com/GeorgeV220/API/commit/3d25d0782a223c4fa726bdf9a3c6394efc6029a4))
+
+# [3.2.0-alpha.3](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.2...v3.2.0-alpha.3) (2022-04-10)
+
+
+### Bug Fixes
+
+* **ExtensionLoader:** Record constructor ([0e0fb92](https://github.com/GeorgeV220/API/commit/0e0fb925787b4542c23d6705ed06cc40c7474882))
+
+# [3.2.0-alpha.2](https://github.com/GeorgeV220/API/compare/v3.2.0-alpha.1...v3.2.0-alpha.2) (2022-04-10)
 
 
 ### Bug Fixes
 
 * **gradle:** fixed build.gradle ([f3d1dc3](https://github.com/GeorgeV220/API/commit/f3d1dc372f992cf9381ea6d1335a36e14e7f6ae1))
+
+# [3.2.0-alpha.1](https://github.com/GeorgeV220/API/compare/v3.1.1...v3.2.0-alpha.1) (2022-04-10)
+
+
+### Features
+
+* **extensions:** Added extensions. ([1c418ab](https://github.com/GeorgeV220/API/commit/1c418ab49dccd30135cb7f47eb0078857af2c34d))
 
 ## [3.1.1](https://github.com/GeorgeV220/API/compare/v3.1.0...v3.1.1) (2022-04-10)
 

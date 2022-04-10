@@ -43,14 +43,12 @@ public record ExtensionLoader(File dataFolder, Logger logger) {
                     }
                     if (stream != null) {
                         try {
+                            ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
+                            extensionClassLoader.initialize(extensionClassLoader.extension);
                             stream.close();
                         } catch (IOException ignored) {
                         }
                     }
-                }
-                if (stream != null) {
-                    ExtensionClassLoader extensionClassLoader = new ExtensionClassLoader(getClass().getClassLoader(), new ExtensionDescriptionFile(YamlConfiguration.loadConfiguration(new InputStreamReader(stream))), getDataFolder(), jarFile, logger);
-                    extensionClassLoader.initialize(extensionClassLoader.extension);
                 }
             }
         }

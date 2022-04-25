@@ -24,8 +24,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.*;
 
 public class MinecraftUtils {
@@ -501,6 +504,29 @@ public class MinecraftUtils {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to save item stacks.", e);
         }
+    }
+
+    /**
+     * Check if a username belongs to a premium account
+     *
+     * @param username player name
+     * @return boolean
+     */
+    public static boolean isUsernamePremium(String username) {
+        try {
+            URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + username);
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            StringBuilder result = new StringBuilder();
+            while ((line = in.readLine()) != null) {
+                result.append(line);
+            }
+            return !result.toString().equals("");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public enum MinecraftVersion {

@@ -113,8 +113,8 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         }
 
         loaders.add(loader);
-
-        return extensionObjectMap.append(description.getName(), loader.extension).get(description.getName());
+        extensionObjectMap.append(loader.extension.getName(), loader.extension);
+        return loader.extension;
     }
 
     @Override
@@ -199,7 +199,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
             if (cloader instanceof ExtensionClassLoader loader) {
                 loaders.remove(loader);
-
+                extensionObjectMap.remove(extension.getName());
                 try {
                     loader.close();
                 } catch (IOException ex) {

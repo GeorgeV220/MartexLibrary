@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/GeorgeV220/API/compare/v3.2.0...v3.3.0) (2022-04-25)
+
+
+### Features
+
+* **Premium:** New Method ([33d3f1d](https://github.com/GeorgeV220/API/commit/33d3f1d1fde4c8b5c000b982d6837f7fb5b295fe))
+
 # [3.2.0](https://github.com/GeorgeV220/API/compare/v3.1.2...v3.2.0) (2022-04-10)
 
 

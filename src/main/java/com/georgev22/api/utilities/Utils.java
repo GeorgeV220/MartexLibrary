@@ -661,6 +661,29 @@ public final class Utils {
         return sb.toString();
     }
 
+    /**
+     * Returns an element at random from a List
+     *
+     * @param list List to select a random element
+     * @return a random element from the specified List
+     */
+    public static Object getRandomElement(@NotNull List<String> list) {
+        Random rand = new Random();
+        return list.get(rand.nextInt(list.size()));
+    }
+
+    /**
+     * Returns an element at random from a Set
+     *
+     * @param set Set to select a random element
+     * @return a random element from the specified Set
+     */
+    public static Object getRandomElement(@NotNull Set<String> set) {
+        List<String> b = Lists.newArrayList();
+        b.addAll(set);
+        return getRandomElement(b);
+    }
+
     public static final class Assertions {
 
         /**

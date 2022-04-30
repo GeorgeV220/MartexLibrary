@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/GeorgeV220/API/compare/v3.4.0...v3.4.1) (2022-04-30)
+
+
+### Bug Fixes
+
+* **MinecraftUtils:** Reflection ([e1aefd2](https://github.com/GeorgeV220/API/commit/e1aefd2e0928615cf4d6e859dd9193ad3904924d))
+
 # [3.4.0](https://github.com/GeorgeV220/API/compare/v3.3.0...v3.4.0) (2022-04-30)
 
 

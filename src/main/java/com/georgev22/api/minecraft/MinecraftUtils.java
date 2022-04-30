@@ -611,6 +611,12 @@ public class MinecraftUtils {
             return currentVersion.name();
         }
 
+        @Contract(pure = true)
+        public static @NotNull String getCurrentVersionNameVtoLowerCase() {
+            return currentVersion.name().replace("V", "v");
+        }
+
+
         static {
             try {
                 currentVersion = MinecraftVersion.valueOf(Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].toUpperCase());
@@ -635,7 +641,7 @@ public class MinecraftUtils {
 
         @Contract(pure = true)
         public static @NotNull String getNMSClassName(String className) {
-            return NET_MINECRAFT_SERVER_PACKAGE + '.' + MinecraftVersion.getCurrentVersionName() + '.' + className;
+            return NET_MINECRAFT_SERVER_PACKAGE + '.' + MinecraftVersion.getCurrentVersionNameVtoLowerCase() + '.' + className;
         }
 
         public static @NotNull Class<?> getNMSClass(String className) throws ClassNotFoundException {
@@ -648,7 +654,7 @@ public class MinecraftUtils {
 
         @Contract(pure = true)
         public static @NotNull String getOBCClassName(String className) {
-            return ORG_BUKKIT_CRAFTBUKKIT_PACKAGE + '.' + MinecraftVersion.getCurrentVersionName() + '.' + className;
+            return ORG_BUKKIT_CRAFTBUKKIT_PACKAGE + '.' + MinecraftVersion.getCurrentVersionNameVtoLowerCase() + '.' + className;
         }
 
         public static @NotNull Class<?> getOBCClass(String className) throws ClassNotFoundException {

@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/GeorgeV220/API/compare/v3.3.0...v3.4.0) (2022-04-30)
+
+
+### Features
+
+* **Utils:** Random Element ([8b917c0](https://github.com/GeorgeV220/API/commit/8b917c0e9d2379f52b1d6ebff54e8f6f1bf6aa40))
+
 # [3.3.0](https://github.com/GeorgeV220/API/compare/v3.2.0...v3.3.0) (2022-04-25)
 
 

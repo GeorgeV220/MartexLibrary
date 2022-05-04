@@ -1,3 +1,16 @@
+# [4.0.0](https://github.com/GeorgeV220/API/compare/v3.4.1...v4.0.0) (2022-05-04)
+
+
+### Features
+
+* **CFG:** Added CFG class ([ddb035a](https://github.com/GeorgeV220/API/commit/ddb035a5613fd360cab86a24f1de84eafea32b61))
+* **Log4J:** Removed Log4J ([8fb731e](https://github.com/GeorgeV220/API/commit/8fb731e9de2ce7be2583e8174af0e109952a620e))
+
+
+### BREAKING CHANGES
+
+* **Log4J:** Replaced Log4J with Java logging implementation.
+
 ## [3.4.1](https://github.com/GeorgeV220/API/compare/v3.4.0...v3.4.1) (2022-04-30)
 
 

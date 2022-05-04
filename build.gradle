@@ -57,7 +57,6 @@ dependencies {
     compileOnly 'commons-codec:commons-codec:1.15'
     compileOnly 'commons-io:commons-io:2.11.0'
     compileOnly 'org.mongodb:mongodb-driver:3.12.10'
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
     compileOnly 'com.mojang:authlib:1.11'
     implementation 'de.tr7zw:item-nbt-api-plugin:2.9.2'
     implementation 'com.github.cryptomorin:XSeries:8.7.1'

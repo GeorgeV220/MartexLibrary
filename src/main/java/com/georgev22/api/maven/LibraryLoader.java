@@ -26,8 +26,6 @@
 package com.georgev22.api.maven;
 
 import com.georgev22.api.utilities.ClassLoaderAccess;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +38,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -73,21 +72,21 @@ public final class LibraryLoader {
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(classLoader);
-        this.logger = LogManager.getLogger(clazz.getSimpleName());
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull ClassLoader classLoader, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(classLoader);
-        this.logger = LogManager.getLogger(clazz.getSimpleName());
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull File dataFolder) {
         this.clazz = clazz;
         classLoaderAccess = new ClassLoaderAccess(clazz.getClassLoader());
-        this.logger = LogManager.getLogger(clazz.getSimpleName());
+        this.logger = Logger.getLogger(clazz.getSimpleName());
         this.dataFolder = dataFolder;
     }
 
@@ -117,9 +116,6 @@ public final class LibraryLoader {
      */
     public <T> void loadAll(@NotNull Class<T> clazz) {
         MavenLibrary[] libs = clazz.getDeclaredAnnotationsByType(MavenLibrary.class);
-        if (libs == null) {
-            return;
-        }
 
         for (MavenLibrary lib : libs) {
             load(lib.groupId(), lib.artifactId(), lib.version(), lib.repo().url());
@@ -133,7 +129,7 @@ public final class LibraryLoader {
     private void load(@NotNull Dependency d) {
         logger.info(String.format("Loading dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
 
-        for (File file : getLibFolder().listFiles((dir, name) -> name.endsWith(".jar"))) {
+        for (File file : Objects.requireNonNull(getLibFolder().listFiles((dir, name) -> name.endsWith(".jar")))) {
             String[] fileandversion = file.getName().replace(".jar", "").split("_");
             String dependencyName = fileandversion[0];
             String version = fileandversion[1];
@@ -195,11 +191,9 @@ public final class LibraryLoader {
     }
 
     @NotNull
-    public static class Dependency {
+    public record Dependency(String groupId, String artifactId, String version, String repoUrl) {
 
-        private final String groupId, artifactId, version, repoUrl;
-
-        private Dependency(String groupId, String artifactId, String version, String repoUrl) {
+        public Dependency(String groupId, String artifactId, String version, String repoUrl) {
             this.groupId = notNull("groupId", groupId);
             this.artifactId = notNull("artifactId", artifactId);
             this.version = notNull("version", version);
@@ -217,33 +211,11 @@ public final class LibraryLoader {
             return new URL(url);
         }
 
-        public String artifactId() {
-            return artifactId;
-        }
-
-        public String groupId() {
-            return groupId;
-        }
-
-        public String version() {
-            return version;
-        }
-
-        public String repoUrl() {
-            return repoUrl;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof Dependency)) return false;
-            Dependency that = (Dependency) o;
+            if (!(o instanceof Dependency that)) return false;
             return groupId.equals(that.groupId) && artifactId.equals(that.artifactId) && version.equals(that.version) && repoUrl.equals(that.repoUrl);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(groupId, artifactId, version, repoUrl);
         }
 
         @Override
@@ -268,8 +240,7 @@ public final class LibraryLoader {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LibraryLoader)) return false;
-        LibraryLoader that = (LibraryLoader) o;
+        if (!(o instanceof LibraryLoader that)) return false;
         return clazz.equals(that.clazz) && logger.equals(that.logger) && dataFolder.equals(that.dataFolder);
     }
 

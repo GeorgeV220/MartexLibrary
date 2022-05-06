@@ -1,3 +1,11 @@
+# [4.1.0](https://github.com/GeorgeV220/API/compare/v4.0.0...v4.1.0) (2022-05-06)
+
+
+### Features
+
+* **ClassLoaderAccess:** Added ClassLoaderAccess#remove(URL) ([58adf4a](https://github.com/GeorgeV220/API/commit/58adf4a0c7a68d9f88a0834035c489539afca626))
+* **LibraryLoader:** load(Dependency) is now public and added Dependency#fromString(String) method ([3eeee22](https://github.com/GeorgeV220/API/commit/3eeee224f6a36781b71fdfa95a3f4a933381f5fe))
+
 # [4.0.0](https://github.com/GeorgeV220/API/compare/v3.4.1...v4.0.0) (2022-05-04)
 
 

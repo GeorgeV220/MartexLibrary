@@ -1313,10 +1313,14 @@ public final class Utils {
 
     }
 
-    public static abstract class Callback {
+    public static abstract class Callback<T> {
 
-        public abstract void onSuccess();
+        public abstract T onSuccess();
 
-        public abstract void onFailure(Throwable throwable);
+        public abstract T onFailure();
+
+        public T onFailure(Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 }

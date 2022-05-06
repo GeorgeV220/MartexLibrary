@@ -9,13 +9,15 @@ import java.util.Collection;
 /**
  * Provides access to {@link ClassLoader} to add URLs on runtime.
  *
- * <p>Edited by GeorgeV22 (https://github.com/GeorgeV220) to work with {@link ClassLoader}</p>
+ * <p>Edited by <a href="https://github.com/GeorgeV220">GeorgeV22</a> to work with {@link ClassLoader}</p>
  * <p></p>
- * Original class: https://github.com/lucko/helper/blob/master/helper/src/main/java/me/lucko/helper/maven/URLClassLoaderAccess.java
+ * Original class: <a href="https://github.com/lucko/helper/blob/master/helper/src/main/java/me/lucko/helper/maven/URLClassLoaderAccess.java">https://github.com/lucko/helper/blob/master/helper/src/main/java/me/lucko/helper/maven/URLClassLoaderAccess.java</a>
  */
 public class ClassLoaderAccess {
     private final Collection<URL> unopenedURLs;
     private final Collection<URL> pathURLs;
+
+    private final ClassLoader classLoader;
 
 
     /**
@@ -24,6 +26,7 @@ public class ClassLoaderAccess {
      * @param classLoader the class loader
      */
     public ClassLoaderAccess(URLClassLoader classLoader) {
+        this.classLoader = classLoader;
         Collection<URL> unopenedURLs;
         Collection<URL> pathURLs;
         try {
@@ -52,6 +55,7 @@ public class ClassLoaderAccess {
      * @param classLoader the class loader
      */
     public ClassLoaderAccess(ClassLoader classLoader) {
+        this.classLoader = classLoader;
         Collection<URL> unopenedURLs;
         Collection<URL> pathURLs;
         try {
@@ -84,6 +88,16 @@ public class ClassLoaderAccess {
         this.pathURLs.add(url);
     }
 
+    /**
+     * Removes the given URL from the class loader.
+     *
+     * @param url the URL to remove
+     */
+    public void remove(@NotNull URL url) {
+        this.unopenedURLs.remove(url);
+        this.pathURLs.remove(url);
+    }
+
     public Collection<URL> getPathURLs() {
         return pathURLs;
     }
@@ -97,6 +111,7 @@ public class ClassLoaderAccess {
         return "ClassLoaderAccess{" +
                 "unopenedURLs=" + unopenedURLs +
                 ", pathURLs=" + pathURLs +
+                ", classLoader=" + classLoader.getClass().getPackage().getName() + "." + classLoader.getName() +
                 '}';
     }
 }

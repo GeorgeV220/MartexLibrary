@@ -37,14 +37,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
 /**
  * Resolves {@link MavenLibrary} annotations for a class, and loads the dependency
- * into the URLClassLoader.
+ * into the given ClassLoader.
  */
 @NotNull
 public final class LibraryLoader {
@@ -54,6 +57,8 @@ public final class LibraryLoader {
     private final Logger logger;
 
     private final File dataFolder;
+
+    private final List<Dependency> dependencyList = new ArrayList<>();
 
     public <T> LibraryLoader(@NotNull Class<T> clazz, @NotNull URLClassLoader classLoader, @NotNull File dataFolder, @NotNull Logger logger) {
         this.clazz = clazz;
@@ -105,7 +110,7 @@ public final class LibraryLoader {
      *
      * @param object the object to load libraries for.
      */
-    public void loadAll(Object object) {
+    public void loadAll(@NotNull Object object) {
         loadAll(object.getClass());
     }
 
@@ -126,7 +131,16 @@ public final class LibraryLoader {
         load(new Dependency(groupId, artifactId, version, repoUrl));
     }
 
-    private void load(@NotNull Dependency d) {
+    /**
+     * Load a dependency to the given ClassLoader
+     *
+     * @param d Dependency object.
+     */
+    public void load(@NotNull Dependency d) {
+        if (dependencyList.contains(d)) {
+            logger.warning(String.format("Dependency %s:%s:%s is already loaded!", d.groupId(), d.artifactId(), d.version()));
+            return;
+        }
         logger.info(String.format("Loading dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
 
         for (File file : Objects.requireNonNull(getLibFolder().listFiles((dir, name) -> name.endsWith(".jar")))) {
@@ -174,6 +188,7 @@ public final class LibraryLoader {
         }
 
         logger.info("Loaded dependency '" + name + "' successfully.");
+        dependencyList.add(d);
     }
 
     @NotNull
@@ -200,7 +215,8 @@ public final class LibraryLoader {
             this.repoUrl = notNull("repoUrl", repoUrl);
         }
 
-        public URL url() throws MalformedURLException {
+        @Contract(" -> new")
+        public @NotNull URL url() throws MalformedURLException {
             String repo = this.repoUrl;
             if (!repo.endsWith("/")) {
                 repo += "/";
@@ -219,12 +235,24 @@ public final class LibraryLoader {
         }
 
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return "LibraryLoader.Dependency(" +
                     "groupId=" + this.groupId() + ", " +
                     "artifactId=" + this.artifactId() + ", " +
                     "version=" + this.version() + ", " +
                     "repoUrl=" + this.repoUrl() + ")";
+        }
+
+        /**
+         * Coverts {@link Dependency#toString()} to {@link Dependency} instance.
+         *
+         * @param string String to transform.
+         * @return a new Dependency instance.
+         */
+        @Contract("_ -> new")
+        public static @NotNull Dependency fromString(@NotNull String string) {
+            String[] arguments = string.split(Pattern.quote("="));
+            return new Dependency(arguments[0], arguments[1], arguments[2], arguments[3]);
         }
     }
 

@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/GeorgeV220/API/compare/v4.1.0...v4.2.0) (2022-05-06)
+
+
+### Features
+
+* **Callback:** Generify Callback methods ([9a64dca](https://github.com/GeorgeV220/API/commit/9a64dcaf90448d3d541b8d13b6a01e8db5ac2982))
+
 # [4.1.0](https://github.com/GeorgeV220/API/compare/v4.0.0...v4.1.0) (2022-05-06)
 
 

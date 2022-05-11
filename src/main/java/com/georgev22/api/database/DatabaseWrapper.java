@@ -77,7 +77,7 @@ public class DatabaseWrapper {
                     throw new DatabaseConnectionException("Unable to connect to the " + type.getName() + " Database", exception);
                 }
             }
-            case PROSTGRESQL -> {
+            case POSTGRESQL -> {
                 try {
                     database = new PostgreSQL(data[0], Integer.parseInt(data[1]), data[2], data[3], Optional.ofNullable(data[4]));
                     connection = database.openConnection();
@@ -119,7 +119,7 @@ public class DatabaseWrapper {
      * @param mongoQuery Mongo query string (eg "uuid")
      * @return The {@link DatabaseWrapper} instance.
      */
-    public DatabaseWrapper insertData(@NotNull ObjectMap.Pair<String, ObjectMap<String, String>> data, @Nullable ObjectMap.Pair<String, String> mongoQuery) {
+    public DatabaseWrapper insertData(@NotNull ObjectMap.Pair<String, ObjectMap<String, Object>> data, @Nullable ObjectMap.Pair<String, String> mongoQuery) {
         if (!isConnected()) {
             throw new DatabaseException("Database is not connected!");
         }
@@ -127,9 +127,9 @@ public class DatabaseWrapper {
             StringBuilder completeStringBuilder = new StringBuilder();
             StringBuilder stringBuilderKeys = new StringBuilder();
             StringBuilder stringBuilderValues = new StringBuilder();
-            Iterator<Map.Entry<String, String>> dataIterator = notNull("data value", data.value()).entrySet().iterator();
+            Iterator<Map.Entry<String, Object>> dataIterator = notNull("data value", data.value()).entrySet().iterator();
             while (dataIterator.hasNext()) {
-                Map.Entry<String, String> entry = dataIterator.next();
+                Map.Entry<String, Object> entry = dataIterator.next();
                 stringBuilderKeys.append("`").append(entry.getKey()).append("`");
                 stringBuilderValues.append("'").append(entry.getValue()).append("'");
                 if (dataIterator.hasNext()) {
@@ -157,7 +157,7 @@ public class DatabaseWrapper {
 
                 BasicDBObject updateObject = new BasicDBObject();
                 updateObject.append("$set", new BasicDBObject());
-                for (Map.Entry<String, String> entry : notNull("data value", data.value()).entrySet()) {
+                for (Map.Entry<String, Object> entry : notNull("data value", data.value()).entrySet()) {
                     updateObject.append(entry.getKey(), entry.getValue());
                 }
                 getCollection(notNull("data key", data.key())).updateOne(query, updateObject);
@@ -173,15 +173,15 @@ public class DatabaseWrapper {
      * @param mongoQuery Mongo query string (eg "uuid")
      * @return The {@link DatabaseWrapper} instance.
      */
-    public DatabaseWrapper updateData(@NotNull ObjectMap.Pair<String, ObjectMap<String, String>> data, @Nullable ObjectMap.Pair<String, String> mongoQuery) {
+    public DatabaseWrapper updateData(@NotNull ObjectMap.Pair<String, ObjectMap<String, Object>> data, @Nullable ObjectMap.Pair<String, String> mongoQuery) {
         if (!isConnected()) {
             throw new DatabaseException("Database is not connected!");
         }
         if (!type.equals(DatabaseType.MONGO)) {
             StringBuilder stringBuilder = new StringBuilder("UPDATE `" + data.key() + "` SET ");
-            Iterator<Map.Entry<String, String>> dataIterator = notNull("data value", data.value()).entrySet().iterator();
+            Iterator<Map.Entry<String, Object>> dataIterator = notNull("data value", data.value()).entrySet().iterator();
             while (dataIterator.hasNext()) {
-                Map.Entry<String, String> entry = dataIterator.next();
+                Map.Entry<String, Object> entry = dataIterator.next();
                 stringBuilder.append("`").append(entry.getKey()).append("` = '").append(entry.getValue()).append("'");
                 if (dataIterator.hasNext()) {
                     stringBuilder.append(", ");
@@ -283,6 +283,15 @@ public class DatabaseWrapper {
      */
     public @Nullable MongoDatabase getMongoDatabase() {
         return mongoDatabase;
+    }
+
+    /**
+     * Get the SQL {@link Database} instance.
+     *
+     * @return the SQL {@link Database} instance
+     */
+    public Database getSQLDatabase() {
+        return database;
     }
 
     /**

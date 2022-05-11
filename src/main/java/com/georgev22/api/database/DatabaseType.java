@@ -4,7 +4,7 @@ public enum DatabaseType {
 
     MYSQL("mySQL"),
     SQLITE("SQLite"),
-    PROSTGRESQL("PostgreSQL"),
+    POSTGRESQL("PostgreSQL"),
     MONGO("MongoDB");
 
     private final String name;

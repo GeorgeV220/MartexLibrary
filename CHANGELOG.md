@@ -1,3 +1,16 @@
+# [5.0.0](https://github.com/GeorgeV220/API/compare/v4.2.0...v5.0.0) (2022-05-11)
+
+
+### Features
+
+* **DatabaseWrapper:** Added DatabaseWrapper ([f5599a5](https://github.com/GeorgeV220/API/commit/f5599a5fafe368f65fc516e6b06b3f8c16ca3604))
+
+
+### BREAKING CHANGES
+
+* **DatabaseWrapper:** New packages for exceptions
+New constructors for the SQL classes
+
 # [4.2.0](https://github.com/GeorgeV220/API/compare/v4.1.0...v4.2.0) (2022-05-06)
 
 

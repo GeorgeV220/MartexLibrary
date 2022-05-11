@@ -1,3 +1,15 @@
+# [5.1.0](https://github.com/GeorgeV220/API/compare/v5.0.0...v5.1.0) (2022-05-11)
+
+
+### Bug Fixes
+
+* **DatabaseType:** Fixed a typo in DatabaseType ([207d2db](https://github.com/GeorgeV220/API/commit/207d2dbb4539678d7694428a3c2495198208c0ce))
+
+
+### Features
+
+* **Database:** Added getSQLDatabase in DatabaseWrapper ([00f3f9c](https://github.com/GeorgeV220/API/commit/00f3f9c54b8649bd4abdc806fc6fffcf6d9ec4f3))
+
 # [5.0.0](https://github.com/GeorgeV220/API/compare/v4.2.0...v5.0.0) (2022-05-11)
 
 

@@ -1,11 +1,13 @@
 package com.georgev22.api.database.sql.postgresql;
 
 import com.georgev22.api.database.Database;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.Optional;
 import java.util.Properties;
 
 public class PostgreSQL extends Database {
@@ -14,13 +16,13 @@ public class PostgreSQL extends Database {
     private final int port;
 
     public PostgreSQL(String hostname, int port, String username, String password) {
-        this(hostname, port, null, username, password);
+        this(hostname, port, password, username, Optional.empty());
     }
 
-    public PostgreSQL(String hostname, int port, String database, String username, String password) {
+    public PostgreSQL(String hostname, int port, String password, String username, @NotNull Optional<String> database) {
         this.hostname = hostname;
         this.port = port;
-        this.database = database;
+        this.database = database.isEmpty() ? null : database.get();
         this.user = username;
         this.password = password;
     }
@@ -57,7 +59,7 @@ public class PostgreSQL extends Database {
         prop.setProperty("password", this.password);
         prop.setProperty("connectTimeout", String.valueOf(Integer.MAX_VALUE));
         prop.setProperty("autosave", "always");
-        return connection = DriverManager.getConnection("jdbc:postgresql://" + this.hostname + ":" + this.port + "/" + this.database, prop);
+        return connection = database != null ? DriverManager.getConnection("jdbc:postgresql://" + this.hostname + ":" + this.port + "/" + this.database, prop) : DriverManager.getConnection("jdbc:postgresql://" + this.hostname + ":" + this.port + "/", prop);
     }
 
     @Override

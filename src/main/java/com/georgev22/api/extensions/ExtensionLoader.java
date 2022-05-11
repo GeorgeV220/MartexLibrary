@@ -1,7 +1,7 @@
 package com.georgev22.api.extensions;
 
-import com.georgev22.api.extensions.exceptions.InvalidDescriptionException;
-import com.georgev22.api.extensions.exceptions.InvalidExtensionException;
+import com.georgev22.api.exceptions.InvalidDescriptionException;
+import com.georgev22.api.exceptions.InvalidExtensionException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

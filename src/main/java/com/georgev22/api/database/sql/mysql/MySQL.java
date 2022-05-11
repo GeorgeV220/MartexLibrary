@@ -1,11 +1,13 @@
 package com.georgev22.api.database.sql.mysql;
 
 import com.georgev22.api.database.Database;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
+import java.util.Optional;
 import java.util.Properties;
 
 public class MySQL extends Database {
@@ -13,14 +15,15 @@ public class MySQL extends Database {
     private final String user, password, database, hostname;
     private final int port;
 
+    @Deprecated(forRemoval = true)
     public MySQL(String hostname, int port, String username, String password) {
-        this(hostname, port, null, username, password);
+        this(hostname, port, password, username, Optional.empty());
     }
 
-    public MySQL(String hostname, int port, String database, String username, String password) {
+    public MySQL(String hostname, int port, String username, String password, @NotNull Optional<String> database) {
         this.hostname = hostname;
         this.port = port;
-        this.database = database;
+        this.database = database.isEmpty() ? null : database.get();
         this.user = username;
         this.password = password;
     }
@@ -58,7 +61,7 @@ public class MySQL extends Database {
         prop.setProperty("useSSL", "false");
         prop.setProperty("autoReconnect", "true");
         prop.setProperty("connectTimeout", String.valueOf(Integer.MAX_VALUE));
-        return connection = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database, prop);
+        return connection = database != null ? DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database, prop) : DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/", prop);
     }
 
     @Override

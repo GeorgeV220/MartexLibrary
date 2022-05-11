@@ -278,8 +278,8 @@ public abstract class Database {
         Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> columnIterator = notNull("columnsMap", columnsMap).entrySet().iterator();
         while (columnIterator.hasNext()) {
             Map.Entry<String, ObjectMap.Pair<String, String>> entry = columnIterator.next();
-            stringBuilder.append("`").append(entry.getKey()).append("` ").append(entry.getValue().getKey()).append(" DEFAULT ").append(entry.getValue().getValue());
-            tableMap.append(entry.getKey(), entry.getValue().getKey() + " DEFAULT " + entry.getValue().getValue());
+            stringBuilder.append("`").append(entry.getKey()).append("` ").append(entry.getValue().key()).append(" DEFAULT ").append(entry.getValue().value());
+            tableMap.append(entry.getKey(), entry.getValue().key() + " DEFAULT " + entry.getValue().value());
             if (columnIterator.hasNext()) {
                 stringBuilder.append(",\n");
             }

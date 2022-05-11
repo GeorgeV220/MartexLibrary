@@ -49,9 +49,7 @@ public class MongoDB {
      * @return the collection
      * @throws IllegalArgumentException if collectionName is invalid
      * @see com.mongodb.MongoNamespace#checkCollectionNameValidity(String)
-     * @deprecated for removal on feature release
      */
-    @Deprecated
     public MongoCollection<Document> getCollection(String collectionName) {
         return mongoDatabase.getCollection(collectionName);
     }
@@ -66,7 +64,9 @@ public class MongoDB {
      * @return the collection
      * @throws IllegalArgumentException if collectionName is invalid
      * @see com.mongodb.MongoNamespace#checkCollectionNameValidity(String)
+     * @deprecated for removal on feature release
      */
+    @Deprecated(forRemoval = true)
     public MongoCollection<Document> getCollection() {
         return collection;
     }

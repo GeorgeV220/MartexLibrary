@@ -1,4 +1,4 @@
-package com.georgev22.api.extensions.exceptions;
+package com.georgev22.api.exceptions;
 
 /**
  * Thrown when attempting to load an invalid Extension file

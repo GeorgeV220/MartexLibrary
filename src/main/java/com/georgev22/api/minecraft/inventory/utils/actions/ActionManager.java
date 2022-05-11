@@ -1,7 +1,7 @@
 package com.georgev22.api.minecraft.inventory.utils.actions;
 
 import com.georgev22.api.minecraft.MinecraftUtils;
-import com.georgev22.api.minecraft.exceptions.ActionRunException;
+import com.georgev22.api.exceptions.ActionRunException;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package com.georgev22.api.minecraft.exceptions;
+package com.georgev22.api.exceptions;
 
 public class ActionRunException extends Exception {
 

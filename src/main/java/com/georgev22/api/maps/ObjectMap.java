@@ -414,23 +414,7 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      */
     <T> T get(final Object key, final T defaultValue);
 
-    class Pair<K, V> {
-
-        private final K key;
-        private final V value;
-
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
+    record Pair<K, V>(K key, V value) {
 
         @Override
         public boolean equals(Object o) {

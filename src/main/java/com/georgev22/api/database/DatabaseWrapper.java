@@ -6,9 +6,9 @@ import com.georgev22.api.database.sql.postgresql.PostgreSQL;
 import com.georgev22.api.database.sql.sqlite.SQLite;
 import com.georgev22.api.exceptions.DatabaseConnectionException;
 import com.georgev22.api.exceptions.DatabaseException;
-import com.georgev22.api.maps.HashObjectMap;
 import com.georgev22.api.maps.ObjectMap;
 import com.mongodb.BasicDBObject;
+import com.mongodb.Block;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -22,9 +22,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.georgev22.api.utilities.Utils.Assertions.notNull;
 
@@ -203,15 +201,15 @@ public class DatabaseWrapper {
      * Selects everything (WHERE = "your key")
      * from a specific table and returns a result set with the data
      *
-     * @param select select data (table name, (key to search, value of the key))
+     * @param query ResultSet query
      * @return A {@link ResultSet} with the data.
      */
-    private ResultSet resultSet(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+    private ResultSet resultSet(String query) {
         if (!isConnected()) {
             throw new DatabaseException("Database is not connected!");
         }
         try {
-            return database.querySQL("SELECT * FROM `" + select.key() + "` WHERE '" + select.value().key() + "' = '" + select.value().value() + "');");
+            return database.querySQL(query);
         } catch (SQLException | ClassNotFoundException exception) {
             throw new DatabaseException("Unable to select data from the database", exception);
         }
@@ -219,32 +217,45 @@ public class DatabaseWrapper {
 
 
     //TODO JAVADOCS
-    private Document getDocument(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+    private @Nullable Document getDocument(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
         if (!isConnected()) {
             throw new DatabaseException("Database is not connected!");
         }
-        BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.append(select.value().key(), select.value().value());
-        FindIterable<Document> findIterable = getCollection(select.key()).find(searchQuery);
-        return findIterable.first();
+        return getDocuments(select).first();
+    }
+
+    private @NotNull FindIterable<Document> getDocuments(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+        if (!isConnected()) {
+            throw new DatabaseException("Database is not connected!");
+        }
+        return getCollection(select.key()).find(new BasicDBObject().append(select.value().key(), select.value().value()));
+    }
+
+    private @NotNull FindIterable<Document> getAllDocuments(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+        if (!isConnected()) {
+            throw new DatabaseException("Database is not connected!");
+        }
+        return getCollection(select.key()).find();
     }
 
     /**
-     * Retrieves the data from the database and returns them in an {@link ObjectMap}
+     * Retrieves the data from the database and returns them in an {@link ObjectMap.PairDocument}
      *
      * @param select Data to retrieve
-     * @return an {@link ObjectMap} with the retrieved data.
+     * @return an {@link ObjectMap.PairDocument} with the retrieved data.
      */
-    public ObjectMap<String, Object> selectData(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
-        ObjectMap<String, Object> objectMap = new HashObjectMap<>();
+    public ObjectMap.PairDocument selectData(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+        List<ObjectMap.Pair> pairList = new ArrayList<>();
         if (!type.equals(DatabaseType.MONGO)) {
             try {
                 if (!select.value().value().getClass().equals(String.class))
                     throw new DatabaseException("Pair value must be a string");
-                ResultSet resultSet = resultSet(select);
-                ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-                for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
-                    objectMap.append(resultSetMetaData.getColumnName(i), resultSet.getString(i));
+                ResultSet resultSet = resultSet("SELECT * FROM `" + select.key() + "` WHERE `" + select.value().key() + "` = '" + select.value().value() + "'");
+                while (resultSet.next()) {
+                    ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+                    for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
+                        pairList.add(ObjectMap.Pair.create(resultSetMetaData.getColumnName(i), resultSet.getString(i)));
+                    }
                 }
             } catch (SQLException exception) {
                 throw new DatabaseException("Unable to select data from the database", exception);
@@ -252,10 +263,47 @@ public class DatabaseWrapper {
         } else {
             Document document = getDocument(select);
             for (Map.Entry<String, Object> entry : document.entrySet()) {
-                objectMap.append(entry.getKey(), entry.getValue());
+                pairList.add(ObjectMap.Pair.create(entry.getKey(), entry.getValue()));
             }
         }
-        return objectMap;
+        return new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new));
+    }
+
+    /**
+     * Retrieves the data from the database and returns them in a {@link List<com.georgev22.api.maps.ObjectMap.PairDocument>}
+     *
+     * @param select Data to retrieve
+     * @return a {@link List<com.georgev22.api.maps.ObjectMap.PairDocument>} with the retrieved data.
+     */
+    public List<ObjectMap.PairDocument> selectAllData(ObjectMap.Pair<String, ObjectMap.Pair<String, Object>> select) {
+        List<ObjectMap.PairDocument> pairDocumentList = new ArrayList<>();
+        if (!type.equals(DatabaseType.MONGO)) {
+            try {
+                if (!select.value().value().getClass().equals(String.class))
+                    throw new DatabaseException("Pair value must be a string");
+                ResultSet resultSet = resultSet("SELECT * FROM `" + select.key() + "`");
+                while (resultSet.next()) {
+                    List<ObjectMap.Pair<String, Object>> pairList = new ArrayList<>();
+                    ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+                    for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
+                        pairList.add(ObjectMap.Pair.create(resultSetMetaData.getColumnName(i), resultSet.getString(i)));
+                    }
+                    pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new)));
+                }
+            } catch (SQLException exception) {
+                throw new DatabaseException("Unable to select data from the database", exception);
+            }
+        } else {
+            FindIterable<Document> findIterable = getAllDocuments(select);
+            List<ObjectMap.Pair<String, Object>> pairList = new ArrayList<>();
+            findIterable.forEach((Block<? super Document>) document -> {
+                for (Map.Entry<String, Object> entry : document.entrySet()) {
+                    pairList.add(ObjectMap.Pair.create(entry.getKey(), entry.getValue()));
+                }
+            });
+            pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new)));
+        }
+        return pairDocumentList;
     }
 
     /**

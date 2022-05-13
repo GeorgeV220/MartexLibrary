@@ -1,3 +1,11 @@
+# [5.2.0](https://github.com/GeorgeV220/API/compare/v5.1.0...v5.2.0) (2022-05-13)
+
+
+### Features
+
+* **DatabaseWrapper:** New methods and fixes ([22a4117](https://github.com/GeorgeV220/API/commit/22a411786145c82c473bd92d7dbbdd584428bec8))
+* **PairDocument:** Added ObjectMap.PairDocument. ([4ece4ee](https://github.com/GeorgeV220/API/commit/4ece4eec08ff79274fac4d22b66c93321eec2aa2))
+
 # [5.1.0](https://github.com/GeorgeV220/API/compare/v5.0.0...v5.1.0) (2022-05-11)
 
 

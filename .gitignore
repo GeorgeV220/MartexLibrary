@@ -4,6 +4,7 @@
 /.idea/libraries/
 /.idea/*.xml
 *.iml
+work/
 
 # Gradle
 

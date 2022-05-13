@@ -3,6 +3,7 @@ package com.georgev22.api.maps;
 import com.georgev22.api.utilities.Utils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements ObjectMap<K, V> {
+public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements ObjectMap<K, V>, Serializable {
 
     /**
      * Creates an LinkedObjectMap instance.

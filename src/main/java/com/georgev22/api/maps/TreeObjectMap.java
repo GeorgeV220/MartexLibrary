@@ -3,6 +3,7 @@ package com.georgev22.api.maps;
 import com.georgev22.api.utilities.Utils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.TreeMap;
 
 import static java.lang.String.format;
 
-public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V> {
+public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V>, Serializable {
 
     /**
      * Creates an TreeObjectMap instance.

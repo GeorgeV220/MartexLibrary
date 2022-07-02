@@ -1,3 +1,11 @@
+## [5.2.1](https://github.com/GeorgeV220/API/compare/v5.2.0...v5.2.1) (2022-07-02)
+
+
+### Bug Fixes
+
+* **MySQL:** Fixed MySQL constructor ([fd7a981](https://github.com/GeorgeV220/API/commit/fd7a981d4bc9153616356ea569638129bb5c58ed))
+* **MySQL:** Fixed PostgreSQL constructor ([91024d7](https://github.com/GeorgeV220/API/commit/91024d7dfcb801b5701be024e5f14a9f11e3d151))
+
 # [5.2.0](https://github.com/GeorgeV220/API/compare/v5.1.0...v5.2.0) (2022-05-13)
 
 

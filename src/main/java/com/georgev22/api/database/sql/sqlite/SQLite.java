@@ -13,6 +13,10 @@ public class SQLite extends Database {
     private final String fileName;
     private final File path;
 
+    /**
+     * @param path     The full path to the database file.
+     * @param fileName The file name of the database file.
+     */
     public SQLite(final File path, final String fileName) {
         this.fileName = fileName;
         this.path = path;

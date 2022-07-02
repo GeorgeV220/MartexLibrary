@@ -15,11 +15,19 @@ public class PostgreSQL extends Database {
     private final String user, password, database, hostname;
     private final int port;
 
+    @Deprecated(forRemoval = true)
     public PostgreSQL(String hostname, int port, String username, String password) {
-        this(hostname, port, password, username, Optional.empty());
+        this(hostname, port, username, password, Optional.empty());
     }
 
-    public PostgreSQL(String hostname, int port, String password, String username, @NotNull Optional<String> database) {
+    /**
+     * @param hostname PostgreSQL hostname.
+     * @param port     PostgreSQL port.
+     * @param username PostgreSQL username.
+     * @param password PostgreSQL password.
+     * @param database PostgreSQL database name.
+     */
+    public PostgreSQL(String hostname, int port, String username, String password, @NotNull Optional<String> database) {
         this.hostname = hostname;
         this.port = port;
         this.database = database.isEmpty() ? null : database.get();

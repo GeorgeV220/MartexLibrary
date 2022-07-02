@@ -17,9 +17,16 @@ public class MySQL extends Database {
 
     @Deprecated(forRemoval = true)
     public MySQL(String hostname, int port, String username, String password) {
-        this(hostname, port, password, username, Optional.empty());
+        this(hostname, port, username, password, Optional.empty());
     }
 
+    /**
+     * @param hostname MySQL hostname.
+     * @param port     MySQL port.
+     * @param username MySQL username.
+     * @param password MySQL password.
+     * @param database MySQL database name.
+     */
     public MySQL(String hostname, int port, String username, String password, @NotNull Optional<String> database) {
         this.hostname = hostname;
         this.port = port;

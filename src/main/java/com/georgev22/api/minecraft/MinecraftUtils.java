@@ -8,6 +8,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
@@ -30,6 +31,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MinecraftUtils {
 
@@ -65,17 +67,17 @@ public class MinecraftUtils {
 
     public static void msg(final CommandSender target, final String message, final Map<String, String> map,
                            final boolean ignoreCase) {
-        msg(target, Utils.placeHolder(message, map, ignoreCase));
+        msg(target, placeholderAPI(target, message, map, ignoreCase));
     }
 
     public static void msg(final CommandSender target, final List<String> message, final Map<String, String> map,
                            final boolean ignoreCase) {
-        msg(target, Utils.placeHolder(message, map, ignoreCase));
+        msg(target, placeholderAPI(target, message, map, ignoreCase));
     }
 
     public static void msg(final CommandSender target, final String[] message, final Map<String, String> map,
                            final boolean ignoreCase) {
-        msg(target, Utils.placeHolder(message, map, ignoreCase));
+        msg(target, placeholderAPI(target, message, map, ignoreCase));
     }
 
     public static void msg(final CommandSender target, final FileConfiguration file, final String path) {
@@ -527,6 +529,77 @@ public class MinecraftUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param target     target for the placeholders.
+     * @param str        the input string to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string with the placeholders replaced
+     */
+    public static String placeholderAPI(final CommandSender target, String str, final Map<String, String> map, final boolean ignoreCase) {
+        Validate.notNull(target, "The target can't be null!");
+        Validate.notNull(str, "The string can't be null!");
+        if (map == null) {
+            return str;
+        }
+        for (final Map.Entry<String, String> entry : map.entrySet()) {
+            str = ignoreCase ? Utils.replaceIgnoreCase(str, entry.getKey(), entry.getValue())
+                    : str.replace(entry.getKey(), entry.getValue());
+        }
+        try {
+            if (target instanceof OfflinePlayer offlinePlayer) {
+                return me.clip.placeholderapi.PlaceholderAPI.setBracketPlaceholders(offlinePlayer, str);
+            }
+            return str;
+        } catch (Throwable error) {
+            return str;
+        }
+    }
+
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param target     target for the placeholders.
+     * @param array      the input array of string to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string array with the placeholders replaced
+     */
+    public static String @NotNull [] placeholderAPI(final CommandSender target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
+        Validate.notNull(array, "The string array can't be null!");
+        Validate.noNullElements(array, "The string array can't have null elements!");
+        final String[] newArray = Arrays.copyOf(array, array.length);
+        if (map == null) {
+            return newArray;
+        }
+        for (int i = 0; i < newArray.length; i++) {
+            newArray[i] = placeholderAPI(target, newArray[i], map, ignoreCase);
+        }
+        return newArray;
+    }
+
+    /**
+     * Translates all the placeholders of the string from the map
+     *
+     * @param target     target for the placeholders.
+     * @param coll       the input string list to translate the placeholders on
+     * @param map        the map that contains all the placeholders with the replacement
+     * @param ignoreCase if it is <code>true</code> all the placeholders will be replaced
+     *                   in ignore case
+     * @return the new string list with the placeholders replaced
+     */
+    public static List<String> placeholderAPI(final CommandSender target, final List<String> coll, final Map<String, String> map,
+                                              final boolean ignoreCase) {
+        Validate.notNull(coll, "The string collection can't be null!");
+        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        return map == null ? coll
+                : coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
     }
 
     public enum MinecraftVersion {

@@ -1,3 +1,15 @@
+# [5.3.0](https://github.com/GeorgeV220/API/compare/v5.2.1...v5.3.0) (2022-07-08)
+
+
+### Bug Fixes
+
+* **MinecraftUtils:** Added v1.19 to MinecraftVersion. ([01905d0](https://github.com/GeorgeV220/API/commit/01905d05fe4b1e7bcc7e08b1ae380923963ca3cc))
+
+
+### Features
+
+* **MinecraftUtils:** PlaceholdersAPI support. ([ebda2f6](https://github.com/GeorgeV220/API/commit/ebda2f6c35e9d9d2beb2002dfafbcd89d71f3524))
+
 ## [5.2.1](https://github.com/GeorgeV220/API/compare/v5.2.0...v5.2.1) (2022-07-02)
 
 

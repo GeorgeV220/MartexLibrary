@@ -625,6 +625,7 @@ public class MinecraftUtils {
         V1_17_R1,
         V1_18_R1,
         V1_18_R2,
+        V1_19_R1,
         UNKNOWN,
         ;
 
@@ -702,7 +703,7 @@ public class MinecraftUtils {
 
     public static class MinecraftReflection {
 
-        private static final String NET_MINECRAFT_PACKAGE = "net.minecraft";
+        public static final String NET_MINECRAFT_PACKAGE = "net.minecraft";
         public static final String ORG_BUKKIT_CRAFTBUKKIT_PACKAGE = "org.bukkit.craftbukkit";
         public static final String NET_MINECRAFT_SERVER_PACKAGE = NET_MINECRAFT_PACKAGE + ".server";
 

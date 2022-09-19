@@ -61,7 +61,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.11'
     compileOnly 'me.clip:placeholderapi:2.11.2'
     implementation 'de.tr7zw:item-nbt-api-plugin:2.10.0'
-    implementation 'com.github.cryptomorin:XSeries:9.0.0'
+    implementation 'com.github.cryptomorin:XSeries:9.1.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
     testImplementation 'org.mockito:mockito-core:4.6.1'

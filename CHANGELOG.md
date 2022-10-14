@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/GeorgeV220/API/compare/v5.3.0...v5.4.0) (2022-10-14)
+
+
+### Features
+
+* **MinecraftUtils:** HEX Colors ([ff59b30](https://github.com/GeorgeV220/API/commit/ff59b30d6726a6855f324fc3e54b701415a167bc))
+
 # [5.3.0](https://github.com/GeorgeV220/API/compare/v5.2.1...v5.3.0) (2022-07-08)
 
 

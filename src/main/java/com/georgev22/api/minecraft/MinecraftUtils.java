@@ -31,6 +31,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MinecraftUtils {
@@ -134,8 +136,24 @@ public class MinecraftUtils {
      * @return A translated message
      */
     public static @NotNull String colorize(final String msg) {
-        Validate.notNull(msg, "The string can't be null!");
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        String unEditedMessage = msg;
+        Validate.notNull(unEditedMessage, "The string can't be null!");
+        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher matcher = pattern.matcher(unEditedMessage);
+        while (matcher.find()) {
+            String hexCode = unEditedMessage.substring(matcher.start(), matcher.end());
+            String replaceSharp = hexCode.replace('#', 'x');
+
+            char[] ch = replaceSharp.toCharArray();
+            StringBuilder builder = new StringBuilder();
+            for (char c : ch) {
+                builder.append("&").append(c);
+            }
+
+            unEditedMessage = unEditedMessage.replace(hexCode, builder.toString());
+            matcher = pattern.matcher(unEditedMessage);
+        }
+        return ChatColor.translateAlternateColorCodes('&', unEditedMessage);
     }
 
     public static String stripColor(final String msg) {

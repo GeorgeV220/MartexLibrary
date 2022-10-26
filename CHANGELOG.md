@@ -1,3 +1,11 @@
+## [5.4.1](https://github.com/GeorgeV220/API/compare/v5.4.0...v5.4.1) (2022-10-26)
+
+
+### Bug Fixes
+
+* **build.gradle:** CI checker ([1b415eb](https://github.com/GeorgeV220/API/commit/1b415ebdfe9586939d716c8152879d256123c095))
+* **build.gradle:** Version fix ([298e928](https://github.com/GeorgeV220/API/commit/298e92878b8260282e1bf3dd541bcd38e36b36ba))
+
 # [5.4.0](https://github.com/GeorgeV220/API/compare/v5.3.0...v5.4.0) (2022-10-14)
 
 

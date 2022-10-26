@@ -1,3 +1,10 @@
+## [5.4.5](https://github.com/GeorgeV220/API/compare/v5.4.4...v5.4.5) (2022-10-26)
+
+
+### Bug Fixes
+
+* **publish:** Publish source and javadocs ([675dbd9](https://github.com/GeorgeV220/API/commit/675dbd95f491cca65362ddf272e6d93e509c99ea))
+
 ## [5.4.4](https://github.com/GeorgeV220/API/compare/v5.4.3...v5.4.4) (2022-10-26)
 
 

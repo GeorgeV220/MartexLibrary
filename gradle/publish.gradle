@@ -1,12 +1,12 @@
 apply plugin: 'maven-publish'
 
-def getBranch() {
+static def getBranch() {
     def process = 'git branch --show-current'.execute()
     process.waitFor()
     return process.text.trim()
 }
 
-def getHash() {
+static def getHash() {
     def process = 'git rev-parse HEAD'.execute()
     process.waitFor()
     return process.text.trim()

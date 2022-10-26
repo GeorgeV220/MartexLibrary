@@ -1,3 +1,10 @@
+## [5.4.4](https://github.com/GeorgeV220/API/compare/v5.4.3...v5.4.4) (2022-10-26)
+
+
+### Bug Fixes
+
+* **publish.gradle:** Publish repository ([031a3a8](https://github.com/GeorgeV220/API/commit/031a3a833dbbbfd751947280db3ed3726932f4a0))
+
 ## [5.4.3](https://github.com/GeorgeV220/API/compare/v5.4.2...v5.4.3) (2022-10-26)
 
 

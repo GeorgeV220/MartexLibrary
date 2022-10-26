@@ -48,24 +48,22 @@ publishing {
                 }
             }
             maven {
-                maven {
-                    name = "GeorgeV22"
+                name = "GeorgeV22"
 
-                    url = uri("https://repo.georgev22.com/releases")
+                url = uri("https://repo.georgev22.com/releases")
 
-                    def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
-                            System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
-                    def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
-                            System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
+                def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
+                        System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
+                def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
+                        System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
 
-                    if (mavenUsername != null && mavenPassword != null) {
-                        credentials {
-                            username = mavenUsername
-                            password = mavenPassword
-                        }
-                        authentication {
-                            basic(BasicAuthentication)
-                        }
+                if (mavenUsername != null && mavenPassword != null) {
+                    credentials {
+                        username = mavenUsername
+                        password = mavenPassword
+                    }
+                    authentication {
+                        basic(BasicAuthentication)
                     }
                 }
             }

@@ -49,19 +49,22 @@ publishing {
             }
             maven {
                 maven {
-                    name = "GeorgeV22-Repository"
+                    name = "GeorgeV22"
 
-                    url = uri("https://repo.georgev22.com/releases/")
+                    url = uri("https://repo.georgev22.com/releases")
 
-                    def mavenUsername = System.getenv("ORG_GRADLE_PROJECT_MAVENUSERNAME") ? System.getenv("ORG_GRADLE_PROJECT_MAVENUSERNAME") :
-                            System.getProperty("ORG_GRADLE_PROJECT_MAVENUSERNAME") ? System.getProperty("ORG_GRADLE_PROJECT_MAVENUSERNAME") : null
-                    def mavenPassword = System.getenv("ORG_GRADLE_PROJECT_MAVENPASSWORD") ? System.getenv("ORG_GRADLE_PROJECT_MAVENPASSWORD") :
-                            System.getProperty("ORG_GRADLE_PROJECT_MAVENPASSWORD") ? System.getProperty("ORG_GRADLE_PROJECT_MAVENPASSWORD") : null
+                    def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
+                            System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
+                    def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
+                            System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
 
                     if (mavenUsername != null && mavenPassword != null) {
                         credentials {
                             username = mavenUsername
                             password = mavenPassword
+                        }
+                        authentication {
+                            basic(BasicAuthentication)
                         }
                     }
                 }
@@ -69,19 +72,22 @@ publishing {
         }
         if (!isGitHub) {
             maven {
-                name = "GeorgeV22-Repository"
+                name = "GeorgeV22"
 
-                url = uri("https://repo.georgev22.com/snapshots/")
+                url = uri("https://repo.georgev22.com/snapshots")
 
-                def mavenUsername = System.getenv("ORG_GRADLE_PROJECT_MAVENUSERNAME") ? System.getenv("ORG_GRADLE_PROJECT_MAVENUSERNAME") :
-                        System.getProperty("ORG_GRADLE_PROJECT_MAVENUSERNAME") ? System.getProperty("ORG_GRADLE_PROJECT_MAVENUSERNAME") : null
-                def mavenPassword = System.getenv("ORG_GRADLE_PROJECT_MAVENPASSWORD") ? System.getenv("ORG_GRADLE_PROJECT_MAVENPASSWORD") :
-                        System.getProperty("ORG_GRADLE_PROJECT_MAVENPASSWORD") ? System.getProperty("ORG_GRADLE_PROJECT_MAVENPASSWORD") : null
+                def mavenUsername = System.getenv("MAVEN_USERNAME") ? System.getenv("MAVEN_USERNAME") :
+                        System.getProperty("MAVEN_USERNAME") ? System.getProperty("MAVEN_USERNAME") : null
+                def mavenPassword = System.getenv("MAVEN_PASSWORD") ? System.getenv("MAVEN_PASSWORD") :
+                        System.getProperty("MAVEN_PASSWORD") ? System.getProperty("MAVEN_PASSWORD") : null
 
                 if (mavenUsername != null && mavenPassword != null) {
                     credentials {
                         username = mavenUsername
                         password = mavenPassword
+                    }
+                    authentication {
+                        basic(BasicAuthentication)
                     }
                 }
             }

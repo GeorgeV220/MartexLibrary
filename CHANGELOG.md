@@ -1,3 +1,10 @@
+## [5.4.2](https://github.com/GeorgeV220/API/compare/v5.4.1...v5.4.2) (2022-10-26)
+
+
+### Bug Fixes
+
+* **publish.gradle:** Basic Authentication ([c9f5296](https://github.com/GeorgeV220/API/commit/c9f529630f84afc68a435dc6e338f8a79393e5e9))
+
 ## [5.4.1](https://github.com/GeorgeV220/API/compare/v5.4.0...v5.4.1) (2022-10-26)
 
 

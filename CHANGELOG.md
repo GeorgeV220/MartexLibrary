@@ -1,3 +1,10 @@
+## [5.4.3](https://github.com/GeorgeV220/API/compare/v5.4.2...v5.4.3) (2022-10-26)
+
+
+### Bug Fixes
+
+* **publish.gradle:** Static methods ([fab7a99](https://github.com/GeorgeV220/API/commit/fab7a998c0a3aa982430fa79a3310d637dbff15a))
+
 ## [5.4.2](https://github.com/GeorgeV220/API/compare/v5.4.1...v5.4.2) (2022-10-26)
 
 

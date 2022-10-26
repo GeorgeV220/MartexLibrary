@@ -28,6 +28,12 @@ ext {
 }
 
 group project.property("group")
+def isCI = System.getenv("CI") ? true : false
+if (isCI) {
+    version("SNAPSHOT")
+} else {
+    version(project.property("version"))
+}
 
 compileJava {
     options.encoding = 'UTF-8'

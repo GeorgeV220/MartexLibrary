@@ -1,3 +1,11 @@
+# [5.5.0](https://github.com/GeorgeV220/API/compare/v5.4.5...v5.5.0) (2022-10-30)
+
+
+### Features
+
+* **Extensions:** Removed abstraction ([1770665](https://github.com/GeorgeV220/API/commit/17706653610bf1a77af92398e41f8834bf78f3de))
+* **MinecraftUtils:** Added methods for extensions to debug messages ([ff283ce](https://github.com/GeorgeV220/API/commit/ff283ce8387137074dd07366931ad565382b7428))
+
 ## [5.4.5](https://github.com/GeorgeV220/API/compare/v5.4.4...v5.4.5) (2022-10-26)
 
 

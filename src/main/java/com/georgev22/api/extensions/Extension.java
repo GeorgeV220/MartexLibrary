@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class Extension {
+public class Extension {
     private boolean isEnabled = false;
     private File file = null;
     private File dataFolder = null;
@@ -303,7 +303,9 @@ public abstract class Extension {
         return extension;
     }
 
-    public abstract String getName();
+    public String getName() {
+        return extensionDescriptionFile.getName();
+    }
 
     public ExtensionDescriptionFile getDescription() {
         return extensionDescriptionFile;

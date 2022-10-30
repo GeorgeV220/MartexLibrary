@@ -1,5 +1,6 @@
 package com.georgev22.api.minecraft;
 
+import com.georgev22.api.extensions.Extension;
 import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.utilities.DiscordWebHook;
 import com.georgev22.api.utilities.Utils;
@@ -231,6 +232,20 @@ public class MinecraftUtils {
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(MinecraftUtils::stripColor);
         return newColl;
+    }
+
+    public static void debug(final Extension extension, final Map<String, String> map, String @NotNull ... messages) {
+        for (final String msg : messages) {
+            MinecraftUtils.printMsg(Utils.placeHolder("[" + extension.getDescription().getName() + "] [Debug] [Version: " + extension.getDescription().getVersion() + "] " + msg, map, false));
+        }
+    }
+
+    public static void debug(final Extension extension, String... messages) {
+        debug(extension, null, messages);
+    }
+
+    public static void debug(final Extension extension, @NotNull List<String> messages) {
+        debug(extension, null, messages.toArray(new String[0]));
     }
 
     public static void debug(final JavaPlugin plugin, final Map<String, String> map, String @NotNull ... messages) {

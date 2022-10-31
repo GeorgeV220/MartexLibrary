@@ -1,3 +1,10 @@
+# [5.10.0](https://github.com/GeorgeV220/API/compare/v5.9.2...v5.10.0) (2022-10-31)
+
+
+### Features
+
+* **Extension:** Package requirement ([e856c86](https://github.com/GeorgeV220/API/commit/e856c865ee7c0291cc2fd22bba35be707fbf5818))
+
 ## [5.9.2](https://github.com/GeorgeV220/API/compare/v5.9.1...v5.9.2) (2022-10-31)
 
 

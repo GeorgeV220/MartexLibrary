@@ -1,3 +1,15 @@
+# [5.6.0](https://github.com/GeorgeV220/API/compare/v5.5.0...v5.6.0) (2022-10-31)
+
+
+### Bug Fixes
+
+* **ExtensionDescriptionFile:** Deprecation ([1402a81](https://github.com/GeorgeV220/API/commit/1402a81726601072852bd6fe9e486994f8a0dca3))
+
+
+### Features
+
+* **ExtensionLoader:** Unload and disable methods ([b0b81bf](https://github.com/GeorgeV220/API/commit/b0b81bf04381c5550132a9b4b5096a90ba9a7421))
+
 # [5.5.0](https://github.com/GeorgeV220/API/compare/v5.4.5...v5.5.0) (2022-10-30)
 
 

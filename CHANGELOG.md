@@ -1,3 +1,16 @@
+# [5.7.0](https://github.com/GeorgeV220/API/compare/v5.6.0...v5.7.0) (2022-10-31)
+
+
+### Bug Fixes
+
+* **Extensions:** Cancel all tasks on disable/unload ([c2f70e7](https://github.com/GeorgeV220/API/commit/c2f70e7b1dca98ecc0b68a7d1cec33f007c1a874))
+
+
+### Features
+
+* **Extensions:** Added IllegalExtensionAccessException ([ff442a7](https://github.com/GeorgeV220/API/commit/ff442a7e5d25f5b6658d96df47eca8abf7136203))
+* **Extensions:** Extensions scheduler ([1c43650](https://github.com/GeorgeV220/API/commit/1c43650bb0c9fb9768aecc1dc2734d84e3d268d4))
+
 # [5.6.0](https://github.com/GeorgeV220/API/compare/v5.5.0...v5.6.0) (2022-10-31)
 
 

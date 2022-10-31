@@ -466,7 +466,7 @@ public class Scheduler implements ExtensionScheduler {
         Validate.notNull(task, "Task cannot be null");
         Validate.isTrue(task instanceof Runnable || task instanceof Consumer || task instanceof Callable, "Task must be Runnable, Consumer, or Callable");
         if (!extension.isEnabled()) {
-            throw new RuntimeException("Extension attempted to register task while disabled");
+            throw new IllegalExtensionAccessException("Extension attempted to register task while disabled");
         }
     }
 

@@ -1,6 +1,7 @@
 package com.georgev22.api.minecraft;
 
 import com.georgev22.api.extensions.Extension;
+import com.georgev22.api.maps.HashObjectMap;
 import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.utilities.DiscordWebHook;
 import com.georgev22.api.utilities.Utils;
@@ -241,11 +242,25 @@ public class MinecraftUtils {
     }
 
     public static void debug(final Extension extension, String... messages) {
-        debug(extension, null, messages);
+        debug(extension, new HashObjectMap<>(), messages);
     }
 
     public static void debug(final Extension extension, @NotNull List<String> messages) {
-        debug(extension, null, messages.toArray(new String[0]));
+        debug(extension, new HashObjectMap<>(), messages.toArray(new String[0]));
+    }
+
+    public static void debug(final String name, String version, final Map<String, String> map, String @NotNull ... messages) {
+        for (final String msg : messages) {
+            MinecraftUtils.printMsg(Utils.placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
+        }
+    }
+
+    public static void debug(final String name, String version, String... messages) {
+        debug(name, version, new HashObjectMap<>(), messages);
+    }
+
+    public static void debug(final String name, String version, @NotNull List<String> messages) {
+        debug(name, version, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
     public static void debug(final JavaPlugin plugin, final Map<String, String> map, String @NotNull ... messages) {
@@ -255,11 +270,11 @@ public class MinecraftUtils {
     }
 
     public static void debug(final JavaPlugin plugin, String... messages) {
-        debug(plugin, null, messages);
+        debug(plugin, new HashObjectMap<>(), messages);
     }
 
     public static void debug(final JavaPlugin plugin, @NotNull List<String> messages) {
-        debug(plugin, null, messages.toArray(new String[0]));
+        debug(plugin, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
     public static ItemStack @NotNull [] getItems(final @NotNull ItemStack item, int amount) {

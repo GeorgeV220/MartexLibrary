@@ -53,6 +53,8 @@ public final class ExtensionDescriptionFile {
     private String name = null;
     private List<String> provides = ImmutableList.of();
     private String main = null;
+
+    private String pkg = null;
     private String classLoaderOf = null;
     private List<String> depend = ImmutableList.of();
     private List<String> softDepend = ImmutableList.of();
@@ -83,30 +85,30 @@ public final class ExtensionDescriptionFile {
     /**
      * Creates a new ExtensionDescriptionFile with the given detailed
      *
-     * @param pluginName    Name of this plugin
-     * @param pluginVersion Version of this plugin
-     * @param mainClass     Full location of the main class of this plugin
+     * @param extensionName    Name of this extension
+     * @param extensionVersion Version of this extension
+     * @param mainClass        Full location of the main class of this extension
      */
-    public ExtensionDescriptionFile(@NotNull final String pluginName, @NotNull final String pluginVersion, @NotNull final String mainClass) {
-        name = rawName = pluginName;
+    public ExtensionDescriptionFile(@NotNull final String extensionName, @NotNull final String extensionVersion, @NotNull final String mainClass) {
+        name = rawName = extensionName;
 
         if (!VALID_NAME.matcher(name).matches()) {
             throw new IllegalArgumentException("name '" + name + "' contains invalid characters.");
         }
         name = name.replace(' ', '_');
-        version = pluginVersion;
+        version = extensionVersion;
         main = mainClass;
     }
 
     /**
-     * Gives the name of the plugin. This name is a unique identifier for
-     * plugins.
+     * Gives the name of the extension. This name is a unique identifier for
+     * extensions.
      * <ul>
      * <li>Must consist of all alphanumeric characters, underscores, hyphon,
      *     and period (a-z,A-Z,0-9, _.-). Any other character will cause the
-     *     plugin.yml to fail loading.
-     * <li>Used to determine the name of the plugin's data folder. Data
-     *     folders are placed in the ./plugins/ directory by default, but this
+     *     extension.yml to fail loading.
+     * <li>Used to determine the name of the extension's data folder. Data
+     *     folders are placed in the ./extensions/ directory by default, but this
      *     behavior should not be relied on. {@link Extension#getDataFolder()}
      *     should be used to reference the data folder.
      * <li>It is good practice to name your jar the same as this, for example
@@ -114,14 +116,14 @@ public final class ExtensionDescriptionFile {
      * <li>Case sensitive.
      * <li>The is the token referenced in {@link #getDepend()}, {@link
      *     #getSoftDepend()}, and {@link #getLoadBefore()}.
-     * <li>Using spaces in the plugin's name is deprecated.
+     * <li>Using spaces in the extension's name is deprecated.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>name</code>.
+     * In the extension.yml, this entry is named <code>name</code>.
      * <p>
      * Example:<blockquote><pre>name: MyExtension</pre></blockquote>
      *
-     * @return the name of the plugin
+     * @return the name of the extension
      */
     @NotNull
     public String getName() {
@@ -129,14 +131,14 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the list of other plugin APIs which this plugin provides.
-     * These are usable for other plugins to depend on.
+     * Gives the list of other extension APIs which this extension provides.
+     * These are usable for other extensions to depend on.
      * <ul>
      * <li>Must consist of all alphanumeric characters, underscores, hyphon,
      *     and period (a-z,A-Z,0-9, _.-). Any other character will cause the
-     *     plugin.yml to fail loading.
-     * <li>A different plugin providing the same one or using it as their name
-     *     will not result in the plugin to fail loading.
+     *     extension.yml to fail loading.
+     * <li>A different extension providing the same one or using it as their name
+     *     will not result in the extension to fail loading.
      * <li>Case sensitive.
      * <li>An entry of this list can be referenced in {@link #getDepend()},
      *    {@link #getSoftDepend()}, and {@link #getLoadBefore()}.
@@ -145,14 +147,14 @@ public final class ExtensionDescriptionFile {
      *     format</a>.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>provides</code>.
+     * In the extension.yml, this entry is named <code>provides</code>.
      * <p>
      * Example:
      * <blockquote><pre>provides:
      * - OtherExtensionName
      * - OldExtensionName</pre></blockquote>
      *
-     * @return immutable list of the plugin APIs which this plugin provides
+     * @return immutable list of the extension APIs which this extension provides
      */
     @NotNull
     public List<String> getProvides() {
@@ -160,7 +162,7 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the version of the plugin.
+     * Gives the version of the extension.
      * <ul>
      * <li>Version is an arbitrary string, however the most common format is
      *     MajorRelease.MinorRelease.Build (eg: 1.4.1).
@@ -169,11 +171,11 @@ public final class ExtensionDescriptionFile {
      * <li>Displayed when a user types <code>/version ExtensionName</code>
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>version</code>.
+     * In the extension.yml, this entry is named <code>version</code>.
      * <p>
      * Example:<blockquote><pre>version: 1.4.1</pre></blockquote>
      *
-     * @return the version of the plugin
+     * @return the version of the extension
      */
     @NotNull
     public String getVersion() {
@@ -181,26 +183,26 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the fully qualified name of the main class for a plugin. The
+     * Gives the fully qualified name of the main class for a extension. The
      * format should follow the {@link ClassLoader#loadClass(String)} syntax
-     * to successfully be resolved at runtime. For most plugins, this is the
+     * to successfully be resolved at runtime. For most extensions, this is the
      * class that extends {@link Extension}.
      * <ul>
      * <li>This must contain the full namespace including the class file
      *     itself.
-     * <li>If your namespace is <code>org.bukkit.plugin</code>, and your class
+     * <li>If your namespace is <code>org.bukkit.extension</code>, and your class
      *     file is called <code>MyExtension</code> then this must be
-     *     <code>org.bukkit.plugin.MyExtension</code>
-     * <li>No plugin can use <code>org.bukkit.</code> as a base package for
+     *     <code>org.bukkit.extension.MyExtension</code>
+     * <li>No extension can use <code>org.bukkit.</code> as a base package for
      *     <b>any class</b>, including the main class.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>main</code>.
+     * In the extension.yml, this entry is named <code>main</code>.
      * <p>
      * Example:
-     * <blockquote><pre>main: org.bukkit.plugin.MyExtension</pre></blockquote>
+     * <blockquote><pre>main: org.bukkit.extension.MyExtension</pre></blockquote>
      *
-     * @return the fully qualified main class for the plugin
+     * @return the fully qualified main class for the extension
      */
     @NotNull
     public String getMain() {
@@ -208,19 +210,37 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives a human-friendly description of the functionality the plugin
+     * Gives the fully qualified name of the package for an extension.
+     * <ul>
+     * <li>This must contain the full namespace
+     * <li>No extension can use <code>org.bukkit.</code>
+     * </ul>
+     * <p>
+     * In the extension.yml, this entry is named <code>package</code>.
+     * <p>
+     * Example:
+     * <blockquote><pre>package: org.bukkit.extension</pre></blockquote>
+     *
+     * @return the fully qualified package for the extension
+     */
+    public String getPackage() {
+        return pkg;
+    }
+
+    /**
+     * Gives a human-friendly description of the functionality the extension
      * provides.
      * <ul>
      * <li>The description can have multiple lines.
      * <li>Displayed when a user types <code>/version ExtensionName</code>
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>description</code>.
+     * In the extension.yml, this entry is named <code>description</code>.
      * <p>
      * Example:
-     * <blockquote><pre>description: This plugin is so 31337. You can set yourself on fire.</pre></blockquote>
+     * <blockquote><pre>description: This extension is so 31337. You can set yourself on fire.</pre></blockquote>
      *
-     * @return description of this plugin, or null if not specified
+     * @return description of this extension, or null if not specified
      */
     @Nullable
     public String getDescription() {
@@ -228,7 +248,7 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the list of authors for the plugin.
+     * Gives the list of authors for the extension.
      * <ul>
      * <li>Gives credit to the developer.
      * <li>Used in some server error messages to provide helpful feedback on
@@ -240,7 +260,7 @@ public final class ExtensionDescriptionFile {
      *     format</a>.
      * </ul>
      * <p>
-     * In the plugin.yml, this has two entries, <code>author</code> and
+     * In the extension.yml, this has two entries, <code>author</code> and
      * <code>authors</code>.
      * <p>
      * Single author example:
@@ -256,7 +276,7 @@ public final class ExtensionDescriptionFile {
      * Is equivilant to this example:
      * <pre>authors: [Grum, feildmaster, aramanth]</pre>
      *
-     * @return an immutable list of the plugin's authors
+     * @return an immutable list of the extension's authors
      */
     @NotNull
     public List<String> getAuthors() {
@@ -264,9 +284,9 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the list of contributors for the plugin.
+     * Gives the list of contributors for the extension.
      * <ul>
-     * <li>Gives credit to those that have contributed to the plugin, though
+     * <li>Gives credit to those that have contributed to the extension, though
      *     not enough so to warrant authorship.
      * <li>Unlike {@link #getAuthors()}, contributors will not be mentioned in
      * server error messages as a means of contact.
@@ -280,7 +300,7 @@ public final class ExtensionDescriptionFile {
      * Example:
      * <blockquote><pre>authors: [Choco, md_5]</pre></blockquote>
      *
-     * @return an immutable list of the plugin's contributors
+     * @return an immutable list of the extension's contributors
      */
     @NotNull
     public List<String> getContributors() {
@@ -288,19 +308,19 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the plugin's or plugin's author's website.
+     * Gives the extension's or extension's author's website.
      * <ul>
      * <li>A link to the Curse page that includes documentation and downloads
      *     is highly recommended.
      * <li>Displayed when a user types <code>/version ExtensionName</code>
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>website</code>.
+     * In the extension.yml, this entry is named <code>website</code>.
      * <p>
      * Example:
      * <blockquote><pre>website: http://www.curse.com/server-mods/minecraft/myextension</pre></blockquote>
      *
-     * @return description of this plugin, or null if not specified
+     * @return description of this extension, or null if not specified
      */
     @Nullable
     public String getWebsite() {
@@ -308,30 +328,30 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives a list of other plugins that the plugin requires.
+     * Gives a list of other extensions that the extension requires.
      * <ul>
-     * <li>Use the value in the {@link #getName()} of the target plugin to
+     * <li>Use the value in the {@link #getName()} of the target extension to
      *     specify the dependency.
-     * <li>If any plugin listed here is not found, your plugin will fail to
+     * <li>If any extension listed here is not found, your extension will fail to
      *     load at startup.
-     * <li>If multiple plugins list each other in <code>depend</code>,
-     *     creating a network with no individual plugin does not list another
-     *     plugin in the <a
+     * <li>If multiple extensions list each other in <code>depend</code>,
+     *     creating a network with no individual extension does not list another
+     *     extension in the <a
      *     href=https://en.wikipedia.org/wiki/Circular_dependency>network</a>,
-     *     all plugins in that network will fail.
+     *     all extensions in that network will fail.
      * <li><code>depend</code> must be in <a
      *     href="http://en.wikipedia.org/wiki/YAML#Lists">YAML list
      *     format</a>.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>depend</code>.
+     * In the extension.yml, this entry is named <code>depend</code>.
      * <p>
      * Example:
      * <blockquote><pre>depend:
      * - OneExtension
      * - AnotherExtension</pre></blockquote>
      *
-     * @return immutable list of the plugin's dependencies
+     * @return immutable list of the extension's dependencies
      */
     @NotNull
     public List<String> getDepend() {
@@ -339,27 +359,27 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives a list of other plugins that the plugin requires for full
+     * Gives a list of other extensions that the extension requires for full
      * functionality.
      * <ul>
-     * <li>Use the value in the {@link #getName()} of the target plugin to
+     * <li>Use the value in the {@link #getName()} of the target extension to
      *     specify the dependency.
-     * <li>When an unresolvable plugin is listed, it will be ignored and does
+     * <li>When an unresolvable extension is listed, it will be ignored and does
      *     not affect load order.
-     * <li>When a circular dependency occurs (a network of plugins depending
+     * <li>When a circular dependency occurs (a network of extensions depending
      *     or soft-dependending each other), it will arbitrarily choose a
-     *     plugin that can be resolved when ignoring soft-dependencies.
+     *     extension that can be resolved when ignoring soft-dependencies.
      * <li><code>softdepend</code> must be in <a
      *     href="http://en.wikipedia.org/wiki/YAML#Lists">YAML list
      *     format</a>.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>softdepend</code>.
+     * In the extension.yml, this entry is named <code>softdepend</code>.
      * <p>
      * Example:
      * <blockquote><pre>softdepend: [OneExtension, AnotherExtension]</pre></blockquote>
      *
-     * @return immutable list of the plugin's preferred dependencies
+     * @return immutable list of the extension's preferred dependencies
      */
     @NotNull
     public List<String> getSoftDepend() {
@@ -367,28 +387,28 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gets the list of plugins that should consider this plugin a
+     * Gets the list of extensions that should consider this extension a
      * soft-dependency.
      * <ul>
-     * <li>Use the value in the {@link #getName()} of the target plugin to
+     * <li>Use the value in the {@link #getName()} of the target extension to
      *     specify the dependency.
-     * <li>The plugin should load before any other plugins listed here.
-     * <li>Specifying another plugin here is strictly equivalent to having the
-     *     specified plugin's {@link #getSoftDepend()} include {@link
-     *     #getName() this plugin}.
+     * <li>The extension should load before any other extensions listed here.
+     * <li>Specifying another extension here is strictly equivalent to having the
+     *     specified extension's {@link #getSoftDepend()} include {@link
+     *     #getName() this extension}.
      * <li><code>loadbefore</code> must be in <a
      *     href="http://en.wikipedia.org/wiki/YAML#Lists">YAML list
      *     format</a>.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>loadbefore</code>.
+     * In the extension.yml, this entry is named <code>loadbefore</code>.
      * <p>
      * Example:
      * <blockquote><pre>loadbefore:
      * - OneExtension
      * - AnotherExtension</pre></blockquote>
      *
-     * @return immutable list of plugins that should consider this plugin a
+     * @return immutable list of extensions that should consider this extension a
      * soft-dependency
      */
     @NotNull
@@ -397,15 +417,15 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gives the token to prefix plugin-specific logging messages with.
+     * Gives the token to prefix extension-specific logging messages with.
      * <ul>
      * <li>This includes all messages using {@link Extension#getLogger()}.
-     * <li>If not specified, the server uses the plugin's {@link #getName()
+     * <li>If not specified, the server uses the extension's {@link #getName()
      *     name}.
-     * <li>This should clearly indicate what plugin is being logged.
+     * <li>This should clearly indicate what extension is being logged.
      * </ul>
      * <p>
-     * In the plugin.yml, this entry is named <code>prefix</code>.
+     * In the extension.yml, this entry is named <code>prefix</code>.
      * <p>
      * Example:<blockquote><pre>prefix: ex-why-zee</pre></blockquote>
      *
@@ -417,11 +437,11 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Returns the name of a plugin, including the version. This method is
+     * Returns the name of a extension, including the version. This method is
      * provided for convenience; it uses the {@link #getName()} and {@link
      * #getVersion()} entries.
      *
-     * @return a descriptive name of the plugin and respective version
+     * @return a descriptive name of the extension and respective version
      */
     @NotNull
     public String getFullName() {
@@ -429,7 +449,7 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Gets the libraries this plugin requires. This is a preview feature.
+     * Gets the libraries this extension requires. This is a preview feature.
      * <ul>
      * <li>Libraries must be GAV specifiers and are loaded from Maven Central.
      * </ul>
@@ -496,6 +516,15 @@ public final class ExtensionDescriptionFile {
             throw new InvalidDescriptionException(ex, "main is not defined");
         } catch (ClassCastException ex) {
             throw new InvalidDescriptionException(ex, "main is of wrong type");
+        }
+
+        try {
+            pkg = map.get("package").toString();
+            if (pkg.startsWith("org.bukkit.")) {
+                throw new InvalidDescriptionException("package may not be within the org.bukkit namespace");
+            }
+        } catch (NullPointerException ex) {
+            throw new InvalidDescriptionException(ex, "package is not defined");
         }
 
         if (map.get("class-loader-of") != null) {
@@ -601,6 +630,9 @@ public final class ExtensionDescriptionFile {
 
         if (depend != null) {
             map.put("depend", depend);
+        }
+        if (pkg != null) {
+            map.put("package", pkg);
         }
         if (softDepend != null) {
             map.put("softdepend", softDepend);

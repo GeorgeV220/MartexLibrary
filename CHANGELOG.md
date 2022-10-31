@@ -1,3 +1,10 @@
+## [5.9.1](https://github.com/GeorgeV220/API/compare/v5.9.0...v5.9.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* **MinecraftUtils:** FileConfiguration API methods ([e6fb11e](https://github.com/GeorgeV220/API/commit/e6fb11e4c8fb4bb75822ce6cd3a164ab900af626))
+
 # [5.9.0](https://github.com/GeorgeV220/API/compare/v5.8.0...v5.9.0) (2022-10-31)
 
 

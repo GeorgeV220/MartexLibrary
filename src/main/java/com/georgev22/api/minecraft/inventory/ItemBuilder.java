@@ -78,6 +78,101 @@ public class ItemBuilder {
         this.nbtItem = new NBTItem(itemStack, true);
     }
 
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
+        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap());
+    }
+
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements) {
+        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap());
+    }
+
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+        }
+        return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
+                .amount(fileConfiguration.getInt(path + ".amount"))
+                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
+                .glow(fileConfiguration.getBoolean(path + ".glow"))
+                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
+                .animation(fileConfiguration.getString(path + ".animation"))
+                .commands(buildItemCommandFromConfig(fileConfiguration, path))
+                .frames(buildFramesFromConfig(fileConfiguration, path, loresReplacements, titleReplacements));
+    }
+
+    public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+        }
+        return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
+                .amount(fileConfiguration.getInt(path + ".amount"));
+    }
+
+    public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
+            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+        }
+        if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
+            return buildSimpleItemFromConfig(fileConfiguration, path);
+        return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
+                .amount(fileConfiguration.getInt(path + ".amount"))
+                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .enchantment(fileConfiguration.getStringList(path + ".enchantments"))
+                ;
+    }
+
+    private static @NotNull List<ItemCommand> buildItemCommandFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
+        List<ItemCommand> itemCommands = Lists.newArrayList();
+        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !fileConfiguration.getConfigurationSection(path + ".commands").getKeys(true).isEmpty()) {
+            if (fileConfiguration.getStringList(path + ".commands.RIGHT") != null && !fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.RIGHT, fileConfiguration.getInt(path + ".commands cooldown.RIGHT"), fileConfiguration.getStringList(path + ".commands.RIGHT"));
+                itemCommands.add(itemCommand);
+            }
+            if (fileConfiguration.getStringList(path + ".commands.LEFT") != null && !fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.LEFT, fileConfiguration.getInt(path + ".commands cooldown.LEFT"), fileConfiguration.getStringList(path + ".commands.LEFT"));
+                itemCommands.add(itemCommand);
+            }
+            if (fileConfiguration.getStringList(path + ".commands.MIDDLE") != null && !fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
+                ItemCommand itemCommand = new ItemCommand(ItemCommandType.MIDDLE, fileConfiguration.getInt(path + ".commands cooldown.MIDDLE"), fileConfiguration.getStringList(path + ".commands.MIDDLE"));
+                itemCommands.add(itemCommand);
+            }
+        }
+        return itemCommands;
+    }
+
+    public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+        List<ItemStack> itemStacks = Lists.newArrayList();
+        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
+        }
+        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
+            itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
+            for (String b : fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false)) {
+                itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial()).build());
+            }
+        }
+        return itemStacks;
+    }
+
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull com.georgev22.api.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        List<Action> actions = Lists.newArrayList();
+        if (fileConfiguration == null || fileConfiguration.get(path) == null) {
+            return actions;
+        }
+
+        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false).isEmpty()) {
+            for (String key : fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false)) {
+                actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
+            }
+        }
+
+        return actions;
+    }
+
+
     public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
         return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap());
     }

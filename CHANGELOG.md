@@ -1,3 +1,10 @@
+## [5.9.2](https://github.com/GeorgeV220/API/compare/v5.9.1...v5.9.2) (2022-10-31)
+
+
+### Bug Fixes
+
+* **Extension:** Changed some methods from protected to public ([65b7cc6](https://github.com/GeorgeV220/API/commit/65b7cc61b0562d6a2002b0274e6f6ab5c7521412))
+
 ## [5.9.1](https://github.com/GeorgeV220/API/compare/v5.9.0...v5.9.1) (2022-10-31)
 
 

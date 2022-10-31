@@ -1,3 +1,11 @@
+# [5.8.0](https://github.com/GeorgeV220/API/compare/v5.7.1...v5.8.0) (2022-10-31)
+
+
+### Features
+
+* **ItemBuilder:** API FileConfiguration support ([51c5327](https://github.com/GeorgeV220/API/commit/51c53271374ee886007dfa6768f692f62666d499))
+* **Utils:** API FileConfiguration isList ([da8ba99](https://github.com/GeorgeV220/API/commit/da8ba990f362303e21a631489cf61a773905305b))
+
 ## [5.7.1](https://github.com/GeorgeV220/API/compare/v5.7.0...v5.7.1) (2022-10-31)
 
 

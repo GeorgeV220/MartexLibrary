@@ -4,7 +4,6 @@ import com.georgev22.api.extensions.Extension;
 import com.georgev22.api.extensions.ExtensionManager;
 import com.georgev22.api.extensions.scheduler.interfaces.ExtensionScheduler;
 import com.georgev22.api.extensions.scheduler.interfaces.ExtensionTask;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ExtensionRunnable implements Runnable {
@@ -28,7 +27,7 @@ public abstract class ExtensionRunnable implements Runnable {
      * @throws IllegalStateException if task was not scheduled yet
      */
     public synchronized void cancel() throws IllegalStateException {
-        Bukkit.getScheduler().cancelTask(getTaskId());
+        ExtensionManager.getScheduler().cancelTask(getTaskId());
     }
 
     /**

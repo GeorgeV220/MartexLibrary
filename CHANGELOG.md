@@ -1,3 +1,10 @@
+## [5.7.1](https://github.com/GeorgeV220/API/compare/v5.7.0...v5.7.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* **ExtensionRunnable:** fixed cancel method ([e9e2931](https://github.com/GeorgeV220/API/commit/e9e29319f82598b75c4757882482e8f306ffef7c))
+
 # [5.7.0](https://github.com/GeorgeV220/API/compare/v5.6.0...v5.7.0) (2022-10-31)
 
 

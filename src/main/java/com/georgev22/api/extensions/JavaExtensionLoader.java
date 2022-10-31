@@ -192,6 +192,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
             extension.getLogger().info(String.format("Disabling %s", extension.getDescription().getFullName()));
 
             try {
+                ExtensionManager.getScheduler().cancelTasks(extension);
                 extension.setEnabled(false);
             } catch (Throwable ex) {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while disabling " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
@@ -207,6 +208,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
             ClassLoader cloader = extension.getClassLoader();
 
             try {
+                ExtensionManager.getScheduler().cancelTasks(extension);
                 extension.setEnabled(false);
             } catch (Throwable ex) {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while unloading " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);

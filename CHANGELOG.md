@@ -1,3 +1,10 @@
+# [5.9.0](https://github.com/GeorgeV220/API/compare/v5.8.0...v5.9.0) (2022-10-31)
+
+
+### Features
+
+* **MinecraftUtils:** new debug methods ([639267c](https://github.com/GeorgeV220/API/commit/639267c94f017f00388a8a397922a2f51a550e25))
+
 # [5.8.0](https://github.com/GeorgeV220/API/compare/v5.7.1...v5.8.0) (2022-10-31)
 
 

@@ -298,7 +298,7 @@ public final class ExtensionDescriptionFile {
      * In the plugin.yml, this entry is named <code>website</code>.
      * <p>
      * Example:
-     * <blockquote><pre>website: http://www.curse.com/server-mods/minecraft/myplugin</pre></blockquote>
+     * <blockquote><pre>website: http://www.curse.com/server-mods/minecraft/myextension</pre></blockquote>
      *
      * @return description of this plugin, or null if not specified
      */
@@ -340,9 +340,7 @@ public final class ExtensionDescriptionFile {
 
     /**
      * Gives a list of other plugins that the plugin requires for full
-     * functionality. The {@link ExtensionManager} will make best effort to treat
-     * all entries here as if they were a {@link #getDepend() dependency}, but
-     * will never fail because of one of these entries.
+     * functionality.
      * <ul>
      * <li>Use the value in the {@link #getName()} of the target plugin to
      *     specify the dependency.
@@ -649,9 +647,7 @@ public final class ExtensionDescriptionFile {
 
     /**
      * @return internal use
-     * @deprecated Internal use
      */
-    @Deprecated
     @NotNull
     public String getRawName() {
         return rawName;

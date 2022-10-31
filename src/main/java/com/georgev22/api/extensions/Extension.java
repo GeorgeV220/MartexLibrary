@@ -53,7 +53,7 @@ public class Extension {
 
 
     /**
-     * Returns a value indicating whether or not this extension is currently
+     * Returns a value indicating whether this extension is currently
      * enabled
      *
      * @return true if this extension is enabled, otherwise false
@@ -91,7 +91,7 @@ public class Extension {
      * @see ClassLoader#getResourceAsStream(String)
      */
     @Nullable
-    protected final Reader getTextResource(@NotNull String file) {
+    public final Reader getTextResource(@NotNull String file) {
         final InputStream in = getResource(file);
 
         return in == null ? null : new InputStreamReader(in, StandardCharsets.UTF_8);
@@ -186,7 +186,7 @@ public class Extension {
      * @return ClassLoader holding this extension
      */
     @NotNull
-    protected final ClassLoader getClassLoader() {
+    public final ClassLoader getClassLoader() {
         return classLoader;
     }
 

@@ -2,13 +2,15 @@ package com.georgev22.api.extensions;
 
 import com.georgev22.api.exceptions.InvalidDescriptionException;
 import com.georgev22.api.exceptions.InvalidExtensionException;
+import com.georgev22.api.maps.ObjectMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.File;
 import java.util.regex.Pattern;
 
 /**
- * Represents a extension loader, which handles direct access to specific types
+ * Represents an extension loader, which handles direct access to specific types
  * of extensions
  */
 public interface ExtensionLoader {
@@ -51,9 +53,23 @@ public interface ExtensionLoader {
     /**
      * Disables the specified extension
      * <p>
-     * Attempting to disable a extension that is not enabled will have no effect
+     * Attempting to disable an extension that is not enabled will have no effect
      *
-     * @param extension Extension to disable
+     * @param extension Extension to unload
      */
     void disableExtension(@NotNull Extension extension);
+
+    /**
+     * Unloads the specified extension
+     * <p>
+     * Attempting to unload an extension that is not enabled/disabled will have no effect
+     *
+     * @param extension Extension to unload
+     */
+    void unloadExtension(@NotNull Extension extension);
+
+    /**
+     * Get an unmodifiable extensions map to list all loaded extensions.
+     */
+    @NotNull @UnmodifiableView ObjectMap<String, Extension> getExtensions();
 }

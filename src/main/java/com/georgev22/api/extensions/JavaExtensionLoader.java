@@ -60,6 +60,11 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         final File dataFolder = new File(parentFile, description.getName());
         final File oldDataFolder = new File(parentFile, description.getRawName());
 
+        logger.log(Level.INFO, String.format(
+                "Loading extension %s",
+                description.getName()
+        ));
+
         // Found old data folder
         if (dataFolder.equals(oldDataFolder)) {
             // They are equal -- nothing needs to be done!
@@ -163,9 +168,8 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
     @Override
     public void enableExtension(@NotNull final Extension extension) {
-
         if (!extension.isEnabled()) {
-            extension.getLogger().info("Enabling " + extension.getDescription().getFullName());
+            extension.getLogger().info(String.format("Enabling %s", extension.getDescription().getFullName()));
 
             ExtensionClassLoader extensionLoader = (ExtensionClassLoader) extension.getClassLoader();
 
@@ -182,19 +186,30 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         }
     }
 
-
     @Override
     public void disableExtension(@NotNull Extension extension) {
         if (extension.isEnabled()) {
-            String message = String.format("Disabling %s", extension.getDescription().getFullName());
-            extension.getLogger().info(message);
+            extension.getLogger().info(String.format("Disabling %s", extension.getDescription().getFullName()));
+
+            try {
+                extension.setEnabled(false);
+            } catch (Throwable ex) {
+                extension.getLogger().log(Level.SEVERE, "Error occurred while disabling " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
+            }
+        }
+    }
+
+    @Override
+    public void unloadExtension(@NotNull Extension extension) {
+        if (extension.isEnabled()) {
+            extension.getLogger().info(String.format("Unloading %s", extension.getDescription().getFullName()));
 
             ClassLoader cloader = extension.getClassLoader();
 
             try {
                 extension.setEnabled(false);
             } catch (Throwable ex) {
-                extension.getLogger().log(Level.SEVERE, "Error occurred while disabling " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
+                extension.getLogger().log(Level.SEVERE, "Error occurred while unloading " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
             if (cloader instanceof ExtensionClassLoader loader) {
@@ -209,6 +224,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         }
     }
 
+    @Override
     @Contract(" -> new")
     public @NotNull @UnmodifiableView ObjectMap<String, Extension> getExtensions() {
         return new UnmodifiableObjectMap<>(extensionObjectMap);

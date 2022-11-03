@@ -1,10 +1,15 @@
-package com.georgev22.api.extensions;
+package com.georgev22.api.extensions.java;
 
 import com.georgev22.api.exceptions.InvalidDescriptionException;
 import com.georgev22.api.exceptions.InvalidExtensionException;
+import com.georgev22.api.extensions.Extension;
+import com.georgev22.api.extensions.ExtensionDescriptionFile;
+import com.georgev22.api.extensions.ExtensionLoader;
+import com.georgev22.api.extensions.ExtensionsImpl;
 import com.georgev22.api.maps.ConcurrentObjectMap;
 import com.georgev22.api.maps.ObjectMap;
 import com.georgev22.api.maps.UnmodifiableObjectMap;
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -30,19 +34,19 @@ public final class JavaExtensionLoader implements ExtensionLoader {
     private final Pattern[] fileFilters = new Pattern[]{Pattern.compile("\\.jar$")};
     private final List<ExtensionClassLoader> loaders = new CopyOnWriteArrayList<>();
     private final ObjectMap<String, Extension> extensionObjectMap = new ConcurrentObjectMap<>();
-    private final Logger logger;
+
+    private final ExtensionsImpl extensionsImpl;
 
     /**
      * This class was not meant to be constructed explicitly
      */
-    @Deprecated
-    public JavaExtensionLoader(Logger logger) {
-        this.logger = logger;
+    public JavaExtensionLoader(ExtensionsImpl extensionsImpl) {
+        this.extensionsImpl = extensionsImpl;
     }
 
     @Override
     @NotNull
-    public Extension loadExtension(@NotNull final File file) throws InvalidExtensionException {
+    public JavaExtension loadExtension(@NotNull final File file) throws InvalidExtensionException {
         Validate.notNull(file, "File cannot be null");
 
         if (!file.exists()) {
@@ -60,7 +64,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         final File dataFolder = new File(parentFile, description.getName());
         final File oldDataFolder = new File(parentFile, description.getRawName());
 
-        logger.log(Level.INFO, String.format(
+        extensionsImpl.getLogger().log(Level.INFO, String.format(
                 "Loading extension %s",
                 description.getName()
         ));
@@ -69,7 +73,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
         if (dataFolder.equals(oldDataFolder)) {
             // They are equal -- nothing needs to be done!
         } else if (dataFolder.isDirectory() && oldDataFolder.isDirectory()) {
-            logger.warning(String.format(
+            extensionsImpl.getLogger().warning(String.format(
                     "While loading %s (%s) found old-data folder: `%s' next to the new one `%s'",
                     description.getFullName(),
                     file,
@@ -80,7 +84,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
             if (!oldDataFolder.renameTo(dataFolder)) {
                 throw new InvalidExtensionException("Unable to rename old data folder: `" + oldDataFolder + "' to: `" + dataFolder + "'");
             }
-            logger.log(Level.INFO, String.format(
+            extensionsImpl.getLogger().log(Level.INFO, String.format(
                     "While loading %s (%s) renamed data folder: `%s' to `%s'",
                     description.getFullName(),
                     file,
@@ -112,14 +116,14 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
         final ExtensionClassLoader loader;
         try {
-            loader = new ExtensionClassLoader(getClass().getClassLoader(), description, dataFolder, file, logger);
+            loader = new ExtensionClassLoader(this, getClass().getClassLoader(), description, dataFolder, file, extensionsImpl);
         } catch (Throwable ex) {
             throw new InvalidExtensionException(ex);
         }
 
         loaders.add(loader);
-        extensionObjectMap.append(loader.extension.getName(), loader.extension);
-        return loader.extension;
+        extensionObjectMap.append(loader.javaExtension.getName(), loader.javaExtension);
+        return loader.javaExtension;
     }
 
     @Override
@@ -168,10 +172,13 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
     @Override
     public void enableExtension(@NotNull final Extension extension) {
+        Preconditions.checkArgument(extension instanceof JavaExtension, "Extension is not associated with this ExtensionLoader");
         if (!extension.isEnabled()) {
             extension.getLogger().info(String.format("Enabling %s", extension.getDescription().getFullName()));
 
-            ExtensionClassLoader extensionLoader = (ExtensionClassLoader) extension.getClassLoader();
+            JavaExtension javaExtension = (JavaExtension) extension;
+
+            ExtensionClassLoader extensionLoader = (ExtensionClassLoader) javaExtension.getClassLoader();
 
             if (!loaders.contains(extensionLoader)) {
                 loaders.add(extensionLoader);
@@ -179,7 +186,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
             }
 
             try {
-                extension.setEnabled(true);
+                javaExtension.setEnabled(true);
             } catch (Throwable ex) {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while enabling " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
@@ -188,12 +195,13 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
     @Override
     public void disableExtension(@NotNull Extension extension) {
+        Preconditions.checkArgument(extension instanceof JavaExtension, "Extension is not associated with this ExtensionLoader");
         if (extension.isEnabled()) {
             extension.getLogger().info(String.format("Disabling %s", extension.getDescription().getFullName()));
 
             try {
-                ExtensionManager.getScheduler().cancelTasks(extension);
-                extension.setEnabled(false);
+                JavaExtension javaExtension = (JavaExtension) extension;
+                javaExtension.setEnabled(false);
             } catch (Throwable ex) {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while disabling " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
@@ -202,14 +210,15 @@ public final class JavaExtensionLoader implements ExtensionLoader {
 
     @Override
     public void unloadExtension(@NotNull Extension extension) {
+        Preconditions.checkArgument(extension instanceof JavaExtension, "Extension is not associated with this ExtensionLoader");
         if (extension.isEnabled()) {
             extension.getLogger().info(String.format("Unloading %s", extension.getDescription().getFullName()));
 
-            ClassLoader cloader = extension.getClassLoader();
+            JavaExtension javaExtension = (JavaExtension) extension;
+            ClassLoader cloader = javaExtension.getClassLoader();
 
             try {
-                ExtensionManager.getScheduler().cancelTasks(extension);
-                extension.setEnabled(false);
+                javaExtension.setEnabled(false);
             } catch (Throwable ex) {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while unloading " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
             }

@@ -1,6 +1,6 @@
 package com.georgev22.api.minecraft;
 
-import com.georgev22.api.extensions.Extension;
+import com.georgev22.api.extensions.java.JavaExtension;
 import com.georgev22.api.maps.HashObjectMap;
 import com.georgev22.api.minecraft.colors.Color;
 import com.georgev22.api.utilities.DiscordWebHook;
@@ -235,18 +235,18 @@ public class MinecraftUtils {
         return newColl;
     }
 
-    public static void debug(final Extension extension, final Map<String, String> map, String @NotNull ... messages) {
+    public static void debug(final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(Utils.placeHolder("[" + extension.getDescription().getName() + "] [Debug] [Version: " + extension.getDescription().getVersion() + "] " + msg, map, false));
+            MinecraftUtils.printMsg(Utils.placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 
-    public static void debug(final Extension extension, String... messages) {
-        debug(extension, new HashObjectMap<>(), messages);
+    public static void debug(final JavaExtension javaExtension, String... messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages);
     }
 
-    public static void debug(final Extension extension, @NotNull List<String> messages) {
-        debug(extension, new HashObjectMap<>(), messages.toArray(new String[0]));
+    public static void debug(final JavaExtension javaExtension, @NotNull List<String> messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
     public static void debug(final String name, String version, final Map<String, String> map, String @NotNull ... messages) {

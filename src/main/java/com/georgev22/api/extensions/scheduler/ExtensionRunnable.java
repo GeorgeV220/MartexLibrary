@@ -1,7 +1,7 @@
 package com.georgev22.api.extensions.scheduler;
 
 import com.georgev22.api.extensions.Extension;
-import com.georgev22.api.extensions.ExtensionManager;
+import com.georgev22.api.extensions.Extensions;
 import com.georgev22.api.extensions.scheduler.interfaces.ExtensionScheduler;
 import com.georgev22.api.extensions.scheduler.interfaces.ExtensionTask;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ public abstract class ExtensionRunnable implements Runnable {
      * @throws IllegalStateException if task was not scheduled yet
      */
     public synchronized void cancel() throws IllegalStateException {
-        ExtensionManager.getScheduler().cancelTask(getTaskId());
+        Extensions.getScheduler().cancelTask(getTaskId());
     }
 
     /**
@@ -42,7 +42,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTask(@NotNull Extension extension) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTask(extension, (Runnable) this));
+        return setupTask(Extensions.getScheduler().runTask(extension, (Runnable) this));
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTaskAsynchronously(@NotNull Extension extension) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTaskAsynchronously(extension, (Runnable) this));
+        return setupTask(Extensions.getScheduler().runTaskAsynchronously(extension, (Runnable) this));
     }
 
     /**
@@ -76,7 +76,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTaskLater(@NotNull Extension extension, long delay) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTaskLater(extension, (Runnable) this, delay));
+        return setupTask(Extensions.getScheduler().runTaskLater(extension, (Runnable) this, delay));
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTaskLaterAsynchronously(@NotNull Extension extension, long delay) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTaskLaterAsynchronously(extension, (Runnable) this, delay));
+        return setupTask(Extensions.getScheduler().runTaskLaterAsynchronously(extension, (Runnable) this, delay));
     }
 
     /**
@@ -114,7 +114,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTaskTimer(@NotNull Extension extension, long delay, long period) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTaskTimer(extension, (Runnable) this, delay, period));
+        return setupTask(Extensions.getScheduler().runTaskTimer(extension, (Runnable) this, delay, period));
     }
 
     /**
@@ -137,7 +137,7 @@ public abstract class ExtensionRunnable implements Runnable {
     @NotNull
     public synchronized ExtensionTask runTaskTimerAsynchronously(@NotNull Extension extension, long delay, long period) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(ExtensionManager.getScheduler().runTaskTimerAsynchronously(extension, (Runnable) this, delay, period));
+        return setupTask(Extensions.getScheduler().runTaskTimerAsynchronously(extension, (Runnable) this, delay, period));
     }
 
     /**

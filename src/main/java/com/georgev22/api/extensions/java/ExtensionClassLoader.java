@@ -1,7 +1,12 @@
-package com.georgev22.api.extensions;
+package com.georgev22.api.extensions.java;
 
+import com.georgev22.api.extensions.Extension;
+import com.georgev22.api.extensions.ExtensionDescriptionFile;
+import com.georgev22.api.extensions.ExtensionLoader;
+import com.georgev22.api.extensions.ExtensionsImpl;
 import com.georgev22.api.maps.ConcurrentObjectMap;
 import com.georgev22.api.maps.ObjectMap;
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +20,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Set;
 import java.util.jar.JarFile;
-import java.util.logging.Logger;
 
 /**
  * A ClassLoader for extensions, to allow shared classes across multiple extensions
@@ -26,23 +30,26 @@ public final class ExtensionClassLoader extends URLClassLoader {
     private final File file;
     private final ExtensionDescriptionFile extensionDescriptionFile;
     private final JarFile jar;
-    final Extension extension;
-    private Extension extensionInit;
+    final JavaExtension javaExtension;
+    private JavaExtension javaExtensionInit;
+    private ExtensionLoader loader;
     private IllegalStateException extensionState;
-    private final Logger logger;
+    private final ExtensionsImpl extensionsImpl;
     private final Set<String> seenIllegalAccess = Collections.newSetFromMap(new ConcurrentObjectMap<>());
 
     static {
         ClassLoader.registerAsParallelCapable();
     }
 
-    public ExtensionClassLoader(@Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file, @NotNull Logger logger) throws Exception {
+    public ExtensionClassLoader(@NotNull final JavaExtensionLoader javaExtensionLoader, @Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file, @NotNull ExtensionsImpl extensionsImpl) throws Exception {
         super(new URL[]{file.toURI().toURL()}, parent);
+        Preconditions.checkArgument(loader != null, "Loader cannot be null");
+        this.loader = javaExtensionLoader;
         this.dataFolder = dataFolder;
         this.file = file;
         this.jar = new JarFile(file);
         this.extensionDescriptionFile = extensionDescriptionFile;
-        this.logger = logger;
+        this.extensionsImpl = extensionsImpl;
 
         try {
             Class<?> jarClass;
@@ -52,15 +59,15 @@ public final class ExtensionClassLoader extends URLClassLoader {
                 throw new Exception("Cannot find main class `" + extensionDescriptionFile.getMain() + "'", ex);
             }
 
-            Class<? extends Extension> extensionClass;
+            Class<? extends JavaExtension> extensionClass;
             try {
-                extensionClass = jarClass.asSubclass(Extension.class);
+                extensionClass = jarClass.asSubclass(JavaExtension.class);
             } catch (ClassCastException ex) {
 
                 throw new Exception("main class `" + extensionDescriptionFile.getMain() + "' does not extend " + Extension.class.getName() + " (" + jarClass.getSuperclass().getName() + ")", ex);
             }
 
-            extension = extensionClass.newInstance();
+            javaExtension = extensionClass.newInstance();
         } catch (IllegalAccessException ex) {
             throw new Exception("No public constructor", ex);
         } catch (InstantiationException ex) {
@@ -97,16 +104,16 @@ public final class ExtensionClassLoader extends URLClassLoader {
         return classes.values();
     }
 
-    synchronized void initialize(@NotNull Extension extension) {
-        Validate.notNull(extension, "Initializing extension cannot be null");
-        Validate.isTrue(extension.getClass().getClassLoader() == this, "Cannot initialize extension outside of this class loader");
-        if (this.extension != null || this.extensionInit != null) {
-            throw new IllegalArgumentException("Extension already initialized!", extensionState);
+    synchronized void initialize(@NotNull JavaExtension javaExtension) {
+        Validate.notNull(javaExtension, "Initializing JavaExtension cannot be null");
+        Validate.isTrue(javaExtension.getClass().getClassLoader() == this, "Cannot initialize JavaExtension outside of this class loader");
+        if (this.javaExtension != null || this.javaExtensionInit != null) {
+            throw new IllegalArgumentException("JavaExtension already initialized!", extensionState);
         }
 
         extensionState = new IllegalStateException("Initial initialization");
-        this.extensionInit = extension;
+        this.javaExtensionInit = javaExtension;
 
-        extension.init(dataFolder, extensionDescriptionFile, file, this, logger);
+        javaExtension.init(loader, dataFolder, extensionDescriptionFile, file, this, extensionsImpl);
     }
 }

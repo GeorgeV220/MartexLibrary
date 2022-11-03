@@ -43,7 +43,7 @@ public interface ExtensionLoader {
     /**
      * Enables the specified extension
      * <p>
-     * Attempting to enable a extension that is already enabled will have no
+     * Attempting to enable an extension that is already enabled will have no
      * effect
      *
      * @param extension Extension to enable

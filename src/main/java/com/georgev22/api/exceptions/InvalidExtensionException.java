@@ -1,7 +1,7 @@
 package com.georgev22.api.exceptions;
 
 /**
- * Thrown when attempting to load an invalid Extension file
+ * Thrown when attempting to load an invalid JavaExtension file
  */
 public class InvalidExtensionException extends Exception {
 

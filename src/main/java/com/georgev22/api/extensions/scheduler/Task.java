@@ -1,7 +1,7 @@
 package com.georgev22.api.extensions.scheduler;
 
 import com.georgev22.api.extensions.Extension;
-import com.georgev22.api.extensions.ExtensionManager;
+import com.georgev22.api.extensions.Extensions;
 import com.georgev22.api.extensions.scheduler.interfaces.ExtensionTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -121,7 +121,7 @@ class Task implements ExtensionTask, Runnable {
 
     @Override
     public void cancel() {
-        ExtensionManager.getScheduler().cancelTask(id);
+        Extensions.getScheduler().cancelTask(id);
     }
 
     /**

@@ -1,3 +1,10 @@
+# [5.11.0](https://github.com/GeorgeV220/API/compare/v5.10.0...v5.11.0) (2022-11-03)
+
+
+### Features
+
+* **MinecraftUtils:** New methods ([55e2235](https://github.com/GeorgeV220/API/commit/55e2235691db03be9aa133b6f9e69fcf3ef7916c))
+
 # [5.10.0](https://github.com/GeorgeV220/API/compare/v5.9.2...v5.10.0) (2022-10-31)
 
 

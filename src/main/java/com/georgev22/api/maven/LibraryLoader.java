@@ -141,25 +141,19 @@ public final class LibraryLoader {
             logger.warning(String.format("Dependency %s:%s:%s is already loaded!", d.groupId(), d.artifactId(), d.version()));
             return;
         }
+
         logger.info(String.format("Loading dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
 
-        for (File file : Objects.requireNonNull(getLibFolder().listFiles((dir, name) -> name.endsWith(".jar")))) {
-            String[] fileandversion = file.getName().replace(".jar", "").split("_");
-            String dependencyName = fileandversion[0];
-            String version = fileandversion[1];
-            if (d.artifactId().equalsIgnoreCase(dependencyName)) {
-                if (!d.version().equalsIgnoreCase(version)) {
-                    logger.info("A different version of the dependency exists. Attempting to delete...");
-                    if (file.delete()) {
-                        logger.info("Dependency '" + dependencyName + "' with version '" + version + "' has been deleted!\nA new version will be downloaded.");
-                    }
-                }
-            }
+        String name = d.artifactId() + "-" + d.version();
+
+        File saveLocationDir = new File(getLibFolder(), d.groupId() + File.separator + d.artifactId() + File.separator + d.version());
+
+        if (!saveLocationDir.exists()) {
+            logger.info(String.format("Creating directory for dependency %s:%s:%s from %s", d.groupId(), d.artifactId(), d.version(), d.repoUrl()));
+            saveLocationDir.mkdirs();
         }
 
-        String name = d.artifactId() + "_" + d.version();
-
-        File saveLocation = new File(getLibFolder(), name + ".jar");
+        File saveLocation = new File(saveLocationDir, name + ".jar");
         if (!saveLocation.exists()) {
 
             try {
@@ -171,7 +165,7 @@ public final class LibraryLoader {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Unable to download '" + d + "' dependency.", e);
             }
 
             logger.info("Dependency '" + name + "' successfully downloaded.");

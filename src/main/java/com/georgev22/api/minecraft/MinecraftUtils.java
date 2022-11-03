@@ -324,6 +324,17 @@ public class MinecraftUtils {
         }
     }
 
+    public static @Nullable SimpleCommandMap getSimpleCommandMap() {
+        try {
+            Field field = Bukkit.getServer().getPluginManager().getClass().getDeclaredField("commandMap");
+            field.setAccessible(true);
+            Object result = field.get(Bukkit.getServer().getPluginManager());
+            return (SimpleCommandMap) result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Register a command given an executor and a name.
      *
@@ -331,15 +342,18 @@ public class MinecraftUtils {
      * @param command     The class that extends the BukkitCommand class
      */
     public static void registerCommand(final String commandName, final Command command) {
-        try {
-            Field field = Bukkit.getServer().getPluginManager().getClass().getDeclaredField("commandMap");
-            field.setAccessible(true);
-            Object result = field.get(Bukkit.getServer().getPluginManager());
-            SimpleCommandMap commandMap = (SimpleCommandMap) result;
-            commandMap.register(commandName, command);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        registerCommand(commandName, commandName, command);
+    }
+
+    /**
+     * Register a command given an executor and a name.
+     *
+     * @param commandName The name of the command
+     * @param prefix      The prefix in front of the command
+     * @param command     The class that extends the BukkitCommand class
+     */
+    public static void registerCommand(final String commandName, final String prefix, final Command command) {
+        getSimpleCommandMap().register(commandName, prefix, command);
     }
 
     /**
@@ -349,8 +363,7 @@ public class MinecraftUtils {
      */
     public static void unRegisterCommand(String commandName) {
         try {
-            Object result = Utils.Reflection.fetchField(Bukkit.getServer().getPluginManager().getClass(), Bukkit.getServer().getPluginManager(), "commandMap");
-            SimpleCommandMap simpleCommandMap = (SimpleCommandMap) result;
+            SimpleCommandMap simpleCommandMap = getSimpleCommandMap();
             Object map = Utils.Reflection.fetchField(MinecraftVersion.getCurrentVersion().isBelowOrEqual(MinecraftVersion.V1_12_R1) ? simpleCommandMap.getClass() : simpleCommandMap.getClass().getSuperclass(), simpleCommandMap, "knownCommands");
             HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             Command command = simpleCommandMap.getCommand(commandName);
@@ -361,6 +374,15 @@ public class MinecraftUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * unregister a command
+     *
+     * @param commandName The name of the command
+     */
+    public static void unregisterCommand(String commandName) {
+        getSimpleCommandMap().getCommand(commandName).unregister(getSimpleCommandMap());
     }
 
 

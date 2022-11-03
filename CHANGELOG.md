@@ -1,3 +1,10 @@
+# [5.13.0](https://github.com/GeorgeV220/API/compare/v5.12.0...v5.13.0) (2022-11-03)
+
+
+### Features
+
+* **Utils:** Debug methods ([ea97370](https://github.com/GeorgeV220/API/commit/ea9737084678ece5eab46eaf6195ecaeec24beff))
+
 # [5.12.0](https://github.com/GeorgeV220/API/compare/v5.11.0...v5.12.0) (2022-11-03)
 
 

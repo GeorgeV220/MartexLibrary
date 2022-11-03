@@ -756,6 +756,38 @@ public final class Utils {
         }
     }
 
+    /*public static void debug(final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
+        for (final String msg : messages) {
+            debug(javaExtension.getDescription().getName(), javaExtension.getDescription().getVersion(), javaExtension.getLogger(), map, messages);
+        }
+    }
+
+    public static void debug(final JavaExtension javaExtension, String... messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages);
+    }
+
+    public static void debug(final JavaExtension javaExtension, @NotNull List<String> messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages.toArray(new String[0]));
+    }*/
+
+    public static void debug(final String name, String version, Logger logger, final Map<String, String> map, String @NotNull ... messages) {
+        for (final String msg : messages) {
+            printMsg(Utils.placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, true), logger);
+        }
+    }
+
+    public static void debug(final String name, String version, final Logger logger, String... messages) {
+        debug(name, version, logger, new HashObjectMap<>(), messages);
+    }
+
+    public static void debug(final String name, String version, final Logger logger, @NotNull List<String> messages) {
+        debug(name, version, logger, new HashObjectMap<>(), messages.toArray(new String[0]));
+    }
+
+    public static void printMsg(final String input, Logger logger) {
+        logger.info(input);
+    }
+
 
     public static final class Assertions {
 

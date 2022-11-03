@@ -1,3 +1,15 @@
+# [6.0.0](https://github.com/GeorgeV220/API/compare/v5.13.0...v6.0.0) (2022-11-03)
+
+
+### Features
+
+* Rewrite Extensions system ([29c600e](https://github.com/GeorgeV220/API/commit/29c600e99ac9e0ffdf311bd6f4942df1d2eb8be3))
+
+
+### BREAKING CHANGES
+
+* Extensions system rewrite
+
 # [5.13.0](https://github.com/GeorgeV220/API/compare/v5.12.0...v5.13.0) (2022-11-03)
 
 

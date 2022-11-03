@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/GeorgeV220/API/compare/v6.0.0...v6.1.0) (2022-11-03)
+
+
+### Features
+
+* **Scheduler:** Bukkit Scheduler for java applications ([284be61](https://github.com/GeorgeV220/API/commit/284be61899c0c55eeeea53c3f38072b06f6bef5d))
+
 # [6.0.0](https://github.com/GeorgeV220/API/compare/v5.13.0...v6.0.0) (2022-11-03)
 
 

@@ -1,3 +1,10 @@
+# [5.12.0](https://github.com/GeorgeV220/API/compare/v5.11.0...v5.12.0) (2022-11-03)
+
+
+### Features
+
+* **LibraryLoader:** Per library version folder ([1d3d944](https://github.com/GeorgeV220/API/commit/1d3d944b4d2037d5beb3fb9ab2192dcca31d64d6))
+
 # [5.11.0](https://github.com/GeorgeV220/API/compare/v5.10.0...v5.11.0) (2022-11-03)
 
 

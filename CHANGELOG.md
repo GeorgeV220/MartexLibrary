@@ -1,3 +1,10 @@
+# [7.1.0](https://github.com/GeorgeV220/API/compare/v7.0.0...v7.1.0) (2022-11-09)
+
+
+### Features
+
+* **Extensions:** New method (getExtensionManager) ([31e1087](https://github.com/GeorgeV220/API/commit/31e1087c1dac8ee9b9069188adfdf92e7b13ecd4))
+
 # [7.0.0](https://github.com/GeorgeV220/API/compare/v6.1.0...v7.0.0) (2022-11-09)
 
 

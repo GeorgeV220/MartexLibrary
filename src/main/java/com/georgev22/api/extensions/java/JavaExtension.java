@@ -1,14 +1,19 @@
 package com.georgev22.api.extensions.java;
 
+import com.georgev22.api.exceptions.InvalidExtensionException;
 import com.georgev22.api.extensions.ExtensionBase;
 import com.georgev22.api.extensions.ExtensionDescriptionFile;
 import com.georgev22.api.extensions.ExtensionLoader;
 import com.georgev22.api.extensions.ExtensionsImpl;
+import com.georgev22.api.maps.HashObjectMap;
+import com.georgev22.api.maps.ObjectMap;
+import com.georgev22.api.maps.UnmodifiableObjectMap;
 import com.georgev22.api.utilities.Utils;
 import com.georgev22.api.yaml.file.FileConfiguration;
 import com.georgev22.api.yaml.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.*;
 import java.net.URL;
@@ -27,6 +32,8 @@ public class JavaExtension extends ExtensionBase {
     private File configFile = null;
     private ExtensionsImpl extensionsImpl = null;
     private ExtensionDescriptionFile extensionDescriptionFile;
+
+    private ObjectMap<Class<?>, Class<?>> classObjectMap;
 
     public JavaExtension() {
         final ClassLoader classLoader = this.getClass().getClassLoader();
@@ -230,6 +237,7 @@ public class JavaExtension extends ExtensionBase {
         this.configFile = new File(dataFolder, "config.yml");
         this.extensionsImpl = extensionsImpl;
         this.extensionDescriptionFile = extensionDescriptionFile;
+        this.classObjectMap = new HashObjectMap<>();
         onLoad();
     }
 
@@ -272,7 +280,7 @@ public class JavaExtension extends ExtensionBase {
      * @throws IllegalArgumentException if clazz is null
      * @throws IllegalArgumentException if clazz does not extend {@link
      *                                  Extension}
-     * @throws IllegalStateException    if clazz was not provided by a extension,
+     * @throws IllegalStateException    if clazz was not provided by an extension,
      *                                  for example, if called with
      *                                  <code>Extension.getExtension(Extension.class)</code>
      * @throws IllegalStateException    if called from the static initializer for
@@ -321,6 +329,17 @@ public class JavaExtension extends ExtensionBase {
             throw new IllegalStateException("Cannot get extension for " + clazz + " from a static initializer");
         }
         return javaExtension;
+    }
+
+    public void registerInterface(@NotNull Class<?> clazz, Class<?> clazz2) throws InvalidExtensionException {
+        if (clazz.isAssignableFrom(clazz2))
+            classObjectMap.append(clazz, clazz2);
+        else throw new InvalidExtensionException("Class " + clazz + " is not assigned from " + clazz2);
+    }
+
+    @UnmodifiableView
+    public ObjectMap<Class<?>, Class<?>> getRegisteredInterfaces() {
+        return new UnmodifiableObjectMap<>(classObjectMap);
     }
 
     public @NotNull ExtensionDescriptionFile getDescription() {

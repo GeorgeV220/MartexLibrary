@@ -1,3 +1,16 @@
+# [7.0.0](https://github.com/GeorgeV220/API/compare/v6.1.0...v7.0.0) (2022-11-09)
+
+
+### Features
+
+* **JavaExtension:** Interface ([b73199b](https://github.com/GeorgeV220/API/commit/b73199b850317d2cf82619bf5416deaa2f1cedd8))
+* **Maven:** Removed maven library loader ([60b6f49](https://github.com/GeorgeV220/API/commit/60b6f4917b5c9782bc702d810d699b462f78e91b))
+
+
+### BREAKING CHANGES
+
+* **Maven:** Removed Maven Library loader.
+
 # [6.1.0](https://github.com/GeorgeV220/API/compare/v6.0.0...v6.1.0) (2022-11-03)
 
 

@@ -1,3 +1,10 @@
+## [7.1.1](https://github.com/GeorgeV220/API/compare/v7.1.0...v7.1.1) (2022-11-09)
+
+
+### Bug Fixes
+
+* **ExtensionClassLoader:** Wrong check for the loader ([3c84a61](https://github.com/GeorgeV220/API/commit/3c84a616f28eadd152fbd4f295c4339d27f0d15d))
+
 # [7.1.0](https://github.com/GeorgeV220/API/compare/v7.0.0...v7.1.0) (2022-11-09)
 
 

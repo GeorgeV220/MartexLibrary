@@ -32,7 +32,7 @@ public final class ExtensionClassLoader extends URLClassLoader {
     private final JarFile jar;
     final JavaExtension javaExtension;
     private JavaExtension javaExtensionInit;
-    private ExtensionLoader loader;
+    private final ExtensionLoader loader;
     private IllegalStateException extensionState;
     private final ExtensionsImpl extensionsImpl;
     private final Set<String> seenIllegalAccess = Collections.newSetFromMap(new ConcurrentObjectMap<>());
@@ -41,10 +41,10 @@ public final class ExtensionClassLoader extends URLClassLoader {
         ClassLoader.registerAsParallelCapable();
     }
 
-    public ExtensionClassLoader(@NotNull final JavaExtensionLoader javaExtensionLoader, @Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file, @NotNull ExtensionsImpl extensionsImpl) throws Exception {
+    public ExtensionClassLoader(@NotNull final JavaExtensionLoader loader, @Nullable final ClassLoader parent, @NotNull ExtensionDescriptionFile extensionDescriptionFile, @NotNull final File dataFolder, @NotNull final File file, @NotNull ExtensionsImpl extensionsImpl) throws Exception {
         super(new URL[]{file.toURI().toURL()}, parent);
         Preconditions.checkArgument(loader != null, "Loader cannot be null");
-        this.loader = javaExtensionLoader;
+        this.loader = loader;
         this.dataFolder = dataFolder;
         this.file = file;
         this.jar = new JarFile(file);

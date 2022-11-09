@@ -40,6 +40,16 @@ public class Extensions {
     }
 
     /**
+     * Gets the extension manager for interfacing with extensions.
+     *
+     * @return an extension manager for this ExtensionsImpl instance
+     */
+    @NotNull
+    public static ExtensionManager getExtensionManager() {
+        return extensionsImpl.getExtensionManager();
+    }
+
+    /**
      * Gets the name of this extensionsImpl implementation.
      *
      * @return name of this extensionsImpl implementation

@@ -1,3 +1,10 @@
+# [7.2.0](https://github.com/GeorgeV220/API/compare/v7.1.1...v7.2.0) (2022-11-10)
+
+
+### Features
+
+* **JavaExtension:** New methods and deprecate ([dafa6d8](https://github.com/GeorgeV220/API/commit/dafa6d8657e6e2f0b25e8c514a3fc6afe5f2333f))
+
 ## [7.1.1](https://github.com/GeorgeV220/API/compare/v7.1.0...v7.1.1) (2022-11-09)
 
 

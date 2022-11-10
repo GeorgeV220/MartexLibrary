@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +34,9 @@ public class JavaExtension extends ExtensionBase {
     private ExtensionsImpl extensionsImpl = null;
     private ExtensionDescriptionFile extensionDescriptionFile;
 
-    private ObjectMap<Class<?>, Class<?>> classObjectMap;
+    private ObjectMap<Class<?>, Class<?>> classClassObjectMap;
+
+    private ObjectMap<Class<?>, Constructor<?>> classConstructorObjectMap;
 
     public JavaExtension() {
         final ClassLoader classLoader = this.getClass().getClassLoader();
@@ -237,7 +240,8 @@ public class JavaExtension extends ExtensionBase {
         this.configFile = new File(dataFolder, "config.yml");
         this.extensionsImpl = extensionsImpl;
         this.extensionDescriptionFile = extensionDescriptionFile;
-        this.classObjectMap = new HashObjectMap<>();
+        this.classClassObjectMap = new HashObjectMap<>();
+        this.classConstructorObjectMap = new HashObjectMap<>();
         onLoad();
     }
 
@@ -331,15 +335,44 @@ public class JavaExtension extends ExtensionBase {
         return javaExtension;
     }
 
+    @Deprecated(forRemoval = true, since = "7.1.1")
     public void registerInterface(@NotNull Class<?> clazz, Class<?> clazz2) throws InvalidExtensionException {
         if (clazz.isAssignableFrom(clazz2))
-            classObjectMap.append(clazz, clazz2);
+            classClassObjectMap.append(clazz, clazz2);
         else throw new InvalidExtensionException("Class " + clazz + " is not assigned from " + clazz2);
     }
 
+    public void registerClassForClass(@NotNull Class<?> clazz, @NotNull Class<?> clazz2) throws InvalidExtensionException {
+        if (clazz == null)
+            throw new InvalidExtensionException("Class " + clazz + " cannot be null");
+        else if (clazz2 == null)
+            throw new InvalidExtensionException("Class " + clazz2 + " cannot be null");
+        else if (clazz.isAssignableFrom(clazz2))
+            classClassObjectMap.append(clazz, clazz2);
+        else throw new InvalidExtensionException("Class " + clazz + " is not assigned from " + clazz2);
+    }
+
+    public void registerClassesForClass(@NotNull Class<?> classInter, Class<?> @NotNull ... classes) throws InvalidExtensionException {
+        for (Class<?> clazz : classes) {
+            registerClassForClass(clazz, classInter);
+        }
+    }
+
+    public void registerClassWithConstructor(@NotNull Class<?> clazz, @NotNull Constructor<?> constructor) throws NoSuchMethodException, InvalidExtensionException {
+        if (clazz.getDeclaredConstructor(constructor.getParameterTypes()) != null) {
+            throw new InvalidExtensionException("Class " + clazz + " does not have the constructor " + constructor);
+        }
+        classConstructorObjectMap.append(clazz, constructor);
+    }
+
     @UnmodifiableView
-    public ObjectMap<Class<?>, Class<?>> getRegisteredInterfaces() {
-        return new UnmodifiableObjectMap<>(classObjectMap);
+    public ObjectMap<Class<?>, Class<?>> getRegisteredClassForClassMap() {
+        return new UnmodifiableObjectMap<>(classClassObjectMap);
+    }
+
+
+    public ObjectMap<Class<?>, Constructor<?>> getRegisteredClassWithConstructorMap() {
+        return classConstructorObjectMap;
     }
 
     public @NotNull ExtensionDescriptionFile getDescription() {

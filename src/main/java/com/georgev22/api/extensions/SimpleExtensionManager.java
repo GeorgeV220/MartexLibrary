@@ -3,6 +3,8 @@ package com.georgev22.api.extensions;
 import com.georgev22.api.exceptions.InvalidDescriptionException;
 import com.georgev22.api.exceptions.InvalidExtensionException;
 import com.georgev22.api.exceptions.UnknownDependencyException;
+import com.georgev22.api.maps.HashObjectMap;
+import com.georgev22.api.maps.ObjectMap;
 import com.google.common.base.Preconditions;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
@@ -28,6 +30,7 @@ public class SimpleExtensionManager implements ExtensionManager {
     private final List<Extension> extensions = new ArrayList<>();
     private final Map<String, Extension> lookupNames = new HashMap<>();
     private MutableGraph<String> dependencyGraph = GraphBuilder.directed().build();
+    private final ObjectMap<String, Object> instances = new HashObjectMap<>();
 
     public SimpleExtensionManager(@NotNull ExtensionsImpl instance) {
         extensionsImpl = instance;
@@ -68,6 +71,26 @@ public class SimpleExtensionManager implements ExtensionManager {
                 fileAssociations.put(pattern, instance);
             }
         }
+    }
+
+    /**
+     * Registers the specified class instance
+     *
+     * @param instance Instance to be registered
+     */
+    @Override
+    public <T> void registerClassInstance(@NotNull String name, @NotNull T instance) {
+        instances.append(name, instance);
+    }
+
+    /**
+     * Get registered class instances
+     *
+     * @return an {@link ObjectMap} with the registered class instances.
+     */
+    @Override
+    public ObjectMap<String, Object> getClassInstances() {
+        return instances;
     }
 
     /**
@@ -260,7 +283,6 @@ public class SimpleExtensionManager implements ExtensionManager {
                         } else {
                             extensionsImpl.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'");
                         }
-                        continue;
                     } catch (InvalidExtensionException ex) {
                         extensionsImpl.getLogger().log(Level.SEVERE, "Could not load '" + file.getPath() + "' in folder '" + directory.getPath() + "'", ex);
                     }

@@ -2,6 +2,7 @@ package com.georgev22.api.extensions;
 
 import com.georgev22.api.exceptions.InvalidDescriptionException;
 import com.georgev22.api.exceptions.InvalidExtensionException;
+import com.georgev22.api.maps.ObjectMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +19,20 @@ public interface ExtensionManager {
      *                                  valid ExtensionLoader
      */
     void registerInterface(@NotNull Class<? extends ExtensionLoader> loader) throws IllegalArgumentException;
+
+    /**
+     * Registers the specified class instance
+     *
+     * @param instance Instance to be registered
+     */
+    <T> void registerClassInstance(@NotNull String name, @NotNull T instance);
+
+    /**
+     * Get registered class instances
+     *
+     * @return an {@link ObjectMap} with the registered class instances.
+     */
+    ObjectMap<String, Object> getClassInstances();
 
     /**
      * Checks if the given extension is loaded and returns it when applicable

@@ -1,10 +1,10 @@
-# API
+# MartexLibrary
 
-# Adding API as a dependency to your build system
+# Adding MartexLibrary as a dependency to your build system
 
 ### Maven
 
-You can have your project depend on API as a dependency through the following code snippets:
+You can have your project depend on MartexLibrary as a dependency through the following code snippets:
 
 ```xml
 
@@ -19,28 +19,28 @@ You can have your project depend on API as a dependency through the following co
     <dependencies>
         <dependency>
             <groupId>com.github.GeorgeV220</groupId>
-            <artifactId>API</artifactId>
-            <version>v3.0.0</version>
+            <artifactId>MartexLibrary</artifactId>
+            <version>/*latest tag*/</version>
         </dependency>
     </dependencies>
 </project>
 ```
 
-Is best to relocate api classes to your own package. Add this code snippet to your shade plugin configuration section:
+Is best to relocate MartexLibrary classes to your own package. Add this code snippet to your shade plugin configuration section:
 
 ```xml
 
 <relocations>
     <relocation>
-        <pattern>com.georgev22.api</pattern>
-        <shadedPattern>your_package.api</shadedPattern>
+        <pattern>com.georgev22.library</pattern>
+        <shadedPattern>your_package.library</shadedPattern>
     </relocation>
 </relocations>
 ```
 
 ### Gradle
 
-You can include API into your gradle project using the following lines:
+You can include MartexLibrary into your gradle project using the following lines:
 
 ```groovy
 repositories {
@@ -48,6 +48,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.GeorgeV220:API:v3.0.0'
+    implementation 'com.github.GeorgeV220:MartexLibrary:/*latest tag*/'
+}
+```
+
+Is best to relocate MartexLibrary classes to your own package(shadowJar gradle plugin example):
+
+```groovy
+
+shadowJar {
+    relocate 'com.georgev22.library', 'your_package.library'
 }
 ```

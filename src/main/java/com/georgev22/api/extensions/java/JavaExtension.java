@@ -347,7 +347,7 @@ public class JavaExtension extends ExtensionBase {
             throw new InvalidExtensionException("Class " + clazz + " cannot be null");
         else if (clazz2 == null)
             throw new InvalidExtensionException("Class " + clazz2 + " cannot be null");
-        else if (clazz.isAssignableFrom(clazz2))
+        else if (clazz2.isAssignableFrom(clazz))
             classClassObjectMap.append(clazz, clazz2);
         else throw new InvalidExtensionException("Class " + clazz + " is not assigned from " + clazz2);
     }
@@ -359,7 +359,7 @@ public class JavaExtension extends ExtensionBase {
     }
 
     public void registerClassWithConstructor(@NotNull Class<?> clazz, @NotNull Constructor<?> constructor) throws NoSuchMethodException, InvalidExtensionException {
-        if (clazz.getDeclaredConstructor(constructor.getParameterTypes()) != null) {
+        if (clazz.getDeclaredConstructor(constructor.getParameterTypes()) == null) {
             throw new InvalidExtensionException("Class " + clazz + " does not have the constructor " + constructor);
         }
         classConstructorObjectMap.append(clazz, constructor);

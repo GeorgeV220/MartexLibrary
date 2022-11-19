@@ -1,3 +1,15 @@
+# [7.3.0](https://github.com/GeorgeV220/API/compare/v7.2.0...v7.3.0) (2022-11-19)
+
+
+### Bug Fixes
+
+* **JavaExtension:** Fixed method checks ([7c8d902](https://github.com/GeorgeV220/API/commit/7c8d902ddf4ff1d362bb26c9b1c35d248bf1a865))
+
+
+### Features
+
+* **ExtensionManager:** Register class instances ([3f2d83d](https://github.com/GeorgeV220/API/commit/3f2d83ddacbdab67a33ac0cba33c863fe8636b9b))
+
 # [7.2.0](https://github.com/GeorgeV220/API/compare/v7.1.1...v7.2.0) (2022-11-10)
 
 

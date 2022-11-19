@@ -1,3 +1,15 @@
+# [8.0.0](https://github.com/GeorgeV220/API/compare/v7.3.0...v8.0.0) (2022-11-19)
+
+
+### Features
+
+* **MartexLibrary:** Changed API to MartexLibrary ([62e2ca3](https://github.com/GeorgeV220/API/commit/62e2ca3efe45d5ebb51e4961d231d318f995006d))
+
+
+### BREAKING CHANGES
+
+* **MartexLibrary:** Changed API name to MartexLibrary
+
 # [7.3.0](https://github.com/GeorgeV220/API/compare/v7.2.0...v7.3.0) (2022-11-19)
 
 

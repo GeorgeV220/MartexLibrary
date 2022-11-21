@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/GeorgeV220/API/compare/v8.0.0...v8.1.0) (2022-11-21)
+
+
+### Features
+
+* **SerializableLocation:** Added SerializableLocation to MinecraftUtils ([d789d1e](https://github.com/GeorgeV220/API/commit/d789d1e00e582c2d0da9f2c36df5946552373e12))
+
 # [8.0.0](https://github.com/GeorgeV220/API/compare/v7.3.0...v8.0.0) (2022-11-19)
 
 

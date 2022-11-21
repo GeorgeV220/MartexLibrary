@@ -8,18 +8,18 @@ import com.georgev22.library.utilities.Utils;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.Contract;
@@ -30,9 +30,11 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -892,6 +894,121 @@ public class MinecraftUtils {
 
         public static Optional<Class<?>> getOBCOptionalClass(String className) {
             return Utils.Reflection.optionalClass(getOBCClassName(className), Bukkit.class.getClassLoader());
+        }
+    }
+
+    public static class SerializableLocation implements ConfigurationSerializable, com.georgev22.library.yaml.serialization.ConfigurationSerializable {
+
+        /**
+         * Name of the world
+         */
+        private final String world;
+        /**
+         * UID of the world
+         */
+        private final String uuid;
+        private final double x;
+        private final double y;
+        private final double z;
+        private final float yaw;
+        private final float pitch;
+
+        private transient WeakReference<Location> weakLoc;
+
+        /**
+         * Constructs a {@link SerializableLocation} with the information of
+         * the given {@link Location}.
+         *
+         * @param location {@link Location} to be serialized
+         */
+        public SerializableLocation(@NotNull Location location) {
+            this.world = location.getWorld().getName();
+            this.uuid = location.getWorld().getUID().toString();
+            this.x = location.getX();
+            this.y = location.getY();
+            this.z = location.getZ();
+            this.yaw = location.getYaw();
+            this.pitch = location.getPitch();
+        }
+
+        /**
+         * Constructs a {@link SerializableLocation} with the given
+         * information. This constructor
+         * is meant to be used if {@link SerializableLocation} is serialized in
+         * another
+         * {@link ConfigurationSerializable} class.
+         *
+         * @param map {@link Map} that contains the necessary data
+         */
+        public SerializableLocation(@NotNull Map<String, Object> map) {
+            this.world = (String) map.get("world");
+            this.uuid = (String) map.get("uuid");
+            this.x = (Double) map.get("x");
+            this.y = (Double) map.get("y");
+            this.z = (Double) map.get("z");
+            this.yaw = (Float) map.get("yaw");
+            this.pitch = (Float) map.get("pitch");
+        }
+
+        /**
+         * Restores from a map back into the class. Used with
+         * {@link ConfigurationSerializable}.
+         *
+         * @param map a {@link Map} which represents a {@link SerializableLocation}
+         * @return A {@link SerializableLocation}
+         */
+        @Contract("_ -> new")
+        @NotNull
+        public static SerializableLocation deserialize(@NotNull Map<String, Object> map) {
+            World world = null;
+            if (map.containsKey("world")) {
+                world = Bukkit.getWorld((String) map.get("world")) != null ? Bukkit.getWorld((String) map.get("world")) : Bukkit.getWorld(UUID.fromString((String) map.get("uuid")));
+                if (world == null) {
+                    throw new IllegalStateException("Cannot find world by UUID or name");
+                }
+            }
+
+            return new SerializableLocation(new Location(world, NumberConversions.toDouble(map.get("x")), NumberConversions.toDouble(map.get("y")), NumberConversions.toDouble(map.get("z")), NumberConversions.toFloat(map.get("yaw")), NumberConversions.toFloat(map.get("pitch"))));
+        }
+
+        /**
+         * Serialize this {@link SerializableLocation} into a Map which contain
+         * the values of
+         * this class
+         *
+         * @return {@link Map} object
+         */
+        public @NotNull Map<String, Object> serialize() {
+            Map<String, Object> map = new HashMap<>();
+            map.put("world", this.world);
+            map.put("uuid", this.uuid);
+            map.put("x", this.x);
+            map.put("y", this.y);
+            map.put("z", this.z);
+            map.put("yaw", this.yaw);
+            map.put("pitch", this.pitch);
+            return map;
+        }
+
+        /**
+         * Resolves the {@link World} on the {@link org.bukkit.Server}, as a proper location has a reference to
+         * the world it belongs to.
+         *
+         * @return {@link Location} represented
+         */
+        public Location getLocation() {
+            if (weakLoc == null || weakLoc.get() == null) {
+                World world = Bukkit.getWorld(this.uuid);
+                if (world == null) {
+                    Logger.getLogger(this.getClass().getName()).warning("World UUID not found, falling back to World Name");
+                    world = Bukkit.getWorld(this.world);
+                }
+                if (world == null) {
+                    throw new IllegalStateException("Cannot find world by UUID or name");
+                }
+                weakLoc = new WeakReference<>(new Location(world, x, y, z, yaw, pitch));
+            }
+            return weakLoc.get();
         }
     }
 

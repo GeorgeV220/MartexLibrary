@@ -1,3 +1,10 @@
+## [8.2.1](https://github.com/GeorgeV220/API/compare/v8.2.0...v8.2.1) (2022-12-05)
+
+
+### Bug Fixes
+
+* **BungeeMinecraftUtils:** Changed target.sendMessage with target.sendMessages ([8db98e6](https://github.com/GeorgeV220/API/commit/8db98e624b62f857d76227b0f65016e708dabd7d))
+
 # [8.2.0](https://github.com/GeorgeV220/API/compare/v8.1.0...v8.2.0) (2022-12-05)
 
 

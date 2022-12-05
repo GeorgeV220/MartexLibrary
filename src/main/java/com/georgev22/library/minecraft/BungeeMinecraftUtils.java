@@ -13,7 +13,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -111,7 +110,7 @@ public class BungeeMinecraftUtils {
             return;
         }
         Validate.noNullElements(message, "The string array can't have null elements.");
-        target.sendMessage(StringUtils.join(colorize(message), " &r"));
+        target.sendMessages(colorize(message));
     }
 
     public static void msg(final CommandSender target, final List<String> message) {

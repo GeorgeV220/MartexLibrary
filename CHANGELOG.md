@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/GeorgeV220/API/compare/v8.1.0...v8.2.0) (2022-12-05)
+
+
+### Features
+
+* **BungeeMinecraftUtils:** Added BungeeMinecraftUtils for BungeeCord ([890c62b](https://github.com/GeorgeV220/API/commit/890c62b59e8802131ee1244edc55c3eb63722a5c))
+
 # [8.1.0](https://github.com/GeorgeV220/API/compare/v8.0.0...v8.1.0) (2022-11-21)
 
 

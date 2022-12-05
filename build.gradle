@@ -48,6 +48,7 @@ repositories {
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT"
+    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
     compileOnly 'commons-codec:commons-codec:1.15'

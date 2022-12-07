@@ -45,7 +45,7 @@ public class BungeeMinecraftUtils {
 
 
     public static void broadcastMsg(final @NotNull List<String> input) {
-        input.forEach(MinecraftUtils::broadcastMsg);
+        input.forEach(BungeeMinecraftUtils::broadcastMsg);
     }
 
     public static void broadcastMsg(final Object input) {
@@ -53,7 +53,7 @@ public class BungeeMinecraftUtils {
     }
 
     public static void printMsg(final @NotNull List<String> input) {
-        input.forEach(MinecraftUtils::printMsg);
+        input.forEach(BungeeMinecraftUtils::printMsg);
     }
 
     public static void printMsg(final Object input) {
@@ -191,7 +191,7 @@ public class BungeeMinecraftUtils {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
-        newColl.replaceAll(MinecraftUtils::colorize);
+        newColl.replaceAll(BungeeMinecraftUtils::colorize);
         return newColl;
     }
 
@@ -223,13 +223,13 @@ public class BungeeMinecraftUtils {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
-        newColl.replaceAll(MinecraftUtils::stripColor);
+        newColl.replaceAll(BungeeMinecraftUtils::stripColor);
         return newColl;
     }
 
     public static void debug(final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
+            BungeeMinecraftUtils.printMsg(placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 
@@ -243,7 +243,7 @@ public class BungeeMinecraftUtils {
 
     public static void debug(final String name, String version, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
+            BungeeMinecraftUtils.printMsg(placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
         }
     }
 
@@ -257,7 +257,7 @@ public class BungeeMinecraftUtils {
 
     public static void debug(final Plugin plugin, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(placeHolder("[" + plugin.getDescription().getName() + "] [Debug] [Version: " + plugin.getDescription().getVersion() + "] " + msg, map, false));
+            BungeeMinecraftUtils.printMsg(placeHolder("[" + plugin.getDescription().getName() + "] [Debug] [Version: " + plugin.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 

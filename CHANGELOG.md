@@ -1,3 +1,10 @@
+## [8.2.2](https://github.com/GeorgeV220/API/compare/v8.2.1...v8.2.2) (2022-12-07)
+
+
+### Bug Fixes
+
+* **BungeeMinecraftUtils:** Remove MinecraftUtils imports ([#35](https://github.com/GeorgeV220/API/issues/35)) ([3d78570](https://github.com/GeorgeV220/API/commit/3d78570e573be1375a9ffcf94a22155be40e79b9))
+
 ## [8.2.1](https://github.com/GeorgeV220/API/compare/v8.2.0...v8.2.1) (2022-12-05)
 
 

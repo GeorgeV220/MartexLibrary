@@ -39,7 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MinecraftUtils {
+public class BukkitMinecraftUtils {
 
     public static boolean isList(final @NotNull FileConfiguration file, final String path) {
         return Utils.isList(file.get(path));
@@ -55,7 +55,7 @@ public class MinecraftUtils {
 
 
     public static void broadcastMsg(final @NotNull List<String> input) {
-        input.forEach(MinecraftUtils::broadcastMsg);
+        input.forEach(BukkitMinecraftUtils::broadcastMsg);
     }
 
     public static void broadcastMsg(final Object input) {
@@ -63,7 +63,7 @@ public class MinecraftUtils {
     }
 
     public static void printMsg(final @NotNull List<String> input) {
-        input.forEach(MinecraftUtils::printMsg);
+        input.forEach(BukkitMinecraftUtils::printMsg);
     }
 
     public static void printMsg(final Object input) {
@@ -201,7 +201,7 @@ public class MinecraftUtils {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
-        newColl.replaceAll(MinecraftUtils::colorize);
+        newColl.replaceAll(BukkitMinecraftUtils::colorize);
         return newColl;
     }
 
@@ -233,13 +233,13 @@ public class MinecraftUtils {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
-        newColl.replaceAll(MinecraftUtils::stripColor);
+        newColl.replaceAll(BukkitMinecraftUtils::stripColor);
         return newColl;
     }
 
     public static void debug(final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(Utils.placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
+            BukkitMinecraftUtils.printMsg(Utils.placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 
@@ -253,7 +253,7 @@ public class MinecraftUtils {
 
     public static void debug(final String name, String version, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(Utils.placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
+            BukkitMinecraftUtils.printMsg(Utils.placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
         }
     }
 
@@ -267,7 +267,7 @@ public class MinecraftUtils {
 
     public static void debug(final JavaPlugin plugin, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            MinecraftUtils.printMsg(Utils.placeHolder("[" + plugin.getDescription().getName() + "] [Debug] [Version: " + plugin.getDescription().getVersion() + "] " + msg, map, false));
+            BukkitMinecraftUtils.printMsg(Utils.placeHolder("[" + plugin.getDescription().getName() + "] [Debug] [Version: " + plugin.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 

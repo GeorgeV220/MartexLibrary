@@ -12,7 +12,7 @@ import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.NextNavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.library.minecraft.inventory.utils.InventoryUtil;
-import com.georgev22.library.minecraft.MinecraftUtils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
@@ -240,7 +240,7 @@ public class PagedInventory implements IPagedInventory {
 
                     if (!nbtItem.hasKey("frames")) continue;
 
-                    List<ItemStack> itemStacks = MinecraftUtils.itemStackListFromBase64(nbtItem.getString("frames"));
+                    List<ItemStack> itemStacks = BukkitMinecraftUtils.itemStackListFromBase64(nbtItem.getString("frames"));
 
                     int size = itemStacks.size() - 1;
                     if (size > 0 & slotFrame.get(i) <= size) {
@@ -283,7 +283,7 @@ public class PagedInventory implements IPagedInventory {
                             colorsList.add(Color.from(s));
                         }
 
-                        itemMeta.setDisplayName(nbtItem.getString("animation").equalsIgnoreCase("wave") ? Animation.wave(MinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList) : Animation.fading(MinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList));
+                        itemMeta.setDisplayName(nbtItem.getString("animation").equalsIgnoreCase("wave") ? Animation.wave(BukkitMinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList) : Animation.fading(BukkitMinecraftUtils.stripColor(itemMeta.getDisplayName()), colorsList));
                         itemStack.setItemMeta(itemMeta);
                         openInventory.setItem(i, itemStack);
 

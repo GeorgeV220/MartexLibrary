@@ -5,7 +5,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.georgev22.library.minecraft.inventory.utils.actions.Action;
 import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.minecraft.MinecraftUtils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -88,12 +88,12 @@ public class ItemBuilder {
 
     public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"))
-                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
-                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .title(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
                 .glow(fileConfiguration.getBoolean(path + ".glow"))
                 .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
@@ -104,7 +104,7 @@ public class ItemBuilder {
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"));
@@ -112,14 +112,14 @@ public class ItemBuilder {
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
             return buildSimpleItemFromConfig(fileConfiguration, path);
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"))
-                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
-                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .title(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .enchantment(fileConfiguration.getStringList(path + ".enchantments"))
                 ;
     }
@@ -146,7 +146,7 @@ public class ItemBuilder {
     public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         List<ItemStack> itemStacks = Lists.newArrayList();
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
+            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
         }
         if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
             itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
@@ -183,12 +183,12 @@ public class ItemBuilder {
 
     public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"))
-                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
-                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .title(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
                 .glow(fileConfiguration.getBoolean(path + ".glow"))
                 .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
@@ -199,7 +199,7 @@ public class ItemBuilder {
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"));
@@ -207,14 +207,14 @@ public class ItemBuilder {
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
-            return new ItemBuilder(Material.PAPER).title(MinecraftUtils.colorize("&c&l&nInvalid path!!"));
+            return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
             return buildSimpleItemFromConfig(fileConfiguration, path);
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
                 .amount(fileConfiguration.getInt(path + ".amount"))
-                .title(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
-                .lores(MinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
+                .title(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getString(path + ".title"), notNull("titleReplacements", titleReplacements), true)))
+                .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .enchantment(fileConfiguration.getStringList(path + ".enchantments"))
                 ;
     }
@@ -241,7 +241,7 @@ public class ItemBuilder {
     public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         List<ItemStack> itemStacks = Lists.newArrayList();
         if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
-            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(MinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
+            return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
         }
         if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
             itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
@@ -405,7 +405,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder frames(List<ItemStack> frames) {
-        this.nbtItem.setString("frames", MinecraftUtils.itemStackListToBase64(frames));
+        this.nbtItem.setString("frames", BukkitMinecraftUtils.itemStackListToBase64(frames));
         return this;
     }
 
@@ -462,11 +462,11 @@ public class ItemBuilder {
         }
 
         if (this.title != null) {
-            meta.setDisplayName(MinecraftUtils.colorize(this.title));
+            meta.setDisplayName(BukkitMinecraftUtils.colorize(this.title));
         }
 
         if (this.lores != null && this.lores.size() > 0) {
-            meta.setLore(MinecraftUtils.colorize(this.lores));
+            meta.setLore(BukkitMinecraftUtils.colorize(this.lores));
         }
 
         if (this.flags != null && this.flags.size() > 0) {

@@ -5,6 +5,7 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.minecraft.colors.Color;
 import com.georgev22.library.utilities.DiscordWebHook;
 import com.georgev22.library.utilities.Utils;
+import com.georgev22.library.yaml.file.FileConfiguration;
 import com.google.common.collect.Lists;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -443,7 +444,7 @@ public class BungeeMinecraftUtils {
      * @param messagePlaceHolders The placeholders of the message.
      * @return {@link DiscordWebHook} instance.
      */
-    public static DiscordWebHook buildDiscordWebHookFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, String path, Map<String, String> embedPlaceHolders, Map<String, String> messagePlaceHolders) {
+    public static DiscordWebHook buildDiscordWebHookFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> embedPlaceHolders, Map<String, String> messagePlaceHolders) {
         return new DiscordWebHook(fileConfiguration.getString(path + ".webhook url")).setContent(placeHolder(fileConfiguration.getString(path + ".message"), messagePlaceHolders, true))
                 .setAvatarUrl(fileConfiguration.getString(path + ".avatar url"))
                 .setUsername(fileConfiguration.getString(path + ".username")).addEmbeds(buildEmbedsFromConfig(fileConfiguration, path + ".embeds", embedPlaceHolders).toArray(new DiscordWebHook.EmbedObject[0]));
@@ -457,7 +458,7 @@ public class BungeeMinecraftUtils {
      * @param placeholders      The placeholders of the embeds.
      * @return A list that contains {@link DiscordWebHook.EmbedObject} objects.
      */
-    public static @NotNull List<DiscordWebHook.EmbedObject> buildEmbedsFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
+    public static @NotNull List<DiscordWebHook.EmbedObject> buildEmbedsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         List<DiscordWebHook.EmbedObject> embedObjects = Lists.newArrayList();
         for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
             embedObjects.add(buildEmbedFromConfig(fileConfiguration, path, placeholders));
@@ -473,7 +474,7 @@ public class BungeeMinecraftUtils {
      * @param placeholders      The placeholders of the fields.
      * @return A list that contains {@link DiscordWebHook.EmbedObject.Field} objects.
      */
-    public static @NotNull List<DiscordWebHook.EmbedObject.Field> buildFieldsFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
+    public static @NotNull List<DiscordWebHook.EmbedObject.Field> buildFieldsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         List<DiscordWebHook.EmbedObject.Field> fields = Lists.newArrayList();
         for (String s : fileConfiguration.getConfigurationSection(path).getKeys(false)) {
             fields.add(buildFieldFromConfig(fileConfiguration, path + "." + s, placeholders));
@@ -489,7 +490,7 @@ public class BungeeMinecraftUtils {
      * @param placeholders      The placeholders of the embed.
      * @return {@link DiscordWebHook.EmbedObject} instance.
      */
-    public static DiscordWebHook.EmbedObject buildEmbedFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
+    public static DiscordWebHook.EmbedObject buildEmbedFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         return new DiscordWebHook.EmbedObject().setTitle(placeHolder(fileConfiguration.getString(path + ".title"), placeholders, true))
                 .setDescription(placeHolder(fileConfiguration.getString(path + ".description"), placeholders, true))
                 .setColor(Color.from(fileConfiguration.getString(path + ".color")))
@@ -512,7 +513,7 @@ public class BungeeMinecraftUtils {
      * @return {@link DiscordWebHook.EmbedObject.Field} instance.
      */
     @Contract("_, _, _ -> new")
-    public static DiscordWebHook.EmbedObject.@NotNull Field buildFieldFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
+    public static DiscordWebHook.EmbedObject.@NotNull Field buildFieldFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Map<String, String> placeholders) {
         return new DiscordWebHook.EmbedObject.Field(
                 placeHolder(fileConfiguration.getString(path + ".name"), placeholders, true),
                 placeHolder(fileConfiguration.getString(path + ".message"), placeholders, true),

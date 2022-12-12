@@ -1,3 +1,17 @@
+# [8.3.0](https://github.com/GeorgeV220/API/compare/v8.2.2...v8.3.0) (2022-12-12)
+
+
+### Bug Fixes
+
+* **BukkitMinecraftUtils:** Added 1.19.2 (1_19_R2) ([133b930](https://github.com/GeorgeV220/API/commit/133b9305132356576ab1e1700ea1b05d7149ee0f))
+* **BungeeMinecraftUtils:** Added import for FileConfiguration ([2fd9398](https://github.com/GeorgeV220/API/commit/2fd939811b3d4c3df78bc734977f61c15aa0494b))
+* **BungeeMinecraftUtils:** Remove MinecraftUtils imports ([9a24486](https://github.com/GeorgeV220/API/commit/9a24486319a2636b047712258fd3e63f233c6a0f))
+
+
+### Features
+
+* **MinecraftUtils:** Changed MinecraftUtils to BukkitMinecraftUtils ([8cf6d31](https://github.com/GeorgeV220/API/commit/8cf6d31282db12beae36595eab697dbf8486d667))
+
 ## [8.2.2](https://github.com/GeorgeV220/API/compare/v8.2.1...v8.2.2) (2022-12-07)
 
 

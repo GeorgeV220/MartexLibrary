@@ -1,6 +1,6 @@
 package com.georgev22.library.minecraft.configmanager;
 
-import com.georgev22.library.minecraft.MinecraftUtils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.google.common.collect.Sets;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,7 +50,7 @@ public final class CFG {
     public void setup() {
         if (!this.plugin.getDataFolder().exists()) {
             if (this.plugin.getDataFolder().mkdir()) {
-                MinecraftUtils.debug(plugin, "Folder " + this.plugin.getDataFolder().getName() + " has been created!");
+                BukkitMinecraftUtils.debug(plugin, "Folder " + this.plugin.getDataFolder().getName() + " has been created!");
             }
         }
 
@@ -59,7 +59,7 @@ public final class CFG {
         if (!this.file.exists()) {
             try {
                 if (this.file.createNewFile()) {
-                    MinecraftUtils.debug(plugin, "File " + this.file.getName() + " has been created!");
+                    BukkitMinecraftUtils.debug(plugin, "File " + this.file.getName() + " has been created!");
                 }
             } catch (final IOException e) {
                 e.printStackTrace();

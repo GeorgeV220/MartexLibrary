@@ -1,6 +1,6 @@
 package com.georgev22.library.minecraft.inventory.utils.actions;
 
-import com.georgev22.library.minecraft.MinecraftUtils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.exceptions.ActionRunException;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +18,7 @@ public class ActionManager {
                 if (error)
                     actionRunException.printStackTrace();
                 else
-                    MinecraftUtils.debug(plugin, actionRunException.getMessage());
+                    BukkitMinecraftUtils.debug(plugin, actionRunException.getMessage());
                 break;
             }
         }

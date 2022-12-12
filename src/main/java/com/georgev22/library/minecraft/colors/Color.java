@@ -1,6 +1,6 @@
 package com.georgev22.library.minecraft.colors;
 
-import com.georgev22.library.minecraft.MinecraftUtils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +55,7 @@ public class Color {
     }
 
     public String getAppliedTag() {
-        boolean bool = MinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(MinecraftUtils.MinecraftVersion.V1_16_R1);
+        boolean bool = BukkitMinecraftUtils.MinecraftVersion.getCurrentVersion().isAboveOrEqual(BukkitMinecraftUtils.MinecraftVersion.V1_16_R1);
         return bool ? "§x" + Arrays.stream(this.colorCode.split("")).map((paramString) -> "§" + paramString).collect(Collectors.joining()) : MinecraftColor.getClosest(this).getAppliedTag();
     }
 

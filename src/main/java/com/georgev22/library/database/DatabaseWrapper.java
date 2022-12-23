@@ -85,8 +85,9 @@ public class DatabaseWrapper {
             }
 
             case MONGO -> {
-                mongoClient = new MongoDB(data[0], Integer.parseInt(data[1]), data[2], data[3], data[4]).getMongoClient();
-                mongoDatabase = getMongoDatabase();
+                MongoDB mongoDB = new MongoDB(data[0], Integer.parseInt(data[1]), data[2], data[3], data[4]);
+                mongoClient = mongoDB.getMongoClient();
+                mongoDatabase = mongoDB.getMongoDatabase();
             }
         }
         return this;

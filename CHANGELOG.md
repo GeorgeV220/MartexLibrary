@@ -1,3 +1,10 @@
+## [8.3.1](https://github.com/GeorgeV220/API/compare/v8.3.0...v8.3.1) (2022-12-23)
+
+
+### Bug Fixes
+
+* **DatabaseWrapper:** MongoDB Database ([1d13d99](https://github.com/GeorgeV220/API/commit/1d13d9962707aa587ffde5dd5bf0530dea5ae6c7))
+
 # [8.3.0](https://github.com/GeorgeV220/API/compare/v8.2.2...v8.3.0) (2022-12-12)
 
 

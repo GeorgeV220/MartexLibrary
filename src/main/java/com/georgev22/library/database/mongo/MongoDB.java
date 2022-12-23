@@ -27,22 +27,6 @@ public class MongoDB {
     }
 
     /**
-     * @param host           Host of the MongoDB (must contain port) format: localhost:27077
-     * @param port           MongoDB port
-     * @param username       MongoDB username
-     * @param password       User password
-     * @param databaseName   database name
-     * @param collectionName collection name
-     * @deprecated for removal on feature release
-     */
-    @Deprecated(since = "3.0.0", forRemoval = true)
-    public MongoDB(String host, int port, String username, String password, String databaseName, String collectionName) {
-        mongoClient = MongoClients.create("mongodb://" + username + ":" + password + "@" + host + ":" + port + "/?authSource=" + databaseName);
-        mongoDatabase = mongoClient.getDatabase(databaseName);
-        collection = mongoDatabase.getCollection(collectionName);
-    }
-
-    /**
      * Gets a collection.
      *
      * @param collectionName the name of the collection to return

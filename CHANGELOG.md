@@ -1,3 +1,10 @@
+# [8.4.0](https://github.com/GeorgeV220/API/compare/v8.3.1...v8.4.0) (2022-12-23)
+
+
+### Features
+
+* **MongoDB:** Removed deprecated construction MongoDB(String,int,String,String,String,String) ([9af304b](https://github.com/GeorgeV220/API/commit/9af304b8d5327d8bce467831af3180d649ccc5d5))
+
 ## [8.3.1](https://github.com/GeorgeV220/API/compare/v8.3.0...v8.3.1) (2022-12-23)
 
 

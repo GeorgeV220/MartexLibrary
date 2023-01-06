@@ -1,3 +1,17 @@
+# [8.5.0](https://github.com/GeorgeV220/API/compare/v8.4.0...v8.5.0) (2023-01-06)
+
+
+### Bug Fixes
+
+* **build.gradle:** Velocity Maven repository ([4b6a64b](https://github.com/GeorgeV220/API/commit/4b6a64bf56930bb58577547d9218c73c63c5d523))
+* **gradle.yml:** Bump node to 18 ([0f9ceca](https://github.com/GeorgeV220/API/commit/0f9cecaaf66ff4ca96808d323f989982dc29bea1))
+* **gradle.yml:** Change to ubuntu latest ([b166f02](https://github.com/GeorgeV220/API/commit/b166f0244533e94f8db22b307d949c6576439b52))
+
+
+### Features
+
+* **VelocityMinecraftUtils:** Added VelocityMinecraftUtils ([c47436d](https://github.com/GeorgeV220/API/commit/c47436d68a9f21134b52d8ccc5d7927485adc934))
+
 # [8.4.0](https://github.com/GeorgeV220/API/compare/v8.3.1...v8.4.0) (2022-12-23)
 
 

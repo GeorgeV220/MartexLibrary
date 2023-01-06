@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
-    id 'io.freefair.lombok' version '6.6'
+    id 'io.freefair.lombok' version '6.6.1'
     id 'java'
     id 'jacoco'
     id 'idea'
@@ -43,12 +43,14 @@ repositories {
     maven { url = 'https://repo.dmulloy2.net/repository/public/' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/public/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://nexus.velocitypowered.com/repository/maven-public/' }
     maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
 }
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT"
     compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
 
     compileOnly 'org.jetbrains:annotations:23.1.0'
     compileOnly 'commons-codec:commons-codec:1.15'
@@ -57,11 +59,11 @@ dependencies {
     compileOnly 'org.mongodb:mongodb-driver:3.12.11'
     compileOnly 'com.mojang:authlib:1.11'
     compileOnly 'me.clip:placeholderapi:2.11.2'
-    implementation 'de.tr7zw:item-nbt-api-plugin:2.11.0'
-    implementation 'com.github.cryptomorin:XSeries:9.1.0'
+    implementation 'de.tr7zw:item-nbt-api-plugin:2.11.1'
+    implementation 'com.github.cryptomorin:XSeries:9.2.0'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
-    testImplementation 'org.mockito:mockito-core:4.9.0'
+    testImplementation 'org.mockito:mockito-core:4.11.0'
     testImplementation 'com.github.seeseemelk:MockBukkit-v1.17:1.13.0'
     testImplementation 'org.assertj:assertj-core:3.23.1'
 }

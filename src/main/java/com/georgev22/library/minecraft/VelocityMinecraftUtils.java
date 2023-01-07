@@ -7,6 +7,8 @@ import com.georgev22.library.utilities.DiscordWebHook;
 import com.georgev22.library.utilities.Utils;
 import com.georgev22.library.yaml.file.FileConfiguration;
 import com.google.common.collect.Lists;
+import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.audience.Audience;
@@ -34,13 +36,11 @@ public class VelocityMinecraftUtils {
     }
 
     public static void broadcastMsg(@NotNull ProxyServer proxyServer, final String input) {
-        proxyServer.getAllPlayers().forEach(player -> {
-            player.sendMessage(textComponent(colorize(input)));
-        });
+        proxyServer.sendMessage(textComponent(colorize(input)));
     }
 
     public static void printMsg(@NotNull ProxyServer proxyServer, final String input) {
-        proxyServer.sendMessage(textComponent(colorize(input)));
+        proxyServer.getConsoleCommandSource().sendMessage(textComponent(colorize(input)));
     }
 
 

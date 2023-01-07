@@ -53,7 +53,7 @@ public class VelocityMinecraftUtils {
     }
 
     public static void printMsg(@NotNull ProxyServer proxyServer, final @NotNull List<String> input) {
-        input.forEach(s -> printMsg(proxyServer, input));
+        input.forEach(s -> printMsg(proxyServer, s));
     }
 
     public static void printMsg(@NotNull ProxyServer proxyServer, final Object input) {

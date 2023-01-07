@@ -49,12 +49,20 @@ public class BungeeMinecraftUtils {
         input.forEach(BungeeMinecraftUtils::broadcastMsg);
     }
 
+    public static void broadcastMsg(final @NotNull String... input) {
+        Arrays.stream(input).forEach(BungeeMinecraftUtils::broadcastMsg);
+    }
+
     public static void broadcastMsg(final Object input) {
         broadcastMsg(String.valueOf(input));
     }
 
     public static void printMsg(final @NotNull List<String> input) {
         input.forEach(BungeeMinecraftUtils::printMsg);
+    }
+
+    public static void printMsg(final @NotNull String... input) {
+        Arrays.stream(input).forEach(BungeeMinecraftUtils::printMsg);
     }
 
     public static void printMsg(final Object input) {

@@ -1,3 +1,10 @@
+## [8.5.1](https://github.com/GeorgeV220/API/compare/v8.5.0...v8.5.1) (2023-01-07)
+
+
+### Bug Fixes
+
+* **Velocity:** Fixed printMsg and broadcastMsg ([c671e9d](https://github.com/GeorgeV220/API/commit/c671e9de64c8680b6e917263dfbc09d04d037260))
+
 # [8.5.0](https://github.com/GeorgeV220/API/compare/v8.4.0...v8.5.0) (2023-01-06)
 
 

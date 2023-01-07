@@ -1,3 +1,15 @@
+# [8.6.0](https://github.com/GeorgeV220/API/compare/v8.5.1...v8.6.0) (2023-01-07)
+
+
+### Bug Fixes
+
+* **Velocity:** Fixed printMsg(ProxyServer,List<String>) ([4129e7c](https://github.com/GeorgeV220/API/commit/4129e7c58d1a9639db6be9cb7bea13cd2909792e))
+
+
+### Features
+
+* **MinecraftUtils:** New printMsg and broadcastMsg ([4d0dcdc](https://github.com/GeorgeV220/API/commit/4d0dcdcab8eb46969de6a14136756ec9c787cca0))
+
 ## [8.5.1](https://github.com/GeorgeV220/API/compare/v8.5.0...v8.5.1) (2023-01-07)
 
 

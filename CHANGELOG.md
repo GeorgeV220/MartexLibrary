@@ -1,3 +1,10 @@
+## [8.10.1](https://github.com/GeorgeV220/API/compare/v8.10.0...v8.10.1) (2023-01-11)
+
+
+### Bug Fixes
+
+* **Reflection:** fetchField object null checker ([603d759](https://github.com/GeorgeV220/API/commit/603d759e3f088f2a050aecfb6c737041a2fc6779))
+
 # [8.10.0](https://github.com/GeorgeV220/API/compare/v8.9.0...v8.10.0) (2023-01-11)
 
 

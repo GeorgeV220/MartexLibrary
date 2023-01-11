@@ -1,3 +1,10 @@
+# [8.10.0](https://github.com/GeorgeV220/API/compare/v8.9.0...v8.10.0) (2023-01-11)
+
+
+### Features
+
+* **Reflection:** Added new methods for declared fields/methods ([0c128c1](https://github.com/GeorgeV220/API/commit/0c128c140e0e28421f5d92dec94fe611c3c8f4ff))
+
 # [8.9.0](https://github.com/GeorgeV220/API/compare/v8.8.0...v8.9.0) (2023-01-11)
 
 

@@ -1,3 +1,11 @@
+# [8.7.0](https://github.com/GeorgeV220/API/compare/v8.6.0...v8.7.0) (2023-01-11)
+
+
+### Features
+
+* **Reflection:** Added getEnum and getSubClass methods ([3286c62](https://github.com/GeorgeV220/API/commit/3286c62c1777d5af2c08fd739ffdca9293b03fe1))
+* **Reflection:** Added new getNMSClass methods ([1addc61](https://github.com/GeorgeV220/API/commit/1addc618d588a4d258283b01c4b2618cc17f1025))
+
 # [8.6.0](https://github.com/GeorgeV220/API/compare/v8.5.1...v8.6.0) (2023-01-07)
 
 

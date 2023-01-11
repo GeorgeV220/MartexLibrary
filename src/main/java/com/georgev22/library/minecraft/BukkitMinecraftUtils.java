@@ -876,7 +876,7 @@ public class BukkitMinecraftUtils {
         private static volatile Object theUnsafe;
 
         public static boolean isRepackaged() {
-            return MinecraftVersion.getCurrentVersion().isBelowOrEqual(MinecraftVersion.V1_17_R1);
+            return MinecraftVersion.getCurrentVersion().isAboveOrEqual(MinecraftVersion.V1_17_R1);
         }
 
         @Contract(pure = true)
@@ -890,6 +890,18 @@ public class BukkitMinecraftUtils {
 
         public static Optional<Class<?>> getNMSOptionalClass(String className) {
             return Utils.Reflection.optionalClass(getNMSClassName(className), Bukkit.class.getClassLoader());
+        }
+
+        public static @NotNull String getNMSClassName(String className, String fullClassName) {
+            return isRepackaged() ? fullClassName : getNMSClassName(className);
+        }
+
+        public static @NotNull Class<?> getNMSClass(String className, String fullClassName) throws ClassNotFoundException {
+            return isRepackaged() ? Class.forName(fullClassName) : getNMSClass(className);
+        }
+
+        public static Optional<Class<?>> getNMSOptionalClass(String className, String fullClassName) {
+            return isRepackaged() ? Utils.Reflection.optionalClass(fullClassName, Bukkit.class.getClassLoader()) : getNMSOptionalClass(className);
         }
 
         @Contract(pure = true)

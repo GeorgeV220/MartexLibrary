@@ -1,3 +1,10 @@
+# [8.8.0](https://github.com/GeorgeV220/API/compare/v8.7.0...v8.8.0) (2023-01-11)
+
+
+### Features
+
+* **Reflection:** Added new Reflection methods ([83a9057](https://github.com/GeorgeV220/API/commit/83a9057ea9c66317e663661ca88aaff7368be8a2))
+
 # [8.7.0](https://github.com/GeorgeV220/API/compare/v8.6.0...v8.7.0) (2023-01-11)
 
 

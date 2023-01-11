@@ -1077,6 +1077,44 @@ public final class Utils {
             return classClassMap.getOrDefault(clazz, clazz);
         }
 
+        public static Object getFieldByType(Object obj, String typeName) throws ReflectionException {
+            return getFieldByType(obj, obj.getClass(), typeName);
+        }
+
+        public static Object getFieldByType(Object obj, Class<?> superClass, String typeName) throws ReflectionException {
+            return getFieldByTypeList(obj, superClass, typeName).get(0);
+        }
+
+        public static @NotNull List<Object> getFieldByTypeList(Object obj, String typeName) throws ReflectionException {
+            return getFieldByTypeList(obj, obj.getClass(), typeName);
+        }
+
+        public static @NotNull List<Object> getFieldByTypeList(Object obj, Class<?> superClass, String typeName) throws ReflectionException {
+            List<Object> fields = new ArrayList<>();
+
+            try {
+                for (Field f : superClass.getDeclaredFields()) {
+                    if (f.getType().getSimpleName().equalsIgnoreCase(typeName)) {
+                        f.setAccessible(true);
+
+                        fields.add(f.get(obj));
+                    }
+                }
+
+                if (superClass.getSuperclass() != null) {
+                    fields.addAll(getFieldByTypeList(obj, superClass.getSuperclass(), typeName));
+                }
+
+                if (fields.isEmpty() && obj.getClass() == superClass) {
+                    throw new ReflectionException("Could not find field of type " + typeName + " in " + obj.getClass().getSimpleName());
+                } else {
+                    return fields;
+                }
+            } catch (Exception e) {
+                throw new ReflectionException(e);
+            }
+        }
+
         /**
          * Returns the inner-{@link Class} object associated with the class or
          * interface with the given parent class, using the given class predicate.

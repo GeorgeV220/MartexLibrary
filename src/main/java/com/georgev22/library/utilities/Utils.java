@@ -540,7 +540,7 @@ public final class Utils {
             if (clazz != null) {
                 Method method;
                 try {
-                    method = Reflection.fetchMethod(clazz, "valueOf", String.class);
+                    method = Reflection.fetchDeclaredMethod(clazz, "valueOf", String.class);
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                     continue;
@@ -1197,11 +1197,11 @@ public final class Utils {
          * @throws ExceptionInInitializerError if the initialization provoked
          *                                     by this method fails.
          */
-        public static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        public static Object fetchDeclaredField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
             if (isUnsafeAvailable()) {
                 Field field = clazz.getDeclaredField(name);
-                long offset = (long) fetchMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
-                return fetchMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});
+                long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                return fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});
             }
             try {
                 Field field = clazz.getDeclaredField(name);
@@ -1281,15 +1281,165 @@ public final class Utils {
          * @throws ExceptionInInitializerError if the initialization provoked
          *                                     by this method fails.
          */
-        public static void setFieldValue(final Class<?> clazz, final Object object, final String name, Object value) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        public static void setDeclaredFieldValue(final Class<?> clazz, final Object object, final String name, Object value) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
             if (isUnsafeAvailable()) {
                 Field field = clazz.getDeclaredField(name);
-                long offset = (long) fetchMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
-                fetchMethodAndInvoke(theUnsafe.getClass(), "putObject", theUnsafe, new Object[]{object, offset, value}, new Class[]{Object.class, long.class, Object.class});
+                long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "putObject", theUnsafe, new Object[]{object, offset, value}, new Class[]{Object.class, long.class, Object.class});
             }
 
             try {
                 Field field = clazz.getDeclaredField(name);
+                field.setAccessible(true);
+                field.set(object, value);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        /**
+         * Returns the value of the field represented by this {@code Field}, on
+         * the specified object. The value is automatically wrapped in an
+         * object if it has a primitive type.
+         *
+         * <p>The underlying field's value is obtained as follows:
+         *
+         * <p>If the underlying field is a static field, the {@code object} argument
+         * is ignored; it may be null.
+         *
+         * <p>Otherwise, the underlying field is an instance field.  If the
+         * specified {@code object} argument is null, the method throws a
+         * {@code NullPointerException}. If the specified object is not an
+         * instance of the class or interface declaring the underlying
+         * field, the method throws an {@code IllegalArgumentException}.
+         *
+         * <p>If this {@code Field} object is enforcing Java language access control, and
+         * the underlying field is inaccessible, the method throws an
+         * {@code IllegalAccessException}.
+         * If the underlying field is static, the class that declared the
+         * field is initialized if it has not already been initialized.
+         *
+         * <p>Otherwise, the value is retrieved from the underlying instance
+         * or static field.  If the field has a primitive type, the value
+         * is wrapped in an object before being returned, otherwise it is
+         * returned as is.
+         *
+         * <p>If the field is hidden in the type of {@code object},
+         * the field's value is obtained according to the preceding rules.
+         *
+         * @param clazz  class that contains the field
+         * @param object object from which the represented field's value is
+         *               to be extracted
+         * @param name   field name
+         * @return the value of the represented field in object
+         * {@code object}; primitive values are wrapped in an appropriate
+         * object before being returned
+         * @throws IllegalAccessException      if this {@code Field} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     field is inaccessible.
+         * @throws IllegalArgumentException    if the specified object is not an
+         *                                     instance of the class or interface declaring the underlying
+         *                                     field (or a subclass or implementor thereof).
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the field is an instance field.
+         * @throws ExceptionInInitializerError if the initialization provoked
+         *                                     by this method fails.
+         */
+        public static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            if (isUnsafeAvailable()) {
+                Field field = clazz.getField(name);
+                long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                return fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});
+            }
+            try {
+                Field field = clazz.getField(name);
+                field.setAccessible(true);
+                return field.get(object);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        /**
+         * Sets the field represented by this {@code Field} object on the
+         * specified object argument to the specified new value. The new
+         * value is automatically unwrapped if the underlying field has a
+         * primitive type.
+         *
+         * <p>The operation proceeds as follows:
+         *
+         * <p>If the underlying field is static, the {@code object} argument is
+         * ignored; it may be null.
+         *
+         * <p>Otherwise the underlying field is an instance field.  If the
+         * specified object argument is null, the method throws a
+         * {@code NullPointerException}.  If the specified object argument is not
+         * an instance of the class or interface declaring the underlying
+         * field, the method throws an {@code IllegalArgumentException}.
+         *
+         * <p>If this {@code Field} object is enforcing Java language access control, and
+         * the underlying field is inaccessible, the method throws an
+         * {@code IllegalAccessException}.
+         *
+         * <p>If the underlying field is final, the method throws an
+         * {@code IllegalAccessException} unless {@code setAccessible(true)}
+         * has succeeded for this {@code Field} object
+         * and the field is non-static. Setting a final field in this way
+         * is meaningful only during deserialization or reconstruction of
+         * instances of classes with blank final fields, before they are
+         * made available for access by other parts of a program. Use in
+         * any other context may have unpredictable effects, including cases
+         * in which other parts of a program continue to use the original
+         * value of this field.
+         *
+         * <p>If the underlying field is of a primitive type, an unwrapping
+         * conversion is attempted to convert the new value to a value of
+         * a primitive type.  If this attempt fails, the method throws an
+         * {@code IllegalArgumentException}.
+         *
+         * <p>If, after possible unwrapping, the new value cannot be
+         * converted to the type of the underlying field by an identity or
+         * widening conversion, the method throws an
+         * {@code IllegalArgumentException}.
+         *
+         * <p>If the underlying field is static, the class that declared the
+         * field is initialized if it has not already been initialized.
+         *
+         * <p>The field is set to the possibly unwrapped and widened new value.
+         *
+         * <p>If the field is hidden in the type of {@code object},
+         * the field's value is set according to the preceding rules.
+         *
+         * @param clazz  class that contains the specific field
+         * @param object object whose field should be modified
+         * @param name   field name
+         * @param value  new value for the field of {@code object}
+         *               being modified
+         * @throws IllegalAccessException      if this {@code Field} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     field is either inaccessible or final.
+         * @throws IllegalArgumentException    if the specified object is not an
+         *                                     instance of the class or interface declaring the underlying
+         *                                     field (or a subclass or implementor thereof),
+         *                                     or if an unwrapping conversion fails.
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the field is an instance field.
+         * @throws ExceptionInInitializerError if the initialization provoked
+         *                                     by this method fails.
+         */
+        public static void setFieldValue(final Class<?> clazz, final Object object, final String name, Object value) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+            if (isUnsafeAvailable()) {
+                Field field = clazz.getField(name);
+                long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
+                fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "putObject", theUnsafe, new Object[]{object, offset, value}, new Class[]{Object.class, long.class, Object.class});
+            }
+
+            try {
+                Field field = clazz.getField(name);
                 field.setAccessible(true);
                 field.set(object, value);
             } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -1322,8 +1472,106 @@ public final class Utils {
          * @throws NoSuchMethodException if a matching method is not found.
          * @throws NullPointerException  if {@code name} is {@code null}
          */
-        public static @NotNull Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+        public static @NotNull Method fetchDeclaredMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
             Method method = clazz.getDeclaredMethod(name, parameterTypes);
+            if (!isUnsafeAvailable()) {
+                method.setAccessible(true);
+            }
+            return method;
+        }
+
+        /**
+         * Check {@link Reflection#fetchDeclaredMethod(Class, String, Class...)} for
+         * the fetch method.
+         * Invokes the underlying method represented by this {@code Method}
+         * object, on the specified object with the specified parameters.
+         * Individual parameters are automatically unwrapped to match
+         * primitive formal parameters, and both primitive and reference
+         * parameters are subject to method invocation conversions as
+         * necessary.
+         *
+         * <p>If the underlying method is static, then the specified {@code obj}
+         * argument is ignored. It may be null.
+         *
+         * <p>If the number of formal parameters required by the underlying method is
+         * 0, the supplied {@code args} array may be of length 0 or null.
+         *
+         * <p>If the underlying method is an instance method, it is invoked
+         * using dynamic method lookup as documented in The Java Language
+         * Specification, Second Edition, section 15.12.4.4; in particular,
+         * overriding based on the runtime type of the target object will occur.
+         *
+         * <p>If the underlying method is static, the class that declared
+         * the method is initialized if it has not already been initialized.
+         *
+         * <p>If the method completes normally, the value it returns is
+         * returned to the caller of invoke; if the value has a primitive
+         * type, it is first appropriately wrapped in an object. However,
+         * if the value has the type of array of a primitive type, the
+         * elements of the array are <i>not</i> wrapped in objects; in
+         * other words, an array of primitive type is returned.  If the
+         * underlying method return type is void, the invocation returns
+         * null.
+         *
+         * @param clazz          the class that contains the method
+         * @param name           the name of the method
+         * @param parameterTypes the parameter array
+         * @param obj            the object the underlying method is invoked from
+         * @param arguments      the arguments used for the method call
+         * @return the result of dispatching the method represented by
+         * this object on {@code obj} with parameters
+         * {@code args}
+         * @throws IllegalAccessException      if this {@code Method} object
+         *                                     is enforcing Java language access control and the underlying
+         *                                     method is inaccessible.
+         * @throws IllegalArgumentException    if the method is an
+         *                                     instance method and the specified object argument
+         *                                     is not an instance of the class or interface
+         *                                     declaring the underlying method (or of a subclass
+         *                                     or implementor thereof); if the number of actual
+         *                                     and formal parameters differ; if an unwrapping
+         *                                     conversion for primitive arguments fails; or if,
+         *                                     after possible unwrapping, a parameter value
+         *                                     cannot be converted to the corresponding formal
+         *                                     parameter type by a method invocation conversion.
+         * @throws InvocationTargetException   if the underlying method
+         *                                     throws an exception.
+         * @throws NullPointerException        if the specified object is null
+         *                                     and the method is an instance method.
+         * @throws ExceptionInInitializerError if the initialization
+         *                                     provoked by this method fails.
+         */
+        public static Object fetchDeclaredMethodAndInvoke(final Class<?> clazz, final String name, Object obj, Object[] arguments, Class<?>[] parameterTypes) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            return fetchDeclaredMethod(clazz, name, parameterTypes).invoke(obj, arguments);
+        }
+
+        /**
+         * Returns a {@code Method} object that reflects the specified
+         * method of the class or interface represented by this
+         * {@code Class} object. The {@code name} parameter is a
+         * {@code String} that specifies the simple name of the desired
+         * method, and the {@code parameterTypes} parameter is an array of
+         * {@code Class} objects that identify the method's formal parameter
+         * types, in declared order.  If more than one method with the same
+         * parameter types is declared in a class, and one of these methods has a
+         * return type that is more specific than any of the others, that method is
+         * returned; otherwise one of the methods is chosen arbitrarily.  If the
+         * name is "&lt;init&gt;"or "&lt;clinit&gt;" a {@code NoSuchMethodException}
+         * is raised.
+         *
+         * <p> If this {@code Class} object represents an array type, then this
+         * method does not find the {@code clone()} method.
+         *
+         * @param clazz          the class that contains the method
+         * @param name           the name of the method
+         * @param parameterTypes the parameter array
+         * @return the {@code Method} object for the method of this class
+         * matching the specified name and parameters
+         * @throws NoSuchMethodException if a matching method is not found.
+         * @throws NullPointerException  if {@code name} is {@code null}
+         */
+        public static @NotNull Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
+            Method method = clazz.getMethod(name, parameterTypes);
             if (!isUnsafeAvailable()) {
                 method.setAccessible(true);
             }

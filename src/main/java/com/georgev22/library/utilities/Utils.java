@@ -1,6 +1,7 @@
 package com.georgev22.library.utilities;
 
 import com.georgev22.library.exceptions.NotFoundException;
+import com.georgev22.library.exceptions.ReflectionException;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.TreeObjectMap;
@@ -881,6 +882,7 @@ public final class Utils {
     public static class Reflection {
 
         private static volatile Object theUnsafe;
+        private static final ObjectMap<Class<?>, Class<?>> classClassMap = new HashObjectMap<>();
 
         static {
             try {
@@ -891,6 +893,15 @@ public final class Utils {
                         theUnsafeField.setAccessible(true);
                         theUnsafe = theUnsafeField.get(null);
                     }
+                    classClassMap
+                            .append(Integer.class, Integer.TYPE)
+                            .append(Long.class, Long.TYPE)
+                            .append(Double.class, Double.TYPE)
+                            .append(Float.class, Float.TYPE)
+                            .append(Boolean.class, Boolean.TYPE)
+                            .append(Character.class, Character.TYPE)
+                            .append(Byte.class, Byte.TYPE)
+                            .append(Short.class, Short.TYPE);
                 }
             } catch (Exception e) {
                 theUnsafe = null;
@@ -918,13 +929,17 @@ public final class Utils {
          * @throws LinkageError                if the linkage fails
          * @throws ExceptionInInitializerError if the initialization provoked
          *                                     by this method fails
-         * @throws ClassNotFoundException      if the class cannot be located by
+         * @throws ReflectionException         if the class cannot be located by
          *                                     the specified class loader
          * @see java.lang.Class#forName(String)
          * @see java.lang.ClassLoader
          */
-        public static @NotNull Class<?> getClass(String name, ClassLoader loader) throws ClassNotFoundException {
-            return Class.forName(name, true, loader);
+        public static @NotNull Class<?> getClass(String name, ClassLoader loader) throws ReflectionException {
+            try {
+                return Class.forName(name, true, loader);
+            } catch (ClassNotFoundException exception) {
+                throw new ReflectionException("Class not found " + name, exception);
+            }
         }
 
         /**
@@ -987,15 +1002,15 @@ public final class Utils {
             }
         }
 
-        public static @NotNull Enum<?> getEnum(Class<?> clazz, String enumName, String constant) throws NotFoundException, ClassNotFoundException {
+        public static @NotNull Enum<?> getEnum(Class<?> clazz, String enumName, String constant) throws NotFoundException, ReflectionException {
             return getEnum(getSubClass(clazz, enumName), constant);
         }
 
-        public static Enum<?> getEnum(Class<?> clazz, String enumName, int ordinal) throws NotFoundException, ClassNotFoundException {
+        public static Enum<?> getEnum(Class<?> clazz, String enumName, int ordinal) throws NotFoundException, ReflectionException {
             return getEnum(getSubClass(clazz, enumName), ordinal);
         }
 
-        public static @NotNull Class<?> getSubClass(@NotNull Class<?> clazz, String className) throws ClassNotFoundException {
+        public static @NotNull Class<?> getSubClass(@NotNull Class<?> clazz, String className) throws ReflectionException {
             for (Class<?> subClass : clazz.getDeclaredClasses()) {
                 if (subClass.getSimpleName().equals(className))
                     return subClass;
@@ -1006,7 +1021,60 @@ public final class Utils {
                     return subClass;
             }
 
-            throw new ClassNotFoundException("Sub class " + className + " of " + clazz.getSimpleName() + " not found!");
+            throw new ReflectionException("Sub class " + className + " of " + clazz.getSimpleName() + " not found!");
+        }
+
+        public static @NotNull Object invokeConstructor(Class<?> clazz, Class<?>[] args, Object... initArgs) throws ReflectionException {
+            try {
+                return getConstructor(clazz, args).newInstance(initArgs);
+            } catch (Exception e) {
+                throw new ReflectionException(e);
+            }
+        }
+
+        public static @NotNull Object invokeConstructor(Class<?> clazz, Object... initArgs) throws ReflectionException {
+            try {
+                return getConstructorByArgs(clazz, initArgs).newInstance(initArgs);
+            } catch (Exception e) {
+                throw new ReflectionException(e);
+            }
+        }
+
+        public static @NotNull Constructor<?> getConstructor(@NotNull Class<?> clazz, Class<?>... args) throws NoSuchMethodException {
+            Constructor<?> c = clazz.getConstructor(args);
+            c.setAccessible(true);
+
+            return c;
+        }
+
+        public static @NotNull Constructor<?> getConstructorByArgs(@NotNull Class<?> clazz, Object... args) throws ReflectionException {
+            for (Constructor<?> constructor : clazz.getConstructors()) {
+                if (constructor.getParameterTypes().length != args.length)
+                    continue;
+
+                int i = 0;
+                for (Class<?> parameter : constructor.getParameterTypes()) {
+                    if (!isAssignable(parameter, args[i]))
+                        break;
+
+                    i++;
+                }
+
+                if (i == args.length)
+                    return constructor;
+            }
+
+            throw new ReflectionException("Could not find constructor with args " + Arrays.stream(args).map(Object::getClass).map(Class::getSimpleName).collect(Collectors.joining(", ")) + " in " + clazz.getSimpleName());
+        }
+
+        public static boolean isAssignable(Class<?> clazz, Object obj) {
+            clazz = convertToPrimitive(clazz);
+
+            return clazz.isInstance(obj) || clazz == convertToPrimitive(obj.getClass());
+        }
+
+        public static Class<?> convertToPrimitive(Class<?> clazz) {
+            return classClassMap.getOrDefault(clazz, clazz);
         }
 
         /**
@@ -1016,18 +1084,18 @@ public final class Utils {
          * @param parentClass    the parent class
          * @param classPredicate the class predicate to test for the inner class
          * @return class object representing the desired inner-class,
-         * @throws ClassNotFoundException if the inner-class does not exist
+         * @throws ReflectionException if the inner-class does not exist
          */
-        static Class<?> innerClass(@NotNull Class<?> parentClass, Predicate<Class<?>> classPredicate) throws ClassNotFoundException {
+        static Class<?> innerClass(@NotNull Class<?> parentClass, Predicate<Class<?>> classPredicate) throws ReflectionException {
             for (Class<?> innerClass : parentClass.getDeclaredClasses()) {
                 if (classPredicate.test(innerClass)) {
                     return innerClass;
                 }
             }
-            throw new ClassNotFoundException("No class in " + parentClass.getCanonicalName() + " matches the predicate.");
+            throw new ReflectionException("No class in " + parentClass.getCanonicalName() + " matches the predicate.");
         }
 
-        public static @NotNull Constructor findConstructor(Class<?> clazz, MethodHandles.@NotNull Lookup lookup) throws NoSuchMethodException, IllegalAccessException {
+        public static @NotNull Utils.Reflection.Constructor0 findConstructor(Class<?> clazz, MethodHandles.@NotNull Lookup lookup) throws NoSuchMethodException, IllegalAccessException {
             if (isUnsafeAvailable()) {
                 MethodType allocateMethodType = MethodType.methodType(Object.class, Class.class);
                 MethodHandle allocateMethod = lookup.findVirtual(theUnsafe.getClass(), "allocateInstance", allocateMethodType);
@@ -1215,25 +1283,6 @@ public final class Utils {
          * matching the specified name and parameters
          * @throws NoSuchMethodException if a matching method is not found.
          * @throws NullPointerException  if {@code name} is {@code null}
-         * @throws SecurityException     If a security manager, <i>s</i>, is present and any of the
-         *                               following conditions is met:
-         *
-         *                               <ul>
-         *
-         *                               <li> the caller's class loader is not the same as the
-         *                               class loader of this class and invocation of
-         *                               {@link SecurityManager#checkPermission
-         *                               s.checkPermission} method with
-         *                               {@code RuntimePermission("accessDeclaredMembers")}
-         *                               denies access to the declared method
-         *
-         *                               <li> the caller's class loader is not the same as or an
-         *                               ancestor of the class loader for the current class and
-         *                               invocation of {@link SecurityManager#checkPackageAccess
-         *                               s.checkPackageAccess()} denies access to the package
-         *                               of this class
-         *
-         *                               </ul>
          */
         public static @NotNull Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
             Method method = clazz.getDeclaredMethod(name, parameterTypes);
@@ -1309,7 +1358,7 @@ public final class Utils {
         }
 
         @FunctionalInterface
-        interface Constructor {
+        interface Constructor0 {
             Object invoke() throws Throwable;
         }
     }

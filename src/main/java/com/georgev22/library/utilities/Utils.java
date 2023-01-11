@@ -1,5 +1,6 @@
 package com.georgev22.library.utilities;
 
+import com.georgev22.library.exceptions.NotFoundException;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.TreeObjectMap;
@@ -952,20 +953,60 @@ public final class Utils {
             }
         }
 
-        public static @NotNull Object enumValueOf(@NotNull Class<?> enumClass, String enumName) {
-            return Enum.valueOf(enumClass.asSubclass(Enum.class), enumName);
+        public static @NotNull Object enumValueOf(@NotNull Class<?> enumClass, String ordinal) {
+            return Enum.valueOf(enumClass.asSubclass(Enum.class), ordinal);
         }
 
-        public static Object enumValueOf(Class<?> enumClass, String enumName, int fallbackOrdinal) {
+        public static Object enumValueOf(Class<?> enumClass, String constant, int fallbackOrdinal) throws NotFoundException {
             try {
-                return enumValueOf(enumClass, enumName);
+                return enumValueOf(enumClass, constant);
             } catch (IllegalArgumentException e) {
                 Object[] constants = enumClass.getEnumConstants();
                 if (constants.length > fallbackOrdinal) {
                     return constants[fallbackOrdinal];
                 }
-                throw e;
+                throw new NotFoundException("Enum constant not found " + constant, e);
             }
+        }
+
+        public static @NotNull Enum<?> getEnum(@NotNull Class<?> clazz, String constant) throws NotFoundException {
+            Enum<?>[] enumConstants = (Enum<?>[]) clazz.getEnumConstants();
+
+            for (Enum<?> e : enumConstants)
+                if (e.name().equalsIgnoreCase(constant))
+                    return e;
+
+            throw new NotFoundException("Enum constant not found " + constant);
+        }
+
+        public static Enum<?> getEnum(@NotNull Class<?> clazz, int ordinal) throws NotFoundException {
+            try {
+                return (Enum<?>) clazz.getEnumConstants()[ordinal];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                throw new NotFoundException("Enum constant not found " + ordinal);
+            }
+        }
+
+        public static @NotNull Enum<?> getEnum(Class<?> clazz, String enumName, String constant) throws NotFoundException, ClassNotFoundException {
+            return getEnum(getSubClass(clazz, enumName), constant);
+        }
+
+        public static Enum<?> getEnum(Class<?> clazz, String enumName, int ordinal) throws NotFoundException, ClassNotFoundException {
+            return getEnum(getSubClass(clazz, enumName), ordinal);
+        }
+
+        public static @NotNull Class<?> getSubClass(@NotNull Class<?> clazz, String className) throws ClassNotFoundException {
+            for (Class<?> subClass : clazz.getDeclaredClasses()) {
+                if (subClass.getSimpleName().equals(className))
+                    return subClass;
+            }
+
+            for (Class<?> subClass : clazz.getClasses()) {
+                if (subClass.getSimpleName().equals(className))
+                    return subClass;
+            }
+
+            throw new ClassNotFoundException("Sub class " + className + " of " + clazz.getSimpleName() + " not found!");
         }
 
         /**

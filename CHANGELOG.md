@@ -1,3 +1,10 @@
+# [8.9.0](https://github.com/GeorgeV220/API/compare/v8.8.0...v8.9.0) (2023-01-11)
+
+
+### Features
+
+* **Reflection:** Added getFieldByType and getFieldByTypeList ([d4180b5](https://github.com/GeorgeV220/API/commit/d4180b5d59f30fee4a19ec44cb5c79edae9c6482))
+
 # [8.8.0](https://github.com/GeorgeV220/API/compare/v8.7.0...v8.8.0) (2023-01-11)
 
 

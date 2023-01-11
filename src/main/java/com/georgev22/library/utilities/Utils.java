@@ -1198,7 +1198,7 @@ public final class Utils {
          *                                     by this method fails.
          */
         public static Object fetchDeclaredField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-            if (isUnsafeAvailable()) {
+            if (isUnsafeAvailable() & object != null) {
                 Field field = clazz.getDeclaredField(name);
                 long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
                 return fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});
@@ -1348,7 +1348,7 @@ public final class Utils {
          *                                     by this method fails.
          */
         public static Object fetchField(final Class<?> clazz, final Object object, final String name) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-            if (isUnsafeAvailable()) {
+            if (isUnsafeAvailable() & object != null) {
                 Field field = clazz.getField(name);
                 long offset = (long) fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "objectFieldOffset", theUnsafe, new Object[]{field}, new Class[]{Field.class});
                 return fetchDeclaredMethodAndInvoke(theUnsafe.getClass(), "getObject", theUnsafe, new Object[]{object, offset}, new Class[]{Object.class, long.class});

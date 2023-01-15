@@ -280,8 +280,8 @@ public class SpongeMinecraftUtils {
      * @param pluginContainer Plugin object
      * @param listeners       Class that have the events
      */
-    public static void registerListeners(PluginContainer pluginContainer, Class<?> @NotNull ... listeners) {
-        for (Class<?> listener : listeners) {
+    public static <T> void registerListeners(PluginContainer pluginContainer, Object @NotNull ... listeners) {
+        for (Object listener : listeners) {
             Sponge.eventManager().registerListeners(pluginContainer, listener);
         }
     }

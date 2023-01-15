@@ -1,3 +1,10 @@
+# [8.11.0](https://github.com/GeorgeV220/API/compare/v8.10.1...v8.11.0) (2023-01-15)
+
+
+### Features
+
+* **Sponge:** Added Sponge support. ([279d9ef](https://github.com/GeorgeV220/API/commit/279d9efad1dcb4bbadbb70267033286305ff5d24))
+
 ## [8.10.1](https://github.com/GeorgeV220/API/compare/v8.10.0...v8.10.1) (2023-01-11)
 
 

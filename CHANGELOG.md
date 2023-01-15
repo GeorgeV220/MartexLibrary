@@ -1,3 +1,10 @@
+## [8.11.1](https://github.com/GeorgeV220/API/compare/v8.11.0...v8.11.1) (2023-01-15)
+
+
+### Bug Fixes
+
+* **SpongeMinecraftUtils:** registerListeners ([c15a27a](https://github.com/GeorgeV220/API/commit/c15a27a986ebeb9ca809ecf128b8d2e68f34bcbf))
+
 # [8.11.0](https://github.com/GeorgeV220/API/compare/v8.10.1...v8.11.0) (2023-01-15)
 
 

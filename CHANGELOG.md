@@ -1,3 +1,10 @@
+## [8.11.2](https://github.com/GeorgeV220/API/compare/v8.11.1...v8.11.2) (2023-01-15)
+
+
+### Bug Fixes
+
+* **VelocityMinecraftUtils:** registerListeners ([d3506f1](https://github.com/GeorgeV220/API/commit/d3506f1037d7b744c705d8cfe8aaee4a3f95abaa))
+
 ## [8.11.1](https://github.com/GeorgeV220/API/compare/v8.11.0...v8.11.1) (2023-01-15)
 
 

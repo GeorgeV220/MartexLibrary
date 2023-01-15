@@ -278,8 +278,8 @@ public class VelocityMinecraftUtils {
      * @param plugin      Plugin object
      * @param listeners   Class that have the events
      */
-    public static void registerListeners(ProxyServer proxyServer, Object plugin, Class<?> @NotNull ... listeners) {
-        for (Class<?> listener : listeners) {
+    public static void registerListeners(ProxyServer proxyServer, Object plugin, Object @NotNull ... listeners) {
+        for (Object listener : listeners) {
             proxyServer.getEventManager().register(plugin, listener);
         }
     }

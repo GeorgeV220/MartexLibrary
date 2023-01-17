@@ -435,4 +435,98 @@ public class SpongeMinecraftUtils {
 
         return false;
     }
+
+    public enum MinecraftVersion {
+        V1_15_R1,
+        V1_16_R2,
+        V1_16_R3,
+        V1_17_R1,
+        V1_18_R1,
+        V1_18_R2,
+        V1_19_R1,
+        V1_19_R2,
+        UNKNOWN,
+        ;
+
+        private static MinecraftVersion currentVersion;
+
+        /**
+         * Check if the version is above or equal.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is above or equal.
+         */
+        public boolean isAboveOrEqual(@NotNull MinecraftVersion minecraftVersion) {
+            return this.ordinal() >= minecraftVersion.ordinal();
+        }
+
+        /**
+         * Check if the version is above.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is above.
+         */
+        public boolean isAbove(@NotNull MinecraftVersion minecraftVersion) {
+            return this.ordinal() > minecraftVersion.ordinal();
+        }
+
+        /**
+         * Check if the version is below or equal.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is below or equal.
+         */
+        public boolean isBelowOrEqual(@NotNull MinecraftVersion minecraftVersion) {
+            return this.ordinal() <= minecraftVersion.ordinal();
+        }
+
+        /**
+         * Check if the version is below.
+         *
+         * @param minecraftVersion The {@link MinecraftVersion} to be checked.
+         * @return if the minecraft version is below.
+         */
+        public boolean isBelow(@NotNull MinecraftVersion minecraftVersion) {
+            return this.ordinal() < minecraftVersion.ordinal();
+        }
+
+        /**
+         * Returns the current minecraft server version.
+         *
+         * @return the current minecraft server version.
+         */
+        public static MinecraftVersion getCurrentVersion() {
+            return currentVersion;
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String getCurrentVersionName() {
+            return currentVersion.name();
+        }
+
+        @Contract(pure = true)
+        public static @NotNull String getCurrentVersionNameVtoLowerCase() {
+            return currentVersion.name().replace("V", "v");
+        }
+
+
+        static {
+            try {
+                switch (Sponge.platform().minecraftVersion().name()) {
+                    case "1.19.3" -> currentVersion = MinecraftVersion.V1_19_R2;
+                    case "1.19.2" -> currentVersion = MinecraftVersion.V1_19_R1;
+                    case "1.18.2" -> currentVersion = MinecraftVersion.V1_18_R2;
+                    case "1.18.1" -> currentVersion = MinecraftVersion.V1_18_R1;
+                    case "1.17", "1.17.1" -> currentVersion = MinecraftVersion.V1_17_R1;
+                    case "1.16.5" -> currentVersion = MinecraftVersion.V1_16_R3;
+                    case "1.16.4" -> currentVersion = MinecraftVersion.V1_16_R2;
+                    case "1.15.2" -> currentVersion = MinecraftVersion.V1_15_R1;
+                    default -> currentVersion = UNKNOWN;
+                }
+            } catch (Exception var2) {
+                currentVersion = UNKNOWN;
+            }
+
+        }
+    }
 }

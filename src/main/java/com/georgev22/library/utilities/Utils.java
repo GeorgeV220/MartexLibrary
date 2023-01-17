@@ -1473,11 +1473,7 @@ public final class Utils {
          * @throws NullPointerException  if {@code name} is {@code null}
          */
         public static @NotNull Method fetchDeclaredMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
-            Method method = clazz.getDeclaredMethod(name, parameterTypes);
-            if (!isUnsafeAvailable()) {
-                method.setAccessible(true);
-            }
-            return method;
+            return clazz.getDeclaredMethod(name, parameterTypes);
         }
 
         /**
@@ -1542,7 +1538,9 @@ public final class Utils {
          *                                     provoked by this method fails.
          */
         public static Object fetchDeclaredMethodAndInvoke(final Class<?> clazz, final String name, Object obj, Object[] arguments, Class<?>[] parameterTypes) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-            return fetchDeclaredMethod(clazz, name, parameterTypes).invoke(obj, arguments);
+            Method method = fetchDeclaredMethod(clazz, name, parameterTypes);
+            method.setAccessible(true);
+            return method.invoke(obj, arguments);
         }
 
         /**
@@ -1571,11 +1569,7 @@ public final class Utils {
          * @throws NullPointerException  if {@code name} is {@code null}
          */
         public static @NotNull Method fetchMethod(final @NotNull Class<?> clazz, final String name, Class<?>... parameterTypes) throws NoSuchMethodException {
-            Method method = clazz.getMethod(name, parameterTypes);
-            if (!isUnsafeAvailable()) {
-                method.setAccessible(true);
-            }
-            return method;
+            return clazz.getMethod(name, parameterTypes);
         }
 
         /**
@@ -1640,7 +1634,9 @@ public final class Utils {
          *                                     provoked by this method fails.
          */
         public static Object fetchMethodAndInvoke(final Class<?> clazz, final String name, Object obj, Object[] arguments, Class<?>[] parameterTypes) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-            return fetchMethod(clazz, name, parameterTypes).invoke(obj, arguments);
+            Method method = fetchMethod(clazz, name, parameterTypes);
+            method.setAccessible(true);
+            return method.invoke(obj, arguments);
         }
 
         @FunctionalInterface

@@ -1,3 +1,10 @@
+# [8.12.0](https://github.com/GeorgeV220/API/compare/v8.11.2...v8.12.0) (2023-01-17)
+
+
+### Features
+
+* **Reflection:** Changed on how method fetches/invokes work ([d4024c8](https://github.com/GeorgeV220/API/commit/d4024c8a49287cb28c33436e73c321d92e3d74b4))
+
 ## [8.11.2](https://github.com/GeorgeV220/API/compare/v8.11.1...v8.11.2) (2023-01-15)
 
 

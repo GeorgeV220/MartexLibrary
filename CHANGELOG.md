@@ -1,3 +1,10 @@
+# [8.13.0](https://github.com/GeorgeV220/API/compare/v8.12.0...v8.13.0) (2023-01-17)
+
+
+### Features
+
+* **MinecraftVersion:** Added SpongeMinecraftUtils.MinecraftVersion ([d655a8f](https://github.com/GeorgeV220/API/commit/d655a8f050b1a9aa0b248472530ea118eb5ac6d0))
+
 # [8.12.0](https://github.com/GeorgeV220/API/compare/v8.11.2...v8.12.0) (2023-01-17)
 
 

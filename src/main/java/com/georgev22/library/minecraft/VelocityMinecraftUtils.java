@@ -29,41 +29,55 @@ import static com.georgev22.library.utilities.Utils.placeHolder;
 
 public class VelocityMinecraftUtils {
 
+    private static ProxyServer server;
+
+    public static void setServer(ProxyServer server) {
+        if (VelocityMinecraftUtils.server != null) {
+            throw new UnsupportedOperationException("Cannot redefine singleton Server");
+        }
+
+        VelocityMinecraftUtils.server = server;
+    }
+
+    public static ProxyServer getServer() {
+        return server;
+    }
+
     public static boolean isList(final @NotNull FileConfiguration file, final String path) {
         return Utils.isList(file.get(path));
     }
 
-    public static void broadcastMsg(@NotNull ProxyServer proxyServer, final String input) {
-        proxyServer.sendMessage(textComponent(colorize(input)));
+    public static void broadcastMsg(final String input) {
+        server.sendMessage(textComponent(colorize(input)));
     }
 
-    public static void printMsg(@NotNull ProxyServer proxyServer, final String input) {
-        proxyServer.getConsoleCommandSource().sendMessage(textComponent(colorize(input)));
+    public static void printMsg(final String input) {
+        server.getConsoleCommandSource().sendMessage(textComponent(colorize(input)));
     }
 
 
-    public static void broadcastMsg(@NotNull ProxyServer proxyServer, final @NotNull List<String> input) {
-        input.forEach(s -> broadcastMsg(proxyServer, s));
+    public static void broadcastMsg(final @NotNull List<String> input) {
+        input.forEach(VelocityMinecraftUtils::broadcastMsg);
     }
 
-    public static void broadcastMsg(@NotNull ProxyServer proxyServer, final @NotNull String... input) {
-        Arrays.stream(input).forEach(s -> broadcastMsg(proxyServer, s));
+    public static void broadcastMsg(final @NotNull String... input) {
+        Arrays.stream(input).forEach(VelocityMinecraftUtils::broadcastMsg);
     }
 
-    public static void broadcastMsg(@NotNull ProxyServer proxyServer, final Object input) {
-        broadcastMsg(proxyServer, String.valueOf(input));
+    public static void broadcastMsg(final Object input) {
+        broadcastMsg(String.valueOf(input));
     }
 
-    public static void printMsg(@NotNull ProxyServer proxyServer, final @NotNull List<String> input) {
-        input.forEach(s -> printMsg(proxyServer, s));
+    public static void printMsg(final @NotNull List<String> input) {
+        input.forEach(VelocityMinecraftUtils::printMsg);
     }
 
-    public static void printMsg(@NotNull ProxyServer proxyServer, final Object input) {
-        printMsg(proxyServer, String.valueOf(input));
+    public static void printMsg(final Object input) {
+        printMsg(String.valueOf(input));
     }
 
-    public static void printMsg(@NotNull ProxyServer proxyServer, final String... input) {
-        Arrays.stream(input).forEach(s -> printMsg(proxyServer, s));
+    public static void printMsg(final String... input) {
+        Arrays.stream(input).forEach(VelocityMinecraftUtils::printMsg);
     }
 
 
@@ -216,46 +230,46 @@ public class VelocityMinecraftUtils {
         return colorList;
     }
 
-    public static void debug(ProxyServer proxyServer, final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
+    public static void debug(final JavaExtension javaExtension, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            printMsg(proxyServer, placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
+            printMsg(placeHolder("[" + javaExtension.getDescription().getName() + "] [Debug] [Version: " + javaExtension.getDescription().getVersion() + "] " + msg, map, false));
         }
     }
 
-    public static void debug(ProxyServer proxyServer, final JavaExtension javaExtension, String... messages) {
-        debug(proxyServer, javaExtension, new HashObjectMap<>(), messages);
+    public static void debug(final JavaExtension javaExtension, String... messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages);
     }
 
-    public static void debug(ProxyServer proxyServer, final JavaExtension javaExtension, @NotNull List<String> messages) {
-        debug(proxyServer, javaExtension, new HashObjectMap<>(), messages.toArray(new String[0]));
+    public static void debug(final JavaExtension javaExtension, @NotNull List<String> messages) {
+        debug(javaExtension, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
-    public static void debug(ProxyServer proxyServer, final String name, String version, final Map<String, String> map, String @NotNull ... messages) {
+    public static void debug(final String name, String version, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            printMsg(proxyServer, placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
+            printMsg(placeHolder("[" + name + "] [Debug] [Version: " + version + "] " + msg, map, false));
         }
     }
 
-    public static void debug(ProxyServer proxyServer, final String name, String version, String... messages) {
-        debug(proxyServer, name, version, new HashObjectMap<>(), messages);
+    public static void debug(final String name, String version, String... messages) {
+        debug(name, version, new HashObjectMap<>(), messages);
     }
 
-    public static void debug(ProxyServer proxyServer, final String name, String version, @NotNull List<String> messages) {
-        debug(proxyServer, name, version, new HashObjectMap<>(), messages.toArray(new String[0]));
+    public static void debug(final String name, String version, @NotNull List<String> messages) {
+        debug(name, version, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
-    public static void debug(ProxyServer proxyServer, final Plugin plugin, final Map<String, String> map, String @NotNull ... messages) {
+    public static void debug(final Plugin plugin, final Map<String, String> map, String @NotNull ... messages) {
         for (final String msg : messages) {
-            printMsg(proxyServer, placeHolder("[" + plugin.name() + "] [Debug] [Version: " + plugin.version() + "] " + msg, map, false));
+            printMsg(placeHolder("[" + plugin.name() + "] [Debug] [Version: " + plugin.version() + "] " + msg, map, false));
         }
     }
 
-    public static void debug(ProxyServer proxyServer, final Plugin plugin, String... messages) {
-        debug(proxyServer, plugin, new HashObjectMap<>(), messages);
+    public static void debug(final Plugin plugin, String... messages) {
+        debug(plugin, new HashObjectMap<>(), messages);
     }
 
-    public static void debug(ProxyServer proxyServer, final Plugin plugin, @NotNull List<String> messages) {
-        debug(proxyServer, plugin, new HashObjectMap<>(), messages.toArray(new String[0]));
+    public static void debug(final Plugin plugin, @NotNull List<String> messages) {
+        debug(plugin, new HashObjectMap<>(), messages.toArray(new String[0]));
     }
 
 
@@ -274,26 +288,24 @@ public class VelocityMinecraftUtils {
     /**
      * Register listeners
      *
-     * @param proxyServer The ProxyServer instance
-     * @param plugin      Plugin object
-     * @param listeners   Class that have the events
+     * @param plugin    Plugin object
+     * @param listeners Class that have the events
      */
-    public static void registerListeners(ProxyServer proxyServer, Object plugin, Object @NotNull ... listeners) {
+    public static void registerListeners(Object plugin, Object @NotNull ... listeners) {
         for (Object listener : listeners) {
-            proxyServer.getEventManager().register(plugin, listener);
+            server.getEventManager().register(plugin, listener);
         }
     }
 
     /**
      * Kick all players.
      *
-     * @param proxyServer The ProxyServer instance
      * @param plugin      Plugin object
      * @param kickMessage The kick message to display.
      * @since v5.0
      */
-    public static void kickAll(@NotNull ProxyServer proxyServer, Object plugin, String kickMessage) {
-        proxyServer.getScheduler().buildTask(plugin, () -> proxyServer.getAllPlayers().forEach(player -> player.disconnect(textComponent(colorize(kickMessage))))).schedule();
+    public static void kickAll(Object plugin, String kickMessage) {
+        server.getScheduler().buildTask(plugin, () -> server.getAllPlayers().forEach(player -> player.disconnect(textComponent(colorize(kickMessage))))).schedule();
     }
 
     private static boolean join = false;

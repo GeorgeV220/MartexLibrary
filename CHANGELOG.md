@@ -1,3 +1,10 @@
+# [8.15.0](https://github.com/GeorgeV220/API/compare/v8.14.0...v8.15.0) (2023-01-20)
+
+
+### Features
+
+* **LoggerWrapper:** Added SLF4J Logger ([6956918](https://github.com/GeorgeV220/API/commit/6956918ea61b7fb1db97bf4d096ed4f2177d1653))
+
 # [8.14.0](https://github.com/GeorgeV220/API/compare/v8.13.0...v8.14.0) (2023-01-20)
 
 

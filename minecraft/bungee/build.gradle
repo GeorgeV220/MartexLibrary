@@ -1,0 +1,13 @@
+apply from: "$rootDir/gradle/publish.gradle"
+
+group 'com.georgev22.library.minecraft'
+
+dependencies {
+    compileOnly project(path: ':extensions')
+    compileOnly project(path: ':maps')
+    compileOnly project(path: ':utilities')
+    compileOnly project(path: ':yaml')
+}
+
+tasks.build.dependsOn(shadowJar)
+tasks.publish.dependsOn(shadowJar)

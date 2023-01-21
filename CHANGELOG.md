@@ -1,3 +1,15 @@
+# [9.0.0](https://github.com/GeorgeV220/API/compare/v8.15.0...v9.0.0) (2023-01-21)
+
+
+### Features
+
+* Sub modules project setup and Sponge7 support ([be752de](https://github.com/GeorgeV220/API/commit/be752de303199e47c7b9d619e42ccc3b1449a022))
+
+
+### BREAKING CHANGES
+
+* Maven/Gradle artifacts changed
+
 # [8.15.0](https://github.com/GeorgeV220/API/compare/v8.14.0...v8.15.0) (2023-01-20)
 
 

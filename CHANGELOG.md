@@ -1,3 +1,10 @@
+# [9.1.0](https://github.com/GeorgeV220/API/compare/v9.0.0...v9.1.0) (2023-01-22)
+
+
+### Features
+
+* **Minecraft:** Shade minecraft classes to one jar ([08f03ae](https://github.com/GeorgeV220/API/commit/08f03aeb480983e7eb079a7693cb69126c038f35))
+
 # [9.0.0](https://github.com/GeorgeV220/API/compare/v8.15.0...v9.0.0) (2023-01-21)
 
 

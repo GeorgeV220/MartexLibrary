@@ -300,7 +300,8 @@ public abstract class Database {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Database database)) return false;
+        if (!(o instanceof Database)) return false;
+        Database database = this;
         return Objects.equals(connection, database.connection);
     }
 

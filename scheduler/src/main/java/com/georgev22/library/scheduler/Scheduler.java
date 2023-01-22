@@ -55,7 +55,7 @@ public class Scheduler implements com.georgev22.library.scheduler.interfaces.Sch
      */
     private final AtomicInteger ids = new AtomicInteger(START_ID);
     /**
-     * Current head of linked-list. This reference is always stale, {@link com.georgev22.library.scheduler.Task#next} is the live reference.
+     * Current head of linked-list. This reference is always stale, {@link com.georgev22.library.scheduler.Task#getNext()} is the live reference.
      */
     private volatile com.georgev22.library.scheduler.Task head = new com.georgev22.library.scheduler.Task();
     /**

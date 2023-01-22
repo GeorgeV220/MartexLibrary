@@ -417,7 +417,23 @@ public interface ObjectMap<K, V> extends Map<K, V> {
      */
     <T> T get(final Object key, final T defaultValue);
 
-    record Pair<K, V>(K key, V value) implements Serializable {
+    class Pair<K, V> implements Serializable {
+
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K key() {
+            return key;
+        }
+
+        public V value() {
+            return value;
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -449,14 +465,17 @@ public interface ObjectMap<K, V> extends Map<K, V> {
         }
     }
 
-    record PairDocument(ObjectMap.Pair<Object, Object>... objectPairs) implements Serializable {
+    class PairDocument implements Serializable {
+
+        private final ObjectMap.Pair<Object, Object>[] objectPairs;
 
 
         @SafeVarargs
-        public PairDocument {
+        public PairDocument(ObjectMap.Pair<Object, Object>... objectPairs) {
             if (objectPairs.length == 0) {
                 throw new PairDocumentException("PairDocument is empty");
             }
+            this.objectPairs = objectPairs;
         }
 
 

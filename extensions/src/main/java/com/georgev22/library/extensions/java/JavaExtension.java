@@ -332,7 +332,7 @@ public class JavaExtension extends ExtensionBase {
         return javaExtension;
     }
 
-    @Deprecated(forRemoval = true, since = "7.1.1")
+    @Deprecated
     public void registerInterface(@NotNull Class<?> clazz, Class<?> clazz2) throws InvalidExtensionException {
         if (clazz.isAssignableFrom(clazz2))
             classClassObjectMap.append(clazz, clazz2);

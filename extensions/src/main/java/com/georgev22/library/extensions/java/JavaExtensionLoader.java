@@ -223,7 +223,8 @@ public final class JavaExtensionLoader implements ExtensionLoader {
                 extension.getLogger().log(Level.SEVERE, "Error occurred while unloading " + extension.getDescription().getFullName() + " (Is it up to date?)", ex);
             }
 
-            if (cloader instanceof ExtensionClassLoader loader) {
+            if (cloader instanceof ExtensionClassLoader) {
+                ExtensionClassLoader loader = (ExtensionClassLoader) cloader;
                 loaders.remove(loader);
                 extensionObjectMap.remove(extension.getName());
                 try {

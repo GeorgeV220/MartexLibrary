@@ -1,14 +1,9 @@
 package com.georgev22.library.exceptions;
 
-import java.io.Serial;
-
 /**
  * Thrown when attempting to load an invalid PluginDescriptionFile
  */
 public class InvalidDescriptionException extends Exception {
-
-    @Serial
-    private static final long serialVersionUID = 5721389122281775896L;
 
     /**
      * Constructs a new InvalidDescriptionException based on the given

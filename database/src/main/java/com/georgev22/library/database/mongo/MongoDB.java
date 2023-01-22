@@ -50,7 +50,7 @@ public class MongoDB {
      * @see com.mongodb.MongoNamespace#checkCollectionNameValidity(String)
      * @deprecated for removal on feature release
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public MongoCollection<Document> getCollection() {
         return collection;
     }
@@ -62,7 +62,8 @@ public class MongoDB {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MongoDB mongoDB)) return false;
+        if (!(o instanceof MongoDB)) return false;
+        MongoDB mongoDB = this;
         return Objects.equals(mongoClient, mongoDB.mongoClient) && Objects.equals(mongoDatabase, mongoDB.mongoDatabase) && Objects.equals(collection, mongoDB.collection);
     }
 

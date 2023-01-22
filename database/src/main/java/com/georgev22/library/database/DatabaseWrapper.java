@@ -59,35 +59,39 @@ public class DatabaseWrapper {
      */
     public DatabaseWrapper connect() {
         switch (type) {
-            case MYSQL -> {
+            case MYSQL: {
                 try {
                     database = new MySQL(data[0], Integer.parseInt(data[1]), data[2], data[3], Optional.ofNullable(data[4]));
                     connection = database.openConnection();
                 } catch (SQLException | ClassNotFoundException exception) {
                     throw new DatabaseConnectionException("Unable to connect to the " + type.getName() + " Database", exception);
                 }
+                break;
             }
-            case SQLITE -> {
+            case SQLITE: {
                 try {
                     database = new SQLite(new File(data[0]), data[1]);
                     connection = database.openConnection();
                 } catch (SQLException | ClassNotFoundException exception) {
                     throw new DatabaseConnectionException("Unable to connect to the " + type.getName() + " Database", exception);
                 }
+                break;
             }
-            case POSTGRESQL -> {
+            case POSTGRESQL: {
                 try {
                     database = new PostgreSQL(data[0], Integer.parseInt(data[1]), data[2], data[3], Optional.ofNullable(data[4]));
                     connection = database.openConnection();
                 } catch (SQLException | ClassNotFoundException exception) {
                     throw new DatabaseConnectionException("Unable to connect to the " + type.getName() + " Database", exception);
                 }
+                break;
             }
 
-            case MONGO -> {
+            case MONGO: {
                 MongoDB mongoDB = new MongoDB(data[0], Integer.parseInt(data[1]), data[2], data[3], data[4]);
                 mongoClient = mongoDB.getMongoClient();
                 mongoDatabase = mongoDB.getMongoDatabase();
+                break;
             }
         }
         return this;
@@ -267,7 +271,7 @@ public class DatabaseWrapper {
                 pairList.add(ObjectMap.Pair.create(entry.getKey(), entry.getValue()));
             }
         }
-        return new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new));
+        return new ObjectMap.PairDocument(pairList.toArray(new ObjectMap.Pair[0]));
     }
 
     /**
@@ -289,7 +293,7 @@ public class DatabaseWrapper {
                     for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
                         pairList.add(ObjectMap.Pair.create(resultSetMetaData.getColumnName(i), resultSet.getString(i)));
                     }
-                    pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new)));
+                    pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(new ObjectMap.Pair[0])));
                 }
             } catch (SQLException exception) {
                 throw new DatabaseException("Unable to select data from the database", exception);
@@ -302,7 +306,7 @@ public class DatabaseWrapper {
                     pairList.add(ObjectMap.Pair.create(entry.getKey(), entry.getValue()));
                 }
             });
-            pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(ObjectMap.Pair[]::new)));
+            pairDocumentList.add(new ObjectMap.PairDocument(pairList.toArray(new ObjectMap.Pair[0])));
         }
         return pairDocumentList;
     }

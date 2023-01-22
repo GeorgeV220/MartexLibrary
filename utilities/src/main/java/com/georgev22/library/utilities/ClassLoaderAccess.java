@@ -111,7 +111,7 @@ public class ClassLoaderAccess {
         return "ClassLoaderAccess{" +
                 "unopenedURLs=" + unopenedURLs +
                 ", pathURLs=" + pathURLs +
-                ", classLoader=" + classLoader.getClass().getPackage().getName() + "." + classLoader.getName() +
+                ", classLoader=" + classLoader.getClass().getPackage().getName() + "." + classLoader.getClass().getSimpleName() +
                 '}';
     }
 }

@@ -15,7 +15,7 @@ public class MySQL extends Database {
     private final String user, password, database, hostname;
     private final int port;
 
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public MySQL(String hostname, int port, String username, String password) {
         this(hostname, port, username, password, Optional.empty());
     }

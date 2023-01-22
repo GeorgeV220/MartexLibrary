@@ -279,10 +279,18 @@ public class VelocityMinecraftUtils {
         final int progressBars = (int) (totalBars * percent);
         final int leftOver = totalBars - progressBars;
 
-        return colorize(completedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
-                colorize(notCompletedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, leftOver));
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(colorize(completedColor));
+        for (int i = 0; i < progressBars; i++) {
+            sb.append(symbol);
+        }
+
+        sb.append(colorize(notCompletedColor));
+        for (int i = 0; i < leftOver; i++) {
+            sb.append(symbol);
+        }
+        return sb.toString();
     }
 
     /**

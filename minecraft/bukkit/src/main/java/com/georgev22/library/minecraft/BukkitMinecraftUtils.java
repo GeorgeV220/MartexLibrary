@@ -310,10 +310,18 @@ public class BukkitMinecraftUtils {
         final int progressBars = (int) (totalBars * percent);
         final int leftOver = totalBars - progressBars;
 
-        return colorize(completedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
-                colorize(notCompletedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, leftOver));
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(colorize(completedColor));
+        for (int i = 0; i < progressBars; i++) {
+            sb.append(symbol);
+        }
+
+        sb.append(colorize(notCompletedColor));
+        for (int i = 0; i < leftOver; i++) {
+            sb.append(symbol);
+        }
+        return sb.toString();
     }
 
     public static @NotNull ItemStack resetItemMeta(final @NotNull ItemStack item) {
@@ -717,7 +725,8 @@ public class BukkitMinecraftUtils {
                     : str.replace(entry.getKey(), entry.getValue());
         }
         try {
-            if (target instanceof OfflinePlayer offlinePlayer) {
+            if (target instanceof OfflinePlayer) {
+                OfflinePlayer offlinePlayer = ((OfflinePlayer) target).getPlayer();
                 return me.clip.placeholderapi.PlaceholderAPI.setBracketPlaceholders(offlinePlayer, str);
             }
             return str;

@@ -35,7 +35,7 @@ public class Animation {
                 frames.addAll(Collections.nCopies(start, color.getAppliedTag(bool, MinecraftColor.getClosest(color).getAppliedTag()) + (bold ? "§l" : "") + string));
                 ArrayList<String> list = Lists.newArrayList();
                 list.addAll(Collections.nCopies(string.length(), color.getAppliedTag(bool, MinecraftColor.getClosest(color).getAppliedTag())));
-                list.addAll(ColorCalculations.getColorsInBetween(color, color2, end).stream().map(c -> c.getAppliedTag(bool, MinecraftColor.getClosest(c).getAppliedTag())).toList());
+                list.addAll(ColorCalculations.getColorsInBetween(color, color2, end).stream().map(c -> c.getAppliedTag(bool, MinecraftColor.getClosest(c).getAppliedTag())).collect(Collectors.toList()));
                 list.addAll(Collections.nCopies(string.length(), color2.getAppliedTag(bool, MinecraftColor.getClosest(color2).getAppliedTag())));
 
                 for (int j = 0; j <= list.size() - string.length(); ++j) {

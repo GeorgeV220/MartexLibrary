@@ -7,7 +7,7 @@ dependencies {
     compileOnly project(path: ':maps')
     compileOnly project(path: ':utilities')
     compileOnly project(path: ':yaml')
-    compileOnly 'org.spongepowered:spongeapi:9.0.0'
+    compileOnly 'org.spongepowered:spongeapi:8.0.0'
 }
 
 tasks.build.dependsOn(shadowJar)

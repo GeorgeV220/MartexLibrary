@@ -268,10 +268,18 @@ public class Sponge8MinecraftUtils {
         final int progressBars = (int) (totalBars * percent);
         final int leftOver = totalBars - progressBars;
 
-        return colorize(completedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, progressBars)) +
-                colorize(notCompletedColor) +
-                String.valueOf(symbol).repeat(Math.max(0, leftOver));
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append(colorize(completedColor));
+        for (int i = 0; i < progressBars; i++) {
+            sb.append(symbol);
+        }
+
+        sb.append(colorize(notCompletedColor));
+        for (int i = 0; i < leftOver; i++) {
+            sb.append(symbol);
+        }
+        return sb.toString();
     }
 
     /**
@@ -513,15 +521,33 @@ public class Sponge8MinecraftUtils {
         static {
             try {
                 switch (Sponge.platform().minecraftVersion().name()) {
-                    case "1.19.3" -> currentVersion = MinecraftVersion.V1_19_R2;
-                    case "1.19.2" -> currentVersion = MinecraftVersion.V1_19_R1;
-                    case "1.18.2" -> currentVersion = MinecraftVersion.V1_18_R2;
-                    case "1.18.1" -> currentVersion = MinecraftVersion.V1_18_R1;
-                    case "1.17", "1.17.1" -> currentVersion = MinecraftVersion.V1_17_R1;
-                    case "1.16.5" -> currentVersion = MinecraftVersion.V1_16_R3;
-                    case "1.16.4" -> currentVersion = MinecraftVersion.V1_16_R2;
-                    case "1.15.2" -> currentVersion = MinecraftVersion.V1_15_R1;
-                    default -> currentVersion = UNKNOWN;
+                    case "1.19.3":
+                        currentVersion = MinecraftVersion.V1_19_R2;
+                        break;
+                    case "1.19.2":
+                        currentVersion = MinecraftVersion.V1_19_R1;
+                        break;
+                    case "1.18.2":
+                        currentVersion = MinecraftVersion.V1_18_R2;
+                        break;
+                    case "1.18.1":
+                        currentVersion = MinecraftVersion.V1_18_R1;
+                        break;
+                    case "1.17":
+                    case "1.17.1":
+                        currentVersion = MinecraftVersion.V1_17_R1;
+                        break;
+                    case "1.16.5":
+                        currentVersion = MinecraftVersion.V1_16_R3;
+                        break;
+                    case "1.16.4":
+                        currentVersion = MinecraftVersion.V1_16_R2;
+                        break;
+                    case "1.15.2":
+                        currentVersion = MinecraftVersion.V1_15_R1;
+                        break;
+                    default:
+                        currentVersion = UNKNOWN;
                 }
             } catch (Exception var2) {
                 currentVersion = UNKNOWN;

@@ -1,3 +1,10 @@
+## [9.1.1](https://github.com/GeorgeV220/API/compare/v9.1.0...v9.1.1) (2023-01-22)
+
+
+### Bug Fixes
+
+* Fixed package and sponge7 implementation ([40c15db](https://github.com/GeorgeV220/API/commit/40c15db1a9184a84307222edc0dd0addec90ecee))
+
 # [9.1.0](https://github.com/GeorgeV220/API/compare/v9.0.0...v9.1.0) (2023-01-22)
 
 

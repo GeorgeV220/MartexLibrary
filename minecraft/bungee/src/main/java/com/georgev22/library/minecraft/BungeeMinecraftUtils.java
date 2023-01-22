@@ -1,4 +1,4 @@
-package com.georgev22.library.minecraft.bungee;
+package com.georgev22.library.minecraft;
 
 import com.georgev22.library.extensions.java.JavaExtension;
 import com.georgev22.library.maps.HashObjectMap;

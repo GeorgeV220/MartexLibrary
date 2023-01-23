@@ -20,6 +20,7 @@ compileJava {
 }
 
 archivesBaseName = project.property("libName")
+apply from: "$rootDir/gradle/publish.gradle"
 group project.property("group")
 
 allprojects {

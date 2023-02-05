@@ -1,3 +1,10 @@
+# [9.2.0](https://github.com/GeorgeV220/API/compare/v9.1.1...v9.2.0) (2023-02-05)
+
+
+### Features
+
+* **Yaml:** CFG replace constructor ([05857b8](https://github.com/GeorgeV220/API/commit/05857b83c55ecb1d989d26d0a6504c109906ea7f))
+
 ## [9.1.1](https://github.com/GeorgeV220/API/compare/v9.1.0...v9.1.1) (2023-01-22)
 
 

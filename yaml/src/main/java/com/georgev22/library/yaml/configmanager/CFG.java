@@ -42,10 +42,13 @@ public final class CFG {
 
     private final boolean saveResource;
 
-    public CFG(final String string, final File dataFolder, final boolean saveResource, final Logger logger, Class<?> clazz) throws Exception {
+    private final boolean replace;
+
+    public CFG(final String string, final File dataFolder, final boolean saveResource, final boolean replace, final Logger logger, Class<?> clazz) throws Exception {
         this.fileName = string + ".yml";
         this.dataFolder = dataFolder;
         this.saveResource = saveResource;
+        this.replace = replace;
         this.logger = logger;
         this.clazz = clazz;
         this.setup();
@@ -106,7 +109,7 @@ public final class CFG {
         }
 
         try {
-            if (!outFile.exists()) {
+            if (!outFile.exists() || replace) {
                 OutputStream out = Files.newOutputStream(outFile.toPath());
                 byte[] buf = new byte[1024];
                 int len;

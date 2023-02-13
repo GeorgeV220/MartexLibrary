@@ -36,6 +36,8 @@ public class DatabaseWrapper {
 
     private Database database;
 
+    private MongoDB mongoDB;
+
     private @Nullable MongoClient mongoClient = null;
     private @Nullable MongoDatabase mongoDatabase = null;
 
@@ -85,7 +87,7 @@ public class DatabaseWrapper {
             }
 
             case MONGO -> {
-                MongoDB mongoDB = new MongoDB(data[0], Integer.parseInt(data[1]), data[2], data[3], data[4]);
+                mongoDB = new MongoDB(data[0], Integer.parseInt(data[1]), data[2], data[3], data[4]);
                 mongoClient = mongoDB.getMongoClient();
                 mongoDatabase = mongoDB.getMongoDatabase();
             }
@@ -341,6 +343,10 @@ public class DatabaseWrapper {
      */
     public Database getSQLDatabase() {
         return database;
+    }
+
+    public MongoDB getMongoDB() {
+        return mongoDB;
     }
 
     /**

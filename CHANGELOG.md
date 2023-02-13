@@ -1,3 +1,11 @@
+# [9.4.0](https://github.com/GeorgeV220/API/compare/v9.3.0...v9.4.0) (2023-02-13)
+
+
+### Features
+
+* **Database:** UserManager utility ([e34a643](https://github.com/GeorgeV220/API/commit/e34a643e650df8f0f0ac07ac78866d4a4fbf9c41))
+* **ObjectMap:** ObjectMap GSON (De)Serialization ([53376d9](https://github.com/GeorgeV220/API/commit/53376d98e890cff511dbff04b16fcc335955edeb))
+
 # [9.3.0](https://github.com/GeorgeV220/API/compare/v9.2.0...v9.3.0) (2023-02-13)
 
 

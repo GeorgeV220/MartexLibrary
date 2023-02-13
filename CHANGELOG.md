@@ -1,3 +1,10 @@
+# [9.3.0](https://github.com/GeorgeV220/API/compare/v9.2.0...v9.3.0) (2023-02-13)
+
+
+### Features
+
+* **Database:** Added getMongoDB ([b632ef9](https://github.com/GeorgeV220/API/commit/b632ef91deb74eb735190c91d89d760fdcae9ac4))
+
 # [9.2.0](https://github.com/GeorgeV220/API/compare/v9.1.1...v9.2.0) (2023-02-05)
 
 

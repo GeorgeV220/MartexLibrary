@@ -12,13 +12,6 @@ plugins {
     id 'idea'
 }
 
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += ["-parameters"]
-    options.fork = true
-    options.forkOptions.executable = 'javac'
-}
-
 archivesBaseName = project.property("libName")
 apply from: "$rootDir/gradle/publish.gradle"
 group project.property("group")
@@ -83,7 +76,7 @@ dependencies {
 }
 
 shadowJar {
-    classifier = ''
+    archiveClassifier = ''
     exclude("de/tr7zw/nbtapi/plugin/**")
     exclude("plugin.yml")
     relocate 'de.tr7zw', 'com.georgev22.library.minecraft.nbt'

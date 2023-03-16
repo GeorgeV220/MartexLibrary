@@ -12,7 +12,7 @@ dependencies {
 }
 
 shadowJar {
-    classifier = ''
+    archiveClassifier = ''
     exclude("de/tr7zw/nbtapi/plugin/**")
     exclude("plugin.yml")
     relocate 'de.tr7zw', 'com.georgev22.library.minecraft.nbt'

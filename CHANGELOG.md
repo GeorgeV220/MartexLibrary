@@ -1,3 +1,10 @@
+## [9.5.1](https://github.com/GeorgeV220/API/compare/v9.5.0...v9.5.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* PUBLISH ([e74001f](https://github.com/GeorgeV220/API/commit/e74001f212b38ac9ca54286955845a1162aabb35))
+
 # [9.5.0](https://github.com/GeorgeV220/API/compare/v9.4.0...v9.5.0) (2023-03-16)
 
 

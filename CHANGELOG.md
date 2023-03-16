@@ -1,3 +1,10 @@
+## [9.4.1](https://github.com/GeorgeV220/API/compare/v9.4.0...v9.4.1) (2023-03-16)
+
+
+### Bug Fixes
+
+* **MinecraftVersion:** 1.19.4 support ([0af0ba9](https://github.com/GeorgeV220/API/commit/0af0ba93618226d9ea1a0bf855491d6252668b7a))
+
 # [9.4.0](https://github.com/GeorgeV220/API/compare/v9.3.0...v9.4.0) (2023-02-13)
 
 

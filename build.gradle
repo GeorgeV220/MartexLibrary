@@ -5,18 +5,11 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
-    id 'io.freefair.lombok' version '6.6.1'
+    id 'com.github.johnrengelman.shadow' version '8.1.0'
+    id 'io.freefair.lombok' version '6.6.3'
     id 'java'
     id 'jacoco'
     id 'idea'
-}
-
-compileJava {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += ["-parameters"]
-    options.fork = true
-    options.forkOptions.executable = 'javac'
 }
 
 archivesBaseName = project.property("libName")
@@ -52,6 +45,7 @@ allprojects {
         maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url = 'https://nexus.velocitypowered.com/repository/maven-public/' }
         maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
     }
 
     dependencies {
@@ -59,7 +53,7 @@ allprojects {
         compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
         compileOnly 'com.velocitypowered:velocity-api:3.1.1'
 
-        compileOnly 'org.jetbrains:annotations:24.0.0'
+        compileOnly 'org.jetbrains:annotations:24.0.1'
         compileOnly 'commons-codec:commons-codec:1.15'
         compileOnly 'commons-io:commons-io:2.11.0'
         compileOnly 'commons-lang:commons-lang:2.6'
@@ -83,7 +77,7 @@ dependencies {
 }
 
 shadowJar {
-    classifier = ''
+    archiveClassifier = ''
     exclude("de/tr7zw/nbtapi/plugin/**")
     exclude("plugin.yml")
     relocate 'de.tr7zw', 'com.georgev22.library.minecraft.nbt'

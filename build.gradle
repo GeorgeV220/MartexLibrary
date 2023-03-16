@@ -84,6 +84,6 @@ shadowJar {
     relocate 'com.cryptomorin.xseries', 'com.georgev22.library.minecraft.xseries'
 }
 
-tasks.publishShadowPublicationToGeorgeV22Repository.dependsOn(jar)
+tasks.shadowJar.dependsOn(jar)
 
 defaultTasks 'build'

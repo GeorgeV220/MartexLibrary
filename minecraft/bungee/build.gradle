@@ -11,3 +11,4 @@ dependencies {
 
 tasks.build.dependsOn(shadowJar)
 tasks.publish.dependsOn(shadowJar)
+tasks.publishShadowPublicationToGeorgeV22Repository.dependsOn(jar)

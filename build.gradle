@@ -59,7 +59,7 @@ allprojects {
         compileOnly 'commons-lang:commons-lang:2.6'
         compileOnly 'org.mongodb:mongodb-driver:3.12.12'
         compileOnly 'com.mojang:authlib:1.11'
-        compileOnly 'me.clip:placeholderapi:2.11.2'
+        compileOnly 'me.clip:placeholderapi:2.11.3'
     }
 }
 

@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,9 @@ import java.util.concurrent.CompletableFuture;
  * @author <a href="https://github.com/GeorgeV220">GeorgeV220</a>
  */
 public class UserManager {
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(ObjectMap.class, new ObjectMapSerializerDeserializer()).setPrettyPrinting().create();
+
+    private GsonBuilder gsonBuilder = new GsonBuilder();
+    private Gson gson;
     private final File usersDirectory;
     private final Connection connection;
     private final MongoDB mongoDB;
@@ -74,6 +77,20 @@ public class UserManager {
         }
     }
 
+    public UserManager initializeGsonBuilder() {
+        gsonBuilder.registerTypeAdapter(ObjectMap.class, new ObjectMapSerializerDeserializer());
+        return this;
+    }
+
+    public UserManager registerTypeAdapters(@NotNull List<ObjectMap.Pair<Class<?>, Object>> pairs) {
+        pairs.forEach(pair -> gsonBuilder.registerTypeAdapter(pair.key(), pair.value()));
+        return this;
+    }
+
+    public Gson getGson() {
+        return gsonBuilder.setPrettyPrinting().create();
+    }
+
     /**
      * Loads the {@link User} with the specified ID
      *
@@ -88,7 +105,7 @@ public class UserManager {
                             switch (type) {
                                 case JSON -> {
                                     try (FileReader reader = new FileReader(new File(usersDirectory, userId + ".json"))) {
-                                        User user = gson.fromJson(reader, User.class);
+                                        User user = getGson().fromJson(reader, User.class);
                                         loadedUsers.put(userId, user);
                                         return user;
                                     } catch (IOException e) {
@@ -104,7 +121,7 @@ public class UserManager {
                                         if (resultSet.next()) {
                                             String userJson = resultSet.getString("user_json");
                                             statement.close();
-                                            User user = gson.fromJson(userJson, User.class);
+                                            User user = getGson().fromJson(userJson, User.class);
                                             loadedUsers.put(userId, user);
                                             return user;
                                         } else {
@@ -117,7 +134,7 @@ public class UserManager {
                                 case MONGODB -> {
                                     Document document = mongoDB.getCollection(collection).find(Filters.eq("userId", userId.toString())).first();
                                     if (document != null) {
-                                        User user = gson.fromJson(document.toJson(), User.class);
+                                        User user = getGson().fromJson(document.toJson(), User.class);
                                         loadedUsers.put(userId, user);
                                         return user;
                                     } else {
@@ -146,7 +163,7 @@ public class UserManager {
             switch (type) {
                 case JSON -> {
                     try (FileWriter writer = new FileWriter(new File(usersDirectory, user.getId() + ".json"))) {
-                        gson.toJson(user, writer);
+                        getGson().toJson(user, writer);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -155,7 +172,7 @@ public class UserManager {
                     String query = result ? "UPDATE " + collection + " SET user_json = ? WHERE user_id =  ?;" : "INSERT INTO " + collection + " (user_id, user_json) VALUES (?, ?)";
                     try {
                         PreparedStatement statement = Objects.requireNonNull(connection).prepareStatement(query);
-                        String userJson = gson.toJson(user);
+                        String userJson = getGson().toJson(user);
                         statement.setString(1, userJson);
                         statement.setString(2, user.getId().toString());
                         statement.executeUpdate();
@@ -166,7 +183,7 @@ public class UserManager {
                 });
                 case MONGODB -> {
                     MongoCollection<Document> mongoCollection = mongoDB.getCollection(collection);
-                    Document document = Document.parse(gson.toJson(user));
+                    Document document = Document.parse(getGson().toJson(user));
                     mongoCollection.insertOne(document);
                 }
             }

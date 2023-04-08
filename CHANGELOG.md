@@ -1,3 +1,11 @@
+# [9.7.0](https://github.com/GeorgeV220/API/compare/v9.6.0...v9.7.0) (2023-04-08)
+
+
+### Features
+
+* **PairDocument:** Changed from ObjectMap.Pair<Object, Object> to ObjectMap.Pair<K, V> ([d1f23bc](https://github.com/GeorgeV220/API/commit/d1f23bce1fa55f6a93cbe0365865a9f672fc2ce3))
+* **UserManager:** New methods and deprecation ([e6bbb19](https://github.com/GeorgeV220/API/commit/e6bbb196b97c263d704a46ced06b719695256b2f))
+
 # [9.6.0](https://github.com/GeorgeV220/API/compare/v9.5.1...v9.6.0) (2023-04-08)
 
 

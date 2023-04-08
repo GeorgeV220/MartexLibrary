@@ -8,6 +8,7 @@ import com.georgev22.library.maps.utilities.ObjectMapSerializerDeserializer;
 import com.google.common.annotations.Beta;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -23,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -78,16 +78,51 @@ public class UserManager {
         }
     }
 
-    public UserManager initializeGsonBuilder() {
+    /**
+     * Adds a type adapter for ObjectMap to the GsonBuilder. Deprecated; use {@link #registerTypeAdaptersByClass} or {@link #registerTypeAdaptersByTypeToken} instead.
+     * <p>
+     * This method will not be removed, but it is recommended to use the newer methods for registering type adapters.
+     *
+     * @return this UserManager
+     * @deprecated Use {@link #registerTypeAdaptersByClass(ObjectMap.PairDocument)} or {@link #registerTypeAdaptersByTypeToken(ObjectMap.PairDocument)} instead.
+     */
+    @Deprecated
+    public UserManager registerObjectMapSerializer() {
         gsonBuilder.registerTypeAdapter(ObjectMap.class, new ObjectMapSerializerDeserializer());
         return this;
     }
 
-    public UserManager registerTypeAdapters(@NotNull List<ObjectMap.Pair<Class<?>, Object>> pairs) {
-        pairs.forEach(pair -> gsonBuilder.registerTypeAdapter(pair.key(), pair.value()));
+    /**
+     * Registers type adapters for the specified classes using the GsonBuilder.
+     *
+     * @param pairs a PairDocument containing the Class and type adapter pairs to register
+     * @return this UserManager
+     */
+    public UserManager registerTypeAdaptersByClass(@NotNull ObjectMap.PairDocument<Class<?>, Object> pairs) {
+        for (ObjectMap.Pair<Class<?>, Object> pair : pairs.objectPairs()) {
+            gsonBuilder.registerTypeAdapter(pair.key(), pair.value());
+        }
         return this;
     }
 
+    /**
+     * Registers type adapters for the specified TypeTokens using the GsonBuilder.
+     *
+     * @param pairs a PairDocument containing the TypeToken and type adapter pairs to register
+     * @return this UserManager
+     */
+    public UserManager registerTypeAdaptersByTypeToken(@NotNull ObjectMap.PairDocument<TypeToken<?>, Object> pairs) {
+        for (ObjectMap.Pair<TypeToken<?>, Object> pair : pairs.objectPairs()) {
+            gsonBuilder.registerTypeAdapter(pair.key().getType(), pair.value());
+        }
+        return this;
+    }
+
+    /**
+     * Builds a new Gson instance with the registered type adapters and pretty printing enabled.
+     *
+     * @return the new Gson instance
+     */
     public Gson getGson() {
         return gsonBuilder.setPrettyPrinting().create();
     }

@@ -3,6 +3,7 @@ package com.georgev22.library.utilities;
 import com.georgev22.library.database.mongo.MongoDB;
 import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.maps.utilities.ObjectMapSerializerDeserializer;
 import com.google.common.annotations.Beta;
 import com.google.gson.Gson;
@@ -43,7 +44,7 @@ public class UserManager {
     private final MongoDB mongoDB;
     private final String collection;
     private final Type type;
-    private final ObjectMap<UUID, User> loadedUsers = new ConcurrentObjectMap<>();
+    private final ObjectMap<UUID, User> loadedUsers = new ObservableObjectMap<>();
 
     /**
      * Constructor for the UserManager class

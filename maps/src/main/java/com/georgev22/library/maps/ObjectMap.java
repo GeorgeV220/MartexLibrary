@@ -449,7 +449,7 @@ public interface ObjectMap<K, V> extends Map<K, V> {
         }
     }
 
-    record PairDocument(ObjectMap.Pair<Object, Object>... objectPairs) implements Serializable {
+    record PairDocument<K, V>(ObjectMap.Pair<K, V>... objectPairs) implements Serializable {
 
 
         @SafeVarargs
@@ -653,7 +653,7 @@ public interface ObjectMap<K, V> extends Map<K, V> {
                     value.set(objectPair.value());
                 }
             });
-            return value == null ? null : (T) value.get();
+            return value.get() == null ? null : (T) value.get();
         }
 
         @Contract(pure = true)

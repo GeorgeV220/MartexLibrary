@@ -1,3 +1,12 @@
+# [9.6.0](https://github.com/GeorgeV220/API/compare/v9.5.1...v9.6.0) (2023-04-08)
+
+
+### Features
+
+* **ObservableObjectMap:** Added ObservableObjectMap ([049f676](https://github.com/GeorgeV220/API/commit/049f67617f867c275c5c3f7568cfec2f31c80244))
+* **UserManager:** Changed ConcurrentObjectMap to ObservableObjectMap ([24fa0a4](https://github.com/GeorgeV220/API/commit/24fa0a4095c84698bf5b0ed35576ce795a4d058c))
+* **UserManager:** Gson changes ([6a6a66a](https://github.com/GeorgeV220/API/commit/6a6a66a6b98c9697d6e6a1664b2b0b399d7e2ac9))
+
 ## [9.5.1](https://github.com/GeorgeV220/API/compare/v9.5.0...v9.5.1) (2023-03-16)
 
 

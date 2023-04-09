@@ -392,6 +392,14 @@ public class UserManager {
         public <T> T getCustomData(String key) {
             return (T) customData.get(key);
         }
+
+        @Override
+        public String toString() {
+            return "User{" +
+                    "userId=" + userId +
+                    ", customData=" + customData +
+                    '}';
+        }
     }
 
     /**

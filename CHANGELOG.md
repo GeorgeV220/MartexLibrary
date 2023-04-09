@@ -1,3 +1,16 @@
+# [9.8.0](https://github.com/GeorgeV220/API/compare/v9.7.0...v9.8.0) (2023-04-09)
+
+
+### Bug Fixes
+
+* **UserManager:** Changed loadedUsers to ObservableObjectMap ([7c9f424](https://github.com/GeorgeV220/API/commit/7c9f424356c1b369a649863f8187815c9131dcbb))
+
+
+### Features
+
+* **ObservableObjectMap:** JavaDocs and new methods ([c633b34](https://github.com/GeorgeV220/API/commit/c633b340ddc2810c748137029f1b78e543364263))
+* **UserManager:** Added UserManager.User.toString ([b44870b](https://github.com/GeorgeV220/API/commit/b44870b6106d9a2170cee3807ac5b3510172a3c0))
+
 # [9.7.0](https://github.com/GeorgeV220/API/compare/v9.6.0...v9.7.0) (2023-04-08)
 
 

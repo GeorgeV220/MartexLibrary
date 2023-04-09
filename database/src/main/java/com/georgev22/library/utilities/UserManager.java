@@ -44,7 +44,7 @@ public class UserManager {
     private final MongoDB mongoDB;
     private final String collection;
     private final Type type;
-    private final ObjectMap<UUID, User> loadedUsers = new ObservableObjectMap<>();
+    private final ObservableObjectMap<UUID, User> loadedUsers = new ObservableObjectMap<>();
 
     /**
      * Constructor for the UserManager class
@@ -325,7 +325,7 @@ public class UserManager {
      *
      * @return the map of loaded users with UUID as the key and User object as the value
      */
-    public ObjectMap<UUID, User> getLoadedUsers() {
+    public ObservableObjectMap<UUID, User> getLoadedUsers() {
         return loadedUsers;
     }
 

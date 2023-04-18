@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 
 public final class ExtensionDescriptionFile {
     private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9 _.-]+$");
+    private static ExtensionAwareness extensionAwareness;
     private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> new Yaml(new SafeConstructor() {
         {
             yamlConstructors.put(null, new AbstractConstruct() {
@@ -30,7 +31,7 @@ public final class ExtensionDescriptionFile {
                     if (!node.getTag().startsWith("!@")) {
                         return SafeConstructor.undefinedConstructor.construct(node);
                     }
-                    return new ExtensionAwareness() {
+                    return extensionAwareness = new ExtensionAwareness() {
                         @Override
                         public String toString() {
                             return node.toString();
@@ -49,6 +50,11 @@ public final class ExtensionDescriptionFile {
             }
         }
     }));
+
+    public static ExtensionAwareness getAwareness() {
+        return extensionAwareness;
+    }
+
     String rawName = null;
     private String name = null;
     private List<String> provides = ImmutableList.of();
@@ -72,7 +78,7 @@ public final class ExtensionDescriptionFile {
     }
 
     /**
-     * Loads a ExtensionDescriptionFile from the specified reader
+     * Loads an ExtensionDescriptionFile from the specified reader
      *
      * @param reader The reader
      * @throws InvalidDescriptionException If the ExtensionDescriptionFile is

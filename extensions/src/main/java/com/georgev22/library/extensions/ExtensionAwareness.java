@@ -16,7 +16,7 @@ public interface ExtensionAwareness {
      */
     enum Flags implements ExtensionAwareness {
         /**
-         * This specifies that all (text) resources stored in a extension's jar
+         * This specifies that all (text) resources stored in an extension's jar
          * use UTF-8 encoding.
          *
          * @deprecated all extensions are now assumed to be UTF-8 aware.

@@ -51,7 +51,7 @@ public class UserManager {
      *
      * @param type           the type of storage system to be used (JSON, SQL or MONGODB)
      * @param obj            the object to be used for storage (File for JSON, Connection for SQL and MongoDB for MONGODB)
-     * @param collectionName the name of the collection to be used for MONGODB, null for other types
+     * @param collectionName the name of the collection to be used for MONGODB and SQL, null for other types
      */
     public UserManager(@NotNull Type type, Object obj, @Nullable String collectionName) {
         this.type = type;
@@ -93,7 +93,7 @@ public class UserManager {
     }
 
     /**
-     * Registers type adapters for the specified classes using the GsonBuilder.
+     * Register type adapters for the specified classes using the GsonBuilder.
      *
      * @param pairs a PairDocument containing the Class and type adapter pairs to register
      * @return this UserManager

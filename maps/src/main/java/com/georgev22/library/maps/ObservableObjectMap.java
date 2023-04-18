@@ -3,10 +3,7 @@ package com.georgev22.library.maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
@@ -27,6 +24,24 @@ public class ObservableObjectMap<K, V> extends ConcurrentObjectMap<K, V> impleme
      */
     public void addListener(MapChangeListener<K, V> listener) {
         listeners.add(listener);
+    }
+
+    /**
+     * Removes a {@link MapChangeListener} to this map.
+     *
+     * @param listener the listener to be removed
+     */
+    public void removeListener(MapChangeListener<K, V> listener) {
+        listeners.remove(listener);
+    }
+
+    /**
+     * Returns an unmodifiable List of the registered MapChangeListeners.
+     *
+     * @return An unmodifiable List of the registered MapChangeListeners.
+     */
+    public List<MapChangeListener<K, V>> getListeners() {
+        return Collections.unmodifiableList(listeners);
     }
 
     /**

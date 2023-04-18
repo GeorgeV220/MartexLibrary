@@ -1,3 +1,10 @@
+## [9.9.2](https://github.com/GeorgeV220/API/compare/v9.9.1...v9.9.2) (2023-04-18)
+
+
+### Bug Fixes
+
+* **build:** Fixed build warnings and errors ([#95](https://github.com/GeorgeV220/API/issues/95)) ([057b0f3](https://github.com/GeorgeV220/API/commit/057b0f34e6c2148a291d11982db45716e09598de))
+
 ## [9.9.1](https://github.com/GeorgeV220/API/compare/v9.9.0...v9.9.1) (2023-04-18)
 
 

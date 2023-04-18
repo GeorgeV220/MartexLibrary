@@ -21,7 +21,7 @@ You can have your project depend on MartexLibrary as a dependency through the fo
         <dependency>
             <groupId>com.georgev22.library</groupId>
             <artifactId>{artifact}</artifactId>
-            <version>9.9.1</version>
+            <version>9.9.2</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -40,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.georgev22.library:{artifact}:9.9.1:all"
+    compileOnly "com.georgev22.library:{artifact}:9.9.2:all"
 }
 ```
 

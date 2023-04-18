@@ -1,3 +1,12 @@
+# [9.9.0](https://github.com/GeorgeV220/API/compare/v9.8.0...v9.9.0) (2023-04-18)
+
+
+### Features
+
+* **CompletableFutureManager:** Add utility class for managing CompletableFuture instances ([a03ef07](https://github.com/GeorgeV220/API/commit/a03ef07c935042da9496f546724f57b6cf3e5523))
+* **ObservableObjectMap:** Added methods to remove and retrieve MapChangeListeners ([99fa7cd](https://github.com/GeorgeV220/API/commit/99fa7cd9ee0afe60bd3296e20ea8ed691eadd26a))
+* **UserManager:** Update constructor for storage systems ([83d3eb4](https://github.com/GeorgeV220/API/commit/83d3eb4874c1325717fbf39047564868501efa59))
+
 # [9.8.0](https://github.com/GeorgeV220/API/compare/v9.7.0...v9.8.0) (2023-04-09)
 
 

@@ -1,3 +1,20 @@
+# [10.0.0](https://github.com/GeorgeV220/API/compare/v9.9.2...v10.0.0) (2023-05-02)
+
+
+### Bug Fixes
+
+* **build:** Fixed build warnings and errors ([88aa2c4](https://github.com/GeorgeV220/API/commit/88aa2c479ab85e98b34a6bb8f9e166598ab7dce5))
+
+
+### Features
+
+* **EntityManager:** Changed UserManager to EntityManager ([638f592](https://github.com/GeorgeV220/API/commit/638f592605b4cb9136e2d985522accf40013f3be))
+
+
+### BREAKING CHANGES
+
+* **EntityManager:** INCOMPATIBLE WITH THE PREVIOUS VERSION
+
 ## [9.9.2](https://github.com/GeorgeV220/API/compare/v9.9.1...v9.9.2) (2023-04-18)
 
 

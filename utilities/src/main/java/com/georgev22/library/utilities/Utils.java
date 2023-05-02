@@ -446,6 +446,88 @@ public final class Utils {
     }
 
     /**
+     * Serializes an object and saves it to the specified file path.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and saves the serialized data to the file
+     * specified by the given file path.
+     * </p>
+     *
+     * @param obj      the object to be serialized
+     * @param filePath the file path where the serialized data will be saved
+     * @throws IOException if there is an error accessing or writing to the file
+     */
+    public static void serializeObject(@NotNull Object obj, @NotNull String filePath) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        fileOutputStream.close();
+    }
+
+    /**
+     * Serializes an object and returns the serialized data as a string.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a string.
+     *
+     * @param obj the object to be serialized
+     * @return the serialized data as a string
+     * @throws IOException if there is an error during serialization
+     */
+    @Contract("_ -> new")
+    public static @NotNull String serializeObjectToString(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        byteArrayOutputStream.close();
+        return byteArrayOutputStream.toString(StandardCharsets.ISO_8859_1);
+    }
+
+    /**
+     * Deserializes an object from the specified file path.
+     * <p>
+     * Deserializes the object
+     * stored in the file specified by the given file path using the {@link ObjectInputStream} and
+     * returns the deserialized object.
+     *
+     * @param filePath the file path where the serialized object is stored
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the file
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObject(@NotNull String filePath) throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        fileInputStream.close();
+        return obj;
+    }
+
+    /**
+     * Deserializes an object from the specified serialized data.
+     * <p>
+     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
+     * deserialized object.
+     *
+     * @param serializedData the serialized object data as a string
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the serialized data
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObjectFromString(String serializedData) throws IOException, ClassNotFoundException {
+        byte[] byteArray = serializedData.getBytes(StandardCharsets.ISO_8859_1);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        byteArrayInputStream.close();
+        return obj;
+    }
+
+    /**
      * Converts a string list to string.
      *
      * @param stringList The String List to convert.

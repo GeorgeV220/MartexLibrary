@@ -1,6 +1,7 @@
 apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
 dependencies {
+    compileOnly 'org.jetbrains:annotations:24.0.0'
     compileOnly project(path: ':maps')
     compileOnly project(path: ':yaml')
 }

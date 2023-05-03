@@ -4,21 +4,14 @@ import com.georgev22.library.database.mongo.MongoDB;
 import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObservableObjectMap;
-import com.georgev22.library.maps.utilities.ObjectMapSerializerDeserializer;
-import com.google.common.annotations.Beta;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.mongodb.annotations.Beta;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,16 +21,13 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * The {@link EntityManager} class is responsible for managing {@link Entity} objects in a persistence storage.
- * It supports multiple storage types including MySQL, SQLite, PostgreSQL, MongoDB, and JSON.
+ * It supports multiple storage types including MySQL, SQLite, PostgreSQL, MongoDB, and FILE.
  * The class provides methods for checking if a {@link Entity} exists,
  * loading a {@link Entity}, and creating a {@link Entity}.
  *
  * @author <a href="https://github.com/GeorgeV220">GeorgeV220</a>
  */
 public class EntityManager {
-
-    private GsonBuilder gsonBuilder = new GsonBuilder();
-    private Gson gson;
     private final File entitiesDirectory;
     private final Connection connection;
     private final MongoDB mongoDB;
@@ -48,15 +38,15 @@ public class EntityManager {
     /**
      * Constructor for the EntityManager class
      *
-     * @param type           the type of storage system to be used (JSON, SQL or MONGODB)
-     * @param obj            the object to be used for storage (File for JSON, Connection for SQL and MongoDB for MONGODB)
+     * @param type           the type of storage system to be used (FILE, SQL or MONGODB)
+     * @param obj            the object to be used for storage (File for FILE, Connection for SQL and MongoDB for MONGODB)
      * @param collectionName the name of the collection to be used for MONGODB and SQL, null for other types
      */
     public EntityManager(@NotNull Type type, Object obj, @Nullable String collectionName) {
         this.type = type;
         this.collection = collectionName;
         switch (type) {
-            case JSON -> {
+            case FILE -> {
                 this.entitiesDirectory = (File) obj;
                 this.connection = null;
                 this.mongoDB = null;
@@ -83,55 +73,6 @@ public class EntityManager {
     }
 
     /**
-     * Adds a type adapter for ObjectMap to the GsonBuilder. Deprecated; use {@link #registerTypeAdaptersByClass} or {@link #registerTypeAdaptersByTypeToken} instead.
-     * <p>
-     * This method will not be removed, but it is recommended to use the newer methods for registering type adapters.
-     *
-     * @return this EntityManager
-     * @deprecated Use {@link #registerTypeAdaptersByClass(ObjectMap.PairDocument)} or {@link #registerTypeAdaptersByTypeToken(ObjectMap.PairDocument)} instead.
-     */
-    @Deprecated
-    public EntityManager registerObjectMapSerializer() {
-        gsonBuilder.registerTypeAdapter(ObjectMap.class, new ObjectMapSerializerDeserializer());
-        return this;
-    }
-
-    /**
-     * Register type adapters for the specified classes using the GsonBuilder.
-     *
-     * @param pairs a PairDocument containing the Class and type adapter pairs to register
-     * @return this EntityManager
-     */
-    public EntityManager registerTypeAdaptersByClass(@NotNull ObjectMap.PairDocument<Class<?>, Object> pairs) {
-        for (ObjectMap.Pair<Class<?>, Object> pair : pairs.objectPairs()) {
-            gsonBuilder.registerTypeAdapter(pair.key(), pair.value());
-        }
-        return this;
-    }
-
-    /**
-     * Register type adapters for the specified TypeTokens using the GsonBuilder.
-     *
-     * @param pairs a PairDocument containing the TypeToken and type adapter pairs to register
-     * @return this EntityManager
-     */
-    public EntityManager registerTypeAdaptersByTypeToken(@NotNull ObjectMap.PairDocument<TypeToken<?>, Object> pairs) {
-        for (ObjectMap.Pair<TypeToken<?>, Object> pair : pairs.objectPairs()) {
-            gsonBuilder.registerTypeAdapter(pair.key().getType(), pair.value());
-        }
-        return this;
-    }
-
-    /**
-     * Builds a new Gson instance with the registered type adapters and pretty printing enabled.
-     *
-     * @return the new Gson instance
-     */
-    public Gson getGson() {
-        return gsonBuilder.setPrettyPrinting().create();
-    }
-
-    /**
      * Loads the {@link Entity} with the specified ID
      *
      * @param entityId the {@link UUID} of the entity to be loaded
@@ -143,38 +84,39 @@ public class EntityManager {
                     if (exists) {
                         return CompletableFuture.supplyAsync(() -> {
                             switch (type) {
-                                case JSON -> {
-                                    try (FileReader reader = new FileReader(new File(entitiesDirectory, entityId + ".json"))) {
-                                        Entity entity = getGson().fromJson(reader, Entity.class);
+                                case FILE -> {
+                                    File file = new File(entitiesDirectory, entityId + ".entity");
+                                    try {
+                                        Entity entity = (Entity) Utils.deserializeObject(file.getAbsolutePath());
                                         loadedEntities.put(entityId, entity);
                                         return entity;
-                                    } catch (IOException e) {
+                                    } catch (IOException | ClassNotFoundException e) {
                                         throw new RuntimeException(e);
                                     }
                                 }
                                 case SQL -> {
-                                    String query = "SELECT entity_json FROM " + collection + " WHERE entity_id = ?";
+                                    String query = "SELECT entity FROM " + collection + " WHERE entity_id = ?";
                                     try {
                                         PreparedStatement statement = Objects.requireNonNull(connection).prepareStatement(query);
                                         statement.setString(1, entityId.toString());
                                         ResultSet resultSet = statement.executeQuery();
                                         if (resultSet.next()) {
-                                            String entityJson = resultSet.getString("entity_json");
+                                            String serializedEntity = resultSet.getString("entity");
                                             statement.close();
-                                            Entity entity = getGson().fromJson(entityJson, Entity.class);
+                                            Entity entity = (Entity) Utils.deserializeObjectFromString(serializedEntity);
                                             loadedEntities.put(entityId, entity);
                                             return entity;
                                         } else {
                                             throw new RuntimeException("No entity found with id: " + entityId);
                                         }
-                                    } catch (SQLException e) {
+                                    } catch (SQLException | IOException | ClassNotFoundException e) {
                                         throw new RuntimeException(e);
                                     }
                                 }
                                 case MONGODB -> {
                                     Document document = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
                                     if (document != null) {
-                                        Entity entity = getGson().fromJson(document.toJson(), Entity.class);
+                                        Entity entity = document.get("entity", Entity.class);
                                         loadedEntities.put(entityId, entity);
                                         return entity;
                                     } else {
@@ -201,19 +143,20 @@ public class EntityManager {
     public CompletableFuture<Void> save(Entity entity) {
         return CompletableFuture.runAsync(() -> {
             switch (type) {
-                case JSON -> {
-                    try (FileWriter writer = new FileWriter(new File(entitiesDirectory, entity.getId() + ".json"))) {
-                        getGson().toJson(entity, writer);
+                case FILE -> {
+                    File file = new File(entitiesDirectory, entity.getId() + ".entity");
+                    try {
+                        Utils.serializeObject(entity, file.getAbsolutePath());
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
                 case SQL -> exists(entity.getId()).thenAccept(result -> {
-                    String query = result ? "UPDATE " + collection + " SET entity_json = ? WHERE entity_id =  ?;" : "INSERT INTO " + collection + " (entity_id, entity_json) VALUES (?, ?)";
+                    String query = result ? "UPDATE " + collection + " SET entity = ? WHERE entity_id =  ?;" : "INSERT INTO " + collection + " (entity, entity_id) VALUES (?, ?)";
                     try {
                         PreparedStatement statement = Objects.requireNonNull(connection).prepareStatement(query);
-                        String entityJson = getGson().toJson(entity);
-                        statement.setString(1, entityJson);
+                        String serializedEntity = Utils.serialize(entity);
+                        statement.setString(1, serializedEntity);
                         statement.setString(2, entity.getId().toString());
                         statement.executeUpdate();
                         statement.close();
@@ -223,8 +166,12 @@ public class EntityManager {
                 });
                 case MONGODB -> {
                     MongoCollection<Document> mongoCollection = mongoDB.getCollection(collection);
-                    Document document = Document.parse(getGson().toJson(entity));
-                    mongoCollection.insertOne(document);
+                    try {
+                        Document document = Document.parse(Utils.serializeObjectToString(entity));
+                        mongoCollection.insertOne(document);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
@@ -254,8 +201,8 @@ public class EntityManager {
     public CompletableFuture<Boolean> exists(UUID entityId) {
         return CompletableFuture.supplyAsync(() -> {
             switch (type) {
-                case JSON -> {
-                    return new File(entitiesDirectory, entityId + ".json").exists();
+                case FILE -> {
+                    return new File(entitiesDirectory, entityId + ".entity").exists();
                 }
                 case SQL -> {
                     return executeSQLQuery(entityId);
@@ -318,10 +265,10 @@ public class EntityManager {
     public void loadAll() {
         List<UUID> entityIDs = new ArrayList<>();
         switch (type) {
-            case JSON -> {
-                File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".json"));
+            case FILE -> {
+                File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".entity"));
                 if (files != null) {
-                    Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".json", ""))));
+                    Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".entity", ""))));
                 }
             }
             case SQL -> {
@@ -359,7 +306,7 @@ public class EntityManager {
     /**
      * A class representing an entity in the system.
      */
-    public static class Entity {
+    public static class Entity implements Serializable {
         private final UUID entityId;
         private ObjectMap<String, Object> customData;
 
@@ -434,9 +381,9 @@ public class EntityManager {
      */
     public enum Type {
         /**
-         * Use a directory of JSON files for storage.
+         * Use a directory of FILE files for storage.
          */
-        JSON,
+        FILE,
 
         /**
          * Use a SQL database for storage.

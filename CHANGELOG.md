@@ -1,3 +1,11 @@
+# [10.1.0](https://github.com/GeorgeV220/API/compare/v10.0.0...v10.1.0) (2023-05-03)
+
+
+### Features
+
+* **EntityManager:** Fix SQL and use the new (de)serializers ([caa98b5](https://github.com/GeorgeV220/API/commit/caa98b51e8cde4f8476e59d60eb304fb27af6136))
+* **Utils:** Added new methods to serialize/deserialize objects. ([38368d1](https://github.com/GeorgeV220/API/commit/38368d1064393ed4ae5e6aa6ee7cd9e072e0592a))
+
 # [10.0.0](https://github.com/GeorgeV220/API/compare/v9.9.2...v10.0.0) (2023-05-02)
 
 

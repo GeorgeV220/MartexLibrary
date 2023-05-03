@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,13 +28,14 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author <a href="https://github.com/GeorgeV220">GeorgeV220</a>
  */
-public class EntityManager {
+public class EntityManager<T extends EntityManager.Entity> {
     private final File entitiesDirectory;
     private final Connection connection;
     private final MongoDB mongoDB;
     private final String collection;
     private final Type type;
-    private final ObservableObjectMap<UUID, Entity> loadedEntities = new ObservableObjectMap<>();
+    private final Class<? extends Entity> entityClazz;
+    private final ObservableObjectMap<UUID, T> loadedEntities = new ObservableObjectMap<>();
 
     /**
      * Constructor for the EntityManager class
@@ -42,7 +44,7 @@ public class EntityManager {
      * @param obj            the object to be used for storage (File for FILE, Connection for SQL and MongoDB for MONGODB)
      * @param collectionName the name of the collection to be used for MONGODB and SQL, null for other types
      */
-    public EntityManager(@NotNull Type type, Object obj, @Nullable String collectionName) {
+    public EntityManager(@NotNull Type type, Object obj, @Nullable String collectionName, Class<? extends Entity> clazz) {
         this.type = type;
         this.collection = collectionName;
         switch (type) {
@@ -70,6 +72,7 @@ public class EntityManager {
                 this.mongoDB = null;
             }
         }
+        this.entityClazz = clazz;
     }
 
     /**
@@ -78,7 +81,7 @@ public class EntityManager {
      * @param entityId the {@link UUID} of the entity to be loaded
      * @return a {@link CompletableFuture} containing the loaded {@link Entity} object
      */
-    public CompletableFuture<Entity> load(UUID entityId) {
+    public CompletableFuture<T> load(UUID entityId) {
         return exists(entityId)
                 .thenCompose(exists -> {
                     if (exists) {
@@ -87,7 +90,7 @@ public class EntityManager {
                                 case FILE -> {
                                     File file = new File(entitiesDirectory, entityId + ".entity");
                                     try {
-                                        Entity entity = (Entity) Utils.deserializeObject(file.getAbsolutePath());
+                                        T entity = (T) Utils.deserializeObject(file.getAbsolutePath());
                                         loadedEntities.put(entityId, entity);
                                         return entity;
                                     } catch (IOException | ClassNotFoundException e) {
@@ -103,7 +106,7 @@ public class EntityManager {
                                         if (resultSet.next()) {
                                             String serializedEntity = resultSet.getString("entity");
                                             statement.close();
-                                            Entity entity = (Entity) Utils.deserializeObjectFromString(serializedEntity);
+                                            T entity = (T) Utils.deserializeObjectFromString(serializedEntity);
                                             loadedEntities.put(entityId, entity);
                                             return entity;
                                         } else {
@@ -116,7 +119,7 @@ public class EntityManager {
                                 case MONGODB -> {
                                     Document document = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
                                     if (document != null) {
-                                        Entity entity = document.get("entity", Entity.class);
+                                        T entity = (T) document.get("entity");
                                         loadedEntities.put(entityId, entity);
                                         return entity;
                                     } else {
@@ -124,7 +127,12 @@ public class EntityManager {
                                     }
                                 }
                                 default -> {
-                                    return new Entity(entityId);
+                                    try {
+                                        return (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
+                                    } catch (InstantiationException | IllegalAccessException |
+                                             InvocationTargetException | NoSuchMethodException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             }
                         });
@@ -183,11 +191,17 @@ public class EntityManager {
      * @param entityId the {@link UUID} of the entity to create
      * @return a {@link CompletableFuture} that returns the newly created {@link Entity}
      */
-    public CompletableFuture<Entity> createEntity(UUID entityId) {
-        Entity entity = new Entity(entityId);
+    public CompletableFuture<T> createEntity(UUID entityId) {
+        T entity;
+        try {
+            entity = (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
         return save(entity)
                 .thenApply(aVoid -> {
-                    loadedEntities.put(entityId, entity);
+                    loadedEntities.append(entityId, entity);
                     return entity;
                 });
     }
@@ -244,7 +258,7 @@ public class EntityManager {
      * @param entityId the {@link UUID} of the entity to retrieve
      * @return a {@link CompletableFuture} that will contain the {@link Entity} with the given id
      */
-    public CompletableFuture<Entity> getEntity(UUID entityId) {
+    public CompletableFuture<T> getEntity(UUID entityId) {
         if (loadedEntities.containsKey(entityId)) {
             return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
@@ -299,7 +313,7 @@ public class EntityManager {
      *
      * @return the map of loaded entities with UUID as the key and Entity object as the value
      */
-    public ObservableObjectMap<UUID, Entity> getLoadedEntities() {
+    public ObservableObjectMap<UUID, T> getLoadedEntities() {
         return loadedEntities;
     }
 

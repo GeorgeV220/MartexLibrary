@@ -1,3 +1,10 @@
+## [10.1.1](https://github.com/GeorgeV220/API/compare/v10.1.0...v10.1.1) (2023-05-03)
+
+
+### Bug Fixes
+
+* **EntityManager:** Class cast exception ([278056c](https://github.com/GeorgeV220/API/commit/278056cec4f4b0bb0e695a0f4d58280cfafd69d4))
+
 # [10.1.0](https://github.com/GeorgeV220/API/compare/v10.0.0...v10.1.0) (2023-05-03)
 
 

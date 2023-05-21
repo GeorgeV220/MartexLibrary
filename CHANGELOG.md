@@ -1,3 +1,10 @@
+## [10.1.2](https://github.com/GeorgeV220/API/compare/v10.1.1...v10.1.2) (2023-05-21)
+
+
+### Bug Fixes
+
+* Improve JavaExtensionClassLoader and JavaExtensionLoader ([2b40e6d](https://github.com/GeorgeV220/API/commit/2b40e6dd83500be2fb35e5ee070342a098b29f9b))
+
 ## [10.1.1](https://github.com/GeorgeV220/API/compare/v10.1.0...v10.1.1) (2023-05-03)
 
 

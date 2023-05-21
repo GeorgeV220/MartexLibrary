@@ -2,10 +2,7 @@ package com.georgev22.library.extensions.java;
 
 import com.georgev22.library.exceptions.InvalidDescriptionException;
 import com.georgev22.library.exceptions.InvalidExtensionException;
-import com.georgev22.library.extensions.Extension;
-import com.georgev22.library.extensions.ExtensionDescriptionFile;
-import com.georgev22.library.extensions.ExtensionLoader;
-import com.georgev22.library.extensions.ExtensionsImpl;
+import com.georgev22.library.extensions.*;
 import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
@@ -13,6 +10,7 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.yaml.snakeyaml.error.YAMLException;
 
@@ -35,7 +33,7 @@ public final class JavaExtensionLoader implements ExtensionLoader {
     private final List<ExtensionClassLoader> loaders = new CopyOnWriteArrayList<>();
     private final ObjectMap<String, Extension> extensionObjectMap = new ConcurrentObjectMap<>();
 
-    private final ExtensionsImpl extensionsImpl;
+    final ExtensionsImpl extensionsImpl;
 
     /**
      * This class was not meant to be constructed explicitly
@@ -168,6 +166,17 @@ public final class JavaExtensionLoader implements ExtensionLoader {
     @NotNull
     public Pattern[] getExtensionFileFilters() {
         return fileFilters.clone();
+    }
+
+    @Nullable
+    Class<?> getClassByName(final String name, boolean resolve, ExtensionDescriptionFile description) {
+        for (ExtensionClassLoader loader : loaders) {
+            try {
+                return loader.loadClass0(name, resolve, false);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        return null;
     }
 
     @Override

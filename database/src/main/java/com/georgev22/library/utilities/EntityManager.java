@@ -119,9 +119,14 @@ public class EntityManager<T extends EntityManager.Entity> {
                                 case MONGODB -> {
                                     Document document = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
                                     if (document != null) {
-                                        T entity = (T) document.get("entity");
-                                        loadedEntities.put(entityId, entity);
-                                        return entity;
+                                        String serializedEntity = document.getString("entity");
+                                        try {
+                                            T entity = (T) Utils.deserializeObjectFromString(serializedEntity);
+                                            loadedEntities.put(entityId, entity);
+                                            return entity;
+                                        } catch (IOException | ClassNotFoundException e) {
+                                            throw new RuntimeException(e);
+                                        }
                                     } else {
                                         throw new RuntimeException("No entity found with id: " + entityId);
                                     }
@@ -163,12 +168,12 @@ public class EntityManager<T extends EntityManager.Entity> {
                     String query = result ? "UPDATE " + collection + " SET entity = ? WHERE entity_id =  ?;" : "INSERT INTO " + collection + " (entity, entity_id) VALUES (?, ?)";
                     try {
                         PreparedStatement statement = Objects.requireNonNull(connection).prepareStatement(query);
-                        String serializedEntity = Utils.serialize(entity);
+                        String serializedEntity = Utils.serializeObjectToString(entity);
                         statement.setString(1, serializedEntity);
                         statement.setString(2, entity.getId().toString());
                         statement.executeUpdate();
                         statement.close();
-                    } catch (SQLException e) {
+                    } catch (SQLException | IOException e) {
                         throw new RuntimeException(e);
                     }
                 });

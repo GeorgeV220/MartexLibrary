@@ -349,7 +349,7 @@ public class EntityManager<T extends EntityManager.Entity> {
         public Entity(UUID entityId) {
             this.entityId = entityId;
             this.customData = new ConcurrentObjectMap<>();
-            this.customData.append("entity_id", entityId);
+            this.customData.append("entity_id", entityId.toString());
         }
 
         /**

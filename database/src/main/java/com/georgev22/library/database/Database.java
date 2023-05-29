@@ -238,13 +238,13 @@ public abstract class Database {
             if (notNull("column", column).equals(metaData.getColumnName(i))) {
                 isMyColumnPresent = true;
             }
-            if (StringUtils.split(notNull("column", column), "(")[0].equals(metaData.getColumnTypeName(i))) {
+            if (type.equals(metaData.getColumnTypeName(i))) {
                 isMyColumnTypeCorrect = true;
             }
         }
 
         if (!isMyColumnPresent) {
-            updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` ADD `" + column + "` " + notNull("type", type) + ";");
+            updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` ADD COLUMN `" + column + "` " + notNull("type", type) + ";");
         } else {
             if (!isMyColumnTypeCorrect) {
                 updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` MODIFY COLUMN `" + column + "` " + notNull("type", type) + ";");
@@ -265,37 +265,86 @@ public abstract class Database {
     }
 
     /**
-     * Create a table.
+     * Creates a table in the database with the specified name and columns.
      *
-     * @param tableName  The name of the table
-     * @param columnsMap The map that contains the columns with their type
+     * @param tableName  the name of the table to create
+     * @param columnsMap a map containing the column names and their types with optional default values
      * @throws SQLException           if a database access error occurs
-     * @throws ClassNotFoundException if the driver class does not exist
+     * @throws ClassNotFoundException if the specified database driver class cannot be found
      */
     public void createTable(@NotNull String tableName, @NotNull ObjectMap<String, ObjectMap.Pair<String, String>> columnsMap) throws SQLException, ClassNotFoundException {
-        StringBuilder stringBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + notNull("tableName", tableName) + "` (\n ");
-        ObjectMap<String, String> tableMap = new HashObjectMap<>();
-        Iterator<Map.Entry<String, ObjectMap.Pair<String, String>>> columnIterator = notNull("columnsMap", columnsMap).entrySet().iterator();
-        while (columnIterator.hasNext()) {
-            Map.Entry<String, ObjectMap.Pair<String, String>> entry = columnIterator.next();
-            stringBuilder.append("`").append(entry.getKey()).append("` ").append(entry.getValue().key()).append(" DEFAULT ").append(entry.getValue().value());
-            tableMap.append(entry.getKey(), entry.getValue().key() + " DEFAULT " + entry.getValue().value());
-            if (columnIterator.hasNext()) {
-                stringBuilder.append(",\n");
-            }
-        }
-        stringBuilder.append("\n)");
-        updateSQL(stringBuilder.toString());
+        StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + tableName + "` (");
 
-        tableMap.forEach((columnName, type) -> {
+        for (Map.Entry<String, ObjectMap.Pair<String, String>> entry : columnsMap.entrySet()) {
+            String columnName = entry.getKey();
+            ObjectMap.Pair<String, String> columnDetails = entry.getValue();
+            String columnType = columnDetails.key();
+            String defaultValue = columnDetails.value();
+
+            queryBuilder.append("`").append(columnName).append("` ").append(columnType);
+
+            if (defaultValue != null && !defaultValue.isEmpty()) {
+                queryBuilder.append(" DEFAULT ").append(defaultValue);
+            }
+
+            queryBuilder.append(", ");
+        }
+
+        queryBuilder.setLength(queryBuilder.length() - 2);
+        queryBuilder.append(");");
+
+        updateSQL(queryBuilder.toString());
+
+        columnsMap.forEach((columnName, columnDetails) -> {
             try {
-                if (!(this instanceof SQLite))
-                    checkColumn(notNull("tableName", tableName), columnName, type);
+                checkColumn(tableName, columnName, columnDetails.key());
             } catch (SQLException | ClassNotFoundException exception) {
                 exception.printStackTrace();
             }
         });
     }
+
+
+    public String buildInsertStatement(String tableName, Map<String, Object> columnValues) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder columnsBuilder = new StringBuilder();
+        StringBuilder valuesBuilder = new StringBuilder();
+
+        sqlBuilder.append("INSERT INTO ").append(tableName);
+
+        for (String column : columnValues.keySet()) {
+            columnsBuilder.append(column).append(", ");
+            valuesBuilder.append("?, ");
+        }
+
+        columnsBuilder.setLength(columnsBuilder.length() - 2);
+        valuesBuilder.setLength(valuesBuilder.length() - 2);
+
+        sqlBuilder.append(" (").append(columnsBuilder).append(")");
+        sqlBuilder.append(" VALUES (").append(valuesBuilder).append(")");
+
+        return sqlBuilder.toString();
+    }
+
+    public String buildUpdateStatement(String tableName, Map<String, Object> columnValues, String condition) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder setBuilder = new StringBuilder();
+
+        sqlBuilder.append("UPDATE ").append(tableName).append(" SET ");
+
+        for (String column : columnValues.keySet()) {
+            setBuilder.append(column).append(" = ?, ");
+        }
+
+        setBuilder.setLength(setBuilder.length() - 2);
+
+        sqlBuilder.append(setBuilder);
+
+        sqlBuilder.append(" WHERE ").append(condition);
+
+        return sqlBuilder.toString();
+    }
+
 
     @Override
     public boolean equals(Object o) {

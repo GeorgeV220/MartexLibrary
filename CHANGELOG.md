@@ -1,3 +1,10 @@
+## [10.2.1](https://github.com/GeorgeV220/API/compare/v10.2.0...v10.2.1) (2023-05-29)
+
+
+### Bug Fixes
+
+* **database:** Fixed column type check and handling for SQLite ([b90cc72](https://github.com/GeorgeV220/API/commit/b90cc7261c7fc3fb603eb9e821a1958b9ff8b012))
+
 # [10.2.0](https://github.com/GeorgeV220/API/compare/v10.1.4...v10.2.0) (2023-05-29)
 
 

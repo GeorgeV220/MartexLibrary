@@ -11,6 +11,8 @@ import java.sql.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
@@ -228,8 +230,8 @@ public abstract class Database {
      * @throws SQLException if a database access error occurs
      */
     public void checkColumn(@NotNull String tableName, @NotNull String column, @NotNull String type) throws SQLException, ClassNotFoundException {
-        ResultSet resultSet = querySQL("SELECT * FROM `" + notNull("tableName", tableName) + "`;");
-        ResultSetMetaData metaData = resultSet.getMetaData();
+        ResultSet set = querySQL("SELECT * FROM `" + notNull("tableName", tableName) + "`;");
+        ResultSetMetaData metaData = set.getMetaData();
         int rowCount = metaData.getColumnCount();
 
         boolean isMyColumnPresent = false;
@@ -238,7 +240,7 @@ public abstract class Database {
             if (notNull("column", column).equals(metaData.getColumnName(i))) {
                 isMyColumnPresent = true;
             }
-            if (type.equals(metaData.getColumnTypeName(i))) {
+            if (type.replaceAll("\\(.*\\)", "").equals(metaData.getColumnTypeName(i))) {
                 isMyColumnTypeCorrect = true;
             }
         }
@@ -247,7 +249,35 @@ public abstract class Database {
             updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` ADD COLUMN `" + column + "` " + notNull("type", type) + ";");
         } else {
             if (!isMyColumnTypeCorrect) {
-                updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` MODIFY COLUMN `" + column + "` " + notNull("type", type) + ";");
+                if (this instanceof SQLite) {
+                    String getTableQuery = "SELECT sql FROM sqlite_master WHERE type='table' AND name='" + tableName + "'";
+                    ResultSet resultSet = querySQL(getTableQuery);
+                    String tableCreationQuery = resultSet.getString("sql");
+
+                    String oldColumnType = null;
+                    Pattern pattern = Pattern.compile(column + "\\s+(\\w+)");
+                    Matcher matcher = pattern.matcher(tableCreationQuery);
+                    if (matcher.find()) {
+                        oldColumnType = matcher.group(1);
+                    }
+
+                    if (oldColumnType != null) {
+                        String modifiedTableCreationQuery = tableCreationQuery.replace(column + " " + oldColumnType, column + " " + type);
+
+                        String renameTableQuery = "ALTER TABLE " + tableName + " RENAME TO temp_" + tableName;
+                        updateSQL(renameTableQuery);
+
+                        updateSQL(modifiedTableCreationQuery);
+
+                        String migrateDataQuery = "INSERT INTO " + tableName + " SELECT * FROM temp_" + tableName;
+                        updateSQL(migrateDataQuery);
+
+                        String dropTempTableQuery = "DROP TABLE temp_" + tableName;
+                        updateSQL(dropTempTableQuery);
+                    }
+                } else {
+                    updateSQL("ALTER TABLE `" + notNull("tableName", tableName) + "` MODIFY COLUMN `" + column + "` " + notNull("type", type) + ";");
+                }
             }
         }
     }

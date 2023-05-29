@@ -89,7 +89,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                     File file = new File(entitiesDirectory, entityId + ".entity");
                                     try {
                                         T entity = (T) Utils.deserializeObject(file.getAbsolutePath());
-                                        loadedEntities.put(entityId, entity);
+                                        loadedEntities.append(entityId, entity);
                                         return entity;
                                     } catch (IOException | ClassNotFoundException e) {
                                         throw new RuntimeException(e);
@@ -111,6 +111,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                             Object columnValue = Utils.deserializeObjectFromString(resultSet.getString(columnName));
                                             entity.addCustomData(columnName, columnValue);
                                         }
+                                        loadedEntities.append(entityId, entity);
                                         return entity;
                                     } catch (InstantiationException | IllegalAccessException |
                                              InvocationTargetException | NoSuchMethodException | SQLException |
@@ -124,7 +125,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                         String serializedEntity = document.getString("entity");
                                         try {
                                             T entity = (T) Utils.deserializeObjectFromString(serializedEntity);
-                                            loadedEntities.put(entityId, entity);
+                                            loadedEntities.append(entityId, entity);
                                             return entity;
                                         } catch (IOException | ClassNotFoundException e) {
                                             throw new RuntimeException(e);

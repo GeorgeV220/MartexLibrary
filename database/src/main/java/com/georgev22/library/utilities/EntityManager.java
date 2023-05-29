@@ -289,7 +289,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                 String query = "SELECT entity_id FROM " + collection;
                 try {
                     PreparedStatement preparedStatement = connection.prepareStatement(query);
-                    ResultSet rs = preparedStatement.executeQuery(query);
+                    ResultSet rs = preparedStatement.executeQuery();
                     while (rs.next()) {
                         entityIDs.add(UUID.fromString(rs.getString("entity_id")));
                     }

@@ -1,3 +1,10 @@
+## [10.2.3](https://github.com/GeorgeV220/API/compare/v10.2.2...v10.2.3) (2023-05-29)
+
+
+### Bug Fixes
+
+* **database:** Removed entity_id from the entity contructor ([c85507c](https://github.com/GeorgeV220/API/commit/c85507c77020949397d0db24b4fd136215b847b1))
+
 ## [10.2.2](https://github.com/GeorgeV220/API/compare/v10.2.1...v10.2.2) (2023-05-29)
 
 

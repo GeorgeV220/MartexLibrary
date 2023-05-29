@@ -1,3 +1,11 @@
+# [10.2.0](https://github.com/GeorgeV220/API/compare/v10.1.4...v10.2.0) (2023-05-29)
+
+
+### Features
+
+* **database:** Simplify createTable method and add insert and update statement builders ([b15e95d](https://github.com/GeorgeV220/API/commit/b15e95d1a6f91111ff76b2cdfc054dddb0f6f9f1))
+* **db:** Simplify createTable method and add insert/update builders ([6321536](https://github.com/GeorgeV220/API/commit/63215360670cf0344e93521c97fcf875f9bda61f)), closes [#102](https://github.com/GeorgeV220/API/issues/102)
+
 ## [10.1.4](https://github.com/GeorgeV220/API/compare/v10.1.3...v10.1.4) (2023-05-29)
 
 

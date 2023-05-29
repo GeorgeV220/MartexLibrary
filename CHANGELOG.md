@@ -1,3 +1,10 @@
+## [10.1.4](https://github.com/GeorgeV220/API/compare/v10.1.3...v10.1.4) (2023-05-29)
+
+
+### Bug Fixes
+
+* entity serialization and deserialization ([574d94c](https://github.com/GeorgeV220/API/commit/574d94ca470b48aaa10edc31fd4a3c93da978803))
+
 ## [10.1.3](https://github.com/GeorgeV220/API/compare/v10.1.2...v10.1.3) (2023-05-29)
 
 

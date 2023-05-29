@@ -1,3 +1,10 @@
+## [10.1.3](https://github.com/GeorgeV220/API/compare/v10.1.2...v10.1.3) (2023-05-29)
+
+
+### Bug Fixes
+
+* Remove unnecessary argument in executeQuery() call ([b148d37](https://github.com/GeorgeV220/API/commit/b148d373d9f73ea0ddc17f802cf0dd89eea299b7))
+
 ## [10.1.2](https://github.com/GeorgeV220/API/compare/v10.1.1...v10.1.2) (2023-05-21)
 
 

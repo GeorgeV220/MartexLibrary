@@ -89,7 +89,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                     File file = new File(entitiesDirectory, entityId + ".entity");
                                     try {
                                         T entity = (T) Utils.deserializeObject(file.getAbsolutePath());
-                                        loadedEntities.put(entityId, entity);
+                                        loadedEntities.append(entityId, entity);
                                         return entity;
                                     } catch (IOException | ClassNotFoundException e) {
                                         throw new RuntimeException(e);
@@ -111,6 +111,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                             Object columnValue = Utils.deserializeObjectFromString(resultSet.getString(columnName));
                                             entity.addCustomData(columnName, columnValue);
                                         }
+                                        loadedEntities.append(entityId, entity);
                                         return entity;
                                     } catch (InstantiationException | IllegalAccessException |
                                              InvocationTargetException | NoSuchMethodException | SQLException |
@@ -124,7 +125,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                         String serializedEntity = document.getString("entity");
                                         try {
                                             T entity = (T) Utils.deserializeObjectFromString(serializedEntity);
-                                            loadedEntities.put(entityId, entity);
+                                            loadedEntities.append(entityId, entity);
                                             return entity;
                                         } catch (IOException | ClassNotFoundException e) {
                                             throw new RuntimeException(e);
@@ -229,7 +230,19 @@ public class EntityManager<T extends EntityManager.Entity> {
                     return new File(entitiesDirectory, entityId + ".entity").exists();
                 }
                 case SQL -> {
-                    return executeSQLQuery(entityId);
+                    String query = "SELECT count(*) FROM " + collection + " WHERE entity_id = ?";
+                    try {
+                        PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
+                        statement.setString(1, entityId.toString());
+                        ResultSet resultSet = statement.executeQuery();
+                        if (resultSet.next()) {
+                            return resultSet.getInt(1) > 0;
+                        } else {
+                            throw new RuntimeException("No entity found with id: " + entityId);
+                        }
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 case MONGODB -> {
                     Document entity = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId)).first();
@@ -240,22 +253,6 @@ public class EntityManager<T extends EntityManager.Entity> {
                 }
             }
         });
-    }
-
-    private @NotNull Boolean executeSQLQuery(@NotNull UUID entityId) {
-        String query = "SELECT count(*) FROM " + collection + " WHERE entity_id = ?";
-        try {
-            PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
-            statement.setString(1, entityId.toString());
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt(1) > 0;
-            } else {
-                throw new RuntimeException("No entity found with id: " + entityId);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

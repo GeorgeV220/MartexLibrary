@@ -2,7 +2,7 @@ package com.georgev22.library.database;
 
 public enum DatabaseType {
 
-    MYSQL("mySQL"),
+    MYSQL("MySQL"),
     SQLITE("SQLite"),
     POSTGRESQL("PostgreSQL"),
     MONGO("MongoDB");

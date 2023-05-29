@@ -168,7 +168,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                     }
                 }
                 case SQL -> exists(entity.getId()).thenAccept(result -> {
-                    String query = result ? database.buildUpdateStatement(collection, entity.customData, "entity_id = ?") : database.buildInsertStatement(collection, entity.customData);
+                    String query = result ? database.buildUpdateStatement(collection, entity.customData, "entity_id = ?") : database.buildInsertStatement(collection, entity.customData.append("entity_id", entity.entityId.toString()));
                     try {
                         PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
                         int i = 1;
@@ -346,7 +346,6 @@ public class EntityManager<T extends EntityManager.Entity> {
         public Entity(UUID entityId) {
             this.entityId = entityId;
             this.customData = new ConcurrentObjectMap<>();
-            this.customData.append("entity_id", entityId.toString());
         }
 
         /**

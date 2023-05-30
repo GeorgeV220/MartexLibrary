@@ -187,6 +187,95 @@ public class ConcurrentObjectMap<K, V> extends ConcurrentHashMap<K, V> implement
     }
 
     /**
+     * Removes the entry with the specified key from the ObjectMap.
+     *
+     * @param key the key of the entry to be removed
+     * @return the modified ObjectMap with the specified entry removed, or the original ObjectMap if the key was not found
+     */
+    @Override
+    public ObjectMap<K, V> removeEntry(K key) {
+        remove(key);
+        return this;
+    }
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap.
+     *
+     * @param map the map containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the specified keys removed
+     */
+    @Override
+    public ObjectMap<K, V> removeEntries(Map<K, V> map) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            remove(entry.getKey());
+        }
+        return this;
+    }
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap.
+     *
+     * @param map the ObjectMap containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed
+     */
+    @Override
+    public ObjectMap<K, V> removeEntries(ObjectMap<K, V> map) {
+        for (ObjectMap.Entry<K, V> entry : map.entrySet()) {
+            remove(entry.getKey());
+        }
+        return this;
+    }
+
+    /**
+     * Removes the entry with the specified key from the ObjectMap if the condition is true.
+     *
+     * @param key    the key of the entry to be removed
+     * @param ifTrue the condition to check before removing the entry
+     * @return the modified ObjectMap with the specified entry removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntryIfTrue(K key, boolean ifTrue) {
+        if (ifTrue) {
+            remove(key);
+        }
+        return this;
+    }
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap if the condition is true.
+     *
+     * @param map    the map containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified map removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntriesIfTrue(Map<K, V> map, boolean ifTrue) {
+        if (ifTrue) {
+            for (Map.Entry<K, V> entry : map.entrySet()) {
+                remove(entry.getKey());
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap if the condition is true.
+     *
+     * @param map    the ObjectMap containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntriesIfTrue(ObjectMap<K, V> map, boolean ifTrue) {
+        if (ifTrue) {
+            for (ObjectMap.Entry<K, V> entry : map.entrySet()) {
+                remove(entry.getKey());
+            }
+        }
+        return this;
+    }
+
+    /**
      * Gets the value of the given key as an Integer.
      *
      * @param key the key

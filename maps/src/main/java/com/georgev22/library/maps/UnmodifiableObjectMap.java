@@ -37,7 +37,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> append(K key, V value) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -51,7 +51,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> append(Map<K, V> map) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -65,7 +65,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> append(ObjectMap<K, V> map) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -81,7 +81,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(K key, V value, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -98,7 +98,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(K key, V valueIfTrue, V valueIfFalse, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -113,7 +113,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(Map<K, V> map, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -129,7 +129,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(Map<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -144,7 +144,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(ObjectMap<K, V> map, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -160,7 +160,76 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public ObjectMap<K, V> appendIfTrue(ObjectMap<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes the entry with the specified key from the ObjectMap.
+     *
+     * @param key the key of the entry to be removed
+     * @return the modified ObjectMap with the specified entry removed, or the original ObjectMap if the key was not found
+     */
+    @Override
+    public ObjectMap<K, V> removeEntry(K key) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap.
+     *
+     * @param map the map containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the specified keys removed
+     */
+    @Override
+    public ObjectMap<K, V> removeEntries(Map<K, V> map) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap.
+     *
+     * @param map the ObjectMap containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed
+     */
+    @Override
+    public ObjectMap<K, V> removeEntries(ObjectMap<K, V> map) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes the entry with the specified key from the ObjectMap if the condition is true.
+     *
+     * @param key    the key of the entry to be removed
+     * @param ifTrue the condition to check before removing the entry
+     * @return the modified ObjectMap with the specified entry removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntryIfTrue(K key, boolean ifTrue) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap if the condition is true.
+     *
+     * @param map    the map containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified map removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntriesIfTrue(Map<K, V> map, boolean ifTrue) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
+    }
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap if the condition is true.
+     *
+     * @param map    the ObjectMap containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed if the condition is true, or the original ObjectMap otherwise
+     */
+    @Override
+    public ObjectMap<K, V> removeEntriesIfTrue(ObjectMap<K, V> map, boolean ifTrue) {
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -496,7 +565,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
     @Nullable
     @Override
     public V put(K key, V value) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -531,7 +600,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public V remove(Object key) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -555,7 +624,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public void putAll(@NotNull Map<? extends K, ? extends V> m) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**
@@ -567,7 +636,7 @@ public class UnmodifiableObjectMap<K, V> implements ObjectMap<K, V>, Serializabl
      */
     @Override
     public void clear() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("UnmodifiableObjectMap");
     }
 
     /**

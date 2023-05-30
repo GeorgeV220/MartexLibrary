@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -351,8 +352,7 @@ public abstract class Database {
         valuesBuilder.setLength(valuesBuilder.length() - 2);
 
         sqlBuilder.append(" (").append(columnsBuilder).append(")");
-        sqlBuilder.append(" VALUES (").append(valuesBuilder).append(")");
-
+        sqlBuilder.append(" VALUES (").append(valuesBuilder).append(")").append(";");
         return sqlBuilder.toString();
     }
 
@@ -370,8 +370,7 @@ public abstract class Database {
 
         sqlBuilder.append(setBuilder);
 
-        sqlBuilder.append(" WHERE ").append(condition);
-
+        sqlBuilder.append(" WHERE ").append(condition).append(";");
         return sqlBuilder.toString();
     }
 

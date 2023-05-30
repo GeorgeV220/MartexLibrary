@@ -254,6 +254,57 @@ public interface ObjectMap<K, V> extends Map<K, V> {
     ObjectMap<K, V> appendIfTrue(final ObjectMap<K, V> mapIfTrue, final Map<K, V> mapIfFalse, boolean ifTrue);
 
     /**
+     * Removes the entry with the specified key from the ObjectMap.
+     *
+     * @param key the key of the entry to be removed
+     * @return the modified ObjectMap with the specified entry removed, or the original ObjectMap if the key was not found
+     */
+    ObjectMap<K, V> removeEntry(final K key);
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap.
+     *
+     * @param map the map containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the specified keys removed
+     */
+    ObjectMap<K, V> removeEntries(final Map<K, V> map);
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap.
+     *
+     * @param map the ObjectMap containing the keys to be removed
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed
+     */
+    ObjectMap<K, V> removeEntries(final ObjectMap<K, V> map);
+
+    /**
+     * Removes the entry with the specified key from the ObjectMap if the condition is true.
+     *
+     * @param key    the key of the entry to be removed
+     * @param ifTrue the condition to check before removing the entry
+     * @return the modified ObjectMap with the specified entry removed if the condition is true, or the original ObjectMap otherwise
+     */
+    ObjectMap<K, V> removeEntryIfTrue(final K key, boolean ifTrue);
+
+    /**
+     * Removes all entries with keys present in the specified map from the ObjectMap if the condition is true.
+     *
+     * @param map    the map containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified map removed if the condition is true, or the original ObjectMap otherwise
+     */
+    ObjectMap<K, V> removeEntriesIfTrue(final Map<K, V> map, boolean ifTrue);
+
+    /**
+     * Removes all entries with keys present in the specified ObjectMap from the ObjectMap if the condition is true.
+     *
+     * @param map    the ObjectMap containing the keys to be removed
+     * @param ifTrue the condition to check before removing the entries
+     * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed if the condition is true, or the original ObjectMap otherwise
+     */
+    ObjectMap<K, V> removeEntriesIfTrue(final ObjectMap<K, V> map, boolean ifTrue);
+
+    /**
      * Gets the value of the given key as an Integer.
      *
      * @param key the key

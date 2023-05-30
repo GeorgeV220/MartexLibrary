@@ -1,8 +1,8 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.database.Database;
-import com.georgev22.library.database.mongo.MongoDB;
+import com.georgev22.library.database.DatabaseWrapper;
 import com.georgev22.library.maps.ConcurrentObjectMap;
+import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.mongodb.annotations.Beta;
@@ -12,9 +12,14 @@ import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,8 +33,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class EntityManager<T extends EntityManager.Entity> {
     private final File entitiesDirectory;
-    private final Database database;
-    private final MongoDB mongoDB;
+    private final DatabaseWrapper database;
     private final String collection;
     private final Type type;
     private final Class<? extends Entity> entityClazz;
@@ -49,25 +53,17 @@ public class EntityManager<T extends EntityManager.Entity> {
             case FILE -> {
                 this.entitiesDirectory = (File) obj;
                 this.database = null;
-                this.mongoDB = null;
                 if (!this.entitiesDirectory.exists()) {
                     this.entitiesDirectory.mkdirs();
                 }
             }
-            case SQL -> {
+            case SQL, MONGODB -> {
                 this.entitiesDirectory = null;
-                this.database = (Database) obj;
-                this.mongoDB = null;
-            }
-            case MONGODB -> {
-                this.entitiesDirectory = null;
-                this.database = null;
-                this.mongoDB = (MongoDB) obj;
+                this.database = (DatabaseWrapper) obj;
             }
             default -> {
                 this.entitiesDirectory = null;
                 this.database = null;
-                this.mongoDB = null;
             }
         }
         this.entityClazz = clazz;
@@ -96,20 +92,22 @@ public class EntityManager<T extends EntityManager.Entity> {
                                     }
                                 }
                                 case SQL -> {
-                                    String query = "SELECT entity FROM " + collection + " WHERE entity_id = ?";
+                                    String query = "SELECT * FROM " + collection + " WHERE entity_id = ?";
                                     try {
                                         T entity = (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
-                                        PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
-                                        statement.setString(1, entityId.toString());
-                                        ResultSet resultSet = statement.executeQuery();
+                                        try (PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query)) {
+                                            statement.setString(1, entityId.toString());
+                                            try (ResultSet resultSet = statement.executeQuery()) {
 
-                                        ResultSetMetaData metaData = resultSet.getMetaData();
-                                        int columnCount = metaData.getColumnCount();
+                                                ResultSetMetaData metaData = resultSet.getMetaData();
+                                                int columnCount = metaData.getColumnCount();
 
-                                        for (int i = 1; i <= columnCount; i++) {
-                                            String columnName = metaData.getColumnName(i);
-                                            Object columnValue = Utils.deserializeObjectFromString(resultSet.getString(columnName));
-                                            entity.addCustomData(columnName, columnValue);
+                                                for (int i = 1; i <= columnCount; i++) {
+                                                    String columnName = metaData.getColumnName(i);
+                                                    Object columnValue = columnName.equalsIgnoreCase("entity_id") ? resultSet.getString(columnName) : Utils.deserializeObjectFromBytes(resultSet.getBytes(columnName));
+                                                    entity.addCustomData(columnName, columnValue);
+                                                }
+                                            }
                                         }
                                         loadedEntities.append(entityId, entity);
                                         return entity;
@@ -120,7 +118,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                                     }
                                 }
                                 case MONGODB -> {
-                                    Document document = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
+                                    Document document = database.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
                                     if (document != null) {
                                         String serializedEntity = document.getString("entity");
                                         try {
@@ -168,23 +166,31 @@ public class EntityManager<T extends EntityManager.Entity> {
                     }
                 }
                 case SQL -> exists(entity.getId()).thenAccept(result -> {
-                    String query = result ? database.buildUpdateStatement(collection, entity.customData, "entity_id = ?") : database.buildInsertStatement(collection, entity.customData.append("entity_id", entity.entityId.toString()));
-                    try {
-                        PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
-                        int i = 1;
-                        for (Map.Entry<String, Object> entry : entity.customData.entrySet()) {
-                            statement.setString(i, Utils.serializeObjectToString(entry.getValue()));
-                            i++;
+                    ObjectMap<String, Object> customData = new HashObjectMap<>(entity.customData);
+                    String query = result ?
+                            database.getSQLDatabase().buildUpdateStatement(collection, customData.removeEntry("entity_id"), "entity_id = ?") :
+                            database.getSQLDatabase().buildInsertStatement(collection, customData.append("entity_id", entity.entityId.toString()));
+
+                    try (PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query)) {
+                        int parameterIndex = 1;
+                        for (Map.Entry<String, Object> entry : result ? customData.append("entity_id", entity.entityId.toString()).entrySet() : customData.entrySet()) {
+                            String key = entry.getKey();
+                            Object value = entry.getValue();
+                            if (key.equalsIgnoreCase("entity_id")) {
+                                statement.setString(parameterIndex, entity.entityId.toString());
+                            } else {
+                                statement.setBytes(parameterIndex, Utils.serializeObjectToBytes(value));
+                            }
+                            parameterIndex++;
                         }
-                        statement.setString(i, entity.getId().toString());
+
                         statement.executeUpdate();
-                        statement.close();
-                    } catch (SQLException | IOException e) {
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 });
                 case MONGODB -> {
-                    MongoCollection<Document> mongoCollection = mongoDB.getCollection(collection);
+                    MongoCollection<Document> mongoCollection = database.getCollection(collection);
                     try {
                         Document document = Document.parse(Utils.serializeObjectToString(entity));
                         mongoCollection.insertOne(document);
@@ -210,11 +216,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        return save(entity)
-                .thenApply(aVoid -> {
-                    loadedEntities.append(entityId, entity);
-                    return entity;
-                });
+        return CompletableFuture.completedFuture(loadedEntities.append(entityId, entity).get(entityId));
     }
 
     /**
@@ -232,20 +234,23 @@ public class EntityManager<T extends EntityManager.Entity> {
                 case SQL -> {
                     String query = "SELECT count(*) FROM " + collection + " WHERE entity_id = ?";
                     try {
-                        PreparedStatement statement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
+                        PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query);
                         statement.setString(1, entityId.toString());
                         ResultSet resultSet = statement.executeQuery();
                         if (resultSet.next()) {
-                            return resultSet.getInt(1) > 0;
+                            boolean returnValue = resultSet.getInt(1) > 0;
+                            resultSet.close();
+                            statement.close();
+                            return returnValue;
                         } else {
                             throw new RuntimeException("No entity found with id: " + entityId);
                         }
-                    } catch (SQLException e) {
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
                 case MONGODB -> {
-                    Document entity = mongoDB.getCollection(collection).find(Filters.eq("entityId", entityId)).first();
+                    Document entity = database.getMongoDB().getCollection(collection).find(Filters.eq("entityId", entityId)).first();
                     return entity != null;
                 }
                 default -> {
@@ -295,7 +300,7 @@ public class EntityManager<T extends EntityManager.Entity> {
             case SQL -> {
                 String query = "SELECT entity_id FROM " + collection;
                 try {
-                    PreparedStatement preparedStatement = Objects.requireNonNull(database.getConnection()).prepareStatement(query);
+                    PreparedStatement preparedStatement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query);
                     ResultSet rs = preparedStatement.executeQuery();
                     while (rs.next()) {
                         entityIDs.add(UUID.fromString(rs.getString("entity_id")));
@@ -307,7 +312,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                 }
             }
             case MONGODB -> {
-                for (Document doc : mongoDB.getCollection(collection).find()) {
+                for (Document doc : database.getCollection(collection).find()) {
                     entityIDs.add((UUID) doc.get("entity_id"));
                 }
             }

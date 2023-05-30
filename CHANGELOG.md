@@ -1,3 +1,17 @@
+# [11.0.0](https://github.com/GeorgeV220/API/compare/v10.2.3...v11.0.0) (2023-05-30)
+
+
+### Features
+
+* **maps:** Add methods to remove entries ([b8efaa3](https://github.com/GeorgeV220/API/commit/b8efaa3df5963851e206e3338ddddf2aa4c83171))
+* Refactor EntityManager class and remove MongoDB references ([0281a4a](https://github.com/GeorgeV220/API/commit/0281a4add713d7cc4f90420334d60a30015b6795))
+* **Utils:** add serializeObjectToBytes and deserializeObjectFromBytes methods ([73d67e2](https://github.com/GeorgeV220/API/commit/73d67e2c4cbf90aefda5191788870d60e08f667f))
+
+
+### BREAKING CHANGES
+
+* The EntityManager's `obj` variable, which accepts a vararg of objects, has been updated to only accept `File` or `DatabaseWrapper` objects.#
+
 ## [10.2.3](https://github.com/GeorgeV220/API/compare/v10.2.2...v10.2.3) (2023-05-29)
 
 

@@ -486,6 +486,25 @@ public final class Utils {
     }
 
     /**
+     * Serializes an object and returns the serialized data as a byte array.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a byte array.
+     *
+     * @param obj the object to be serialized
+     * @return the serialized data as a  byte array
+     * @throws IOException if there is an error during serialization
+     */
+    public static byte[] serializeObjectToBytes(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        byteArrayOutputStream.close();
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    /**
      * Deserializes an object from the specified file path.
      * <p>
      * Deserializes the object
@@ -518,7 +537,21 @@ public final class Utils {
      * @throws ClassNotFoundException if the class of the serialized object cannot be found
      */
     public static Object deserializeObjectFromString(String serializedData) throws IOException, ClassNotFoundException {
-        byte[] byteArray = serializedData.getBytes(StandardCharsets.ISO_8859_1);
+        return deserializeObjectFromBytes(serializedData.getBytes(StandardCharsets.ISO_8859_1));
+    }
+
+    /**
+     * Deserializes an object from the specified serialized data.
+     * <p>
+     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
+     * deserialized object.
+     *
+     * @param byteArray the serialized object data as a byte array
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the serialized data
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObjectFromBytes(byte[] byteArray) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         Object obj = objectInputStream.readObject();

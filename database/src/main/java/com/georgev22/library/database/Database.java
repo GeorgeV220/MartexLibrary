@@ -301,11 +301,10 @@ public abstract class Database {
      * Builds an SQL DELETE statement for the specified table name, column values, and condition.
      *
      * @param tableName    the name of the table
-     * @param columnValues a map containing column names as keys and corresponding values
      * @param condition    the condition to apply for deleting the rows
      * @return the SQL DELETE statement
      */
-    public String buildDeleteStatement(String tableName, Map<String, Object> columnValues, String condition) {
+    public String buildDeleteStatement(String tableName, String condition) {
         return "DELETE FROM " +
                 tableName +
                 " WHERE " +

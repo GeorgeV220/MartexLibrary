@@ -1,12 +1,5 @@
 package com.georgev22.library.database;
 
-import java.io.File;
-import java.sql.*;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.georgev22.library.database.mongo.MongoDB;
 import com.georgev22.library.database.sql.mysql.MySQL;
 import com.georgev22.library.database.sql.postgresql.PostgreSQL;
@@ -19,6 +12,13 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.sql.*;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A wrapper class for interacting with different types of databases.
@@ -290,15 +290,14 @@ public class DatabaseWrapper {
      * @return a Pair object containing the collection name and a List of DatabaseObject
      * @throws IllegalArgumentException if an invalid database type is specified
      */
-    public Pair<String, List<DatabaseObject>> retrieveData(String collectionName, Pair<String, Object> conditionPair, @Nullable String condition) {
+    public Pair<String, List<DatabaseObject>> retrieveData(String collectionName, @Nullable Pair<String, Object> conditionPair, @Nullable String condition) {
         if (condition == null || condition.equals("")) {
             condition = dbType.equals(DatabaseType.MONGO) ? "$eq" : "=";
         }
         final Pair<String, List<DatabaseObject>> stringDatabaseObjectPair = new Pair<>(collectionName, new ArrayList<>());
         switch (dbType) {
             case MYSQL, POSTGRESQL, SQLITE -> {
-                String conditionString = conditionPair.key() + " " + condition + " " + conditionPair.value();
-                String selectQuery = "SELECT * FROM " + collectionName + " WHERE " + conditionString;
+                String selectQuery = "SELECT * FROM " + collectionName + (conditionPair == null ? "" : " WHERE " + conditionPair.key() + " " + condition + " " + conditionPair.value());
                 try (ResultSet resultSet = sqlDatabase.querySQL(selectQuery)) {
                     ResultSetMetaData metaData = resultSet.getMetaData();
                     int columnCount = metaData.getColumnCount();
@@ -320,8 +319,13 @@ public class DatabaseWrapper {
             }
             case MONGO -> {
                 MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
-                Document filter = new Document(conditionPair.key(), new Document(condition, conditionPair.value()));
-                FindIterable<Document> result = collection.find(filter);
+                FindIterable<Document> result;
+                if (conditionPair == null) {
+                    result = collection.find();
+                } else {
+                    Document filter = new Document(conditionPair.key(), new Document(condition, conditionPair.value()));
+                    result = collection.find(filter);
+                }
                 List<DatabaseObject> databaseObjects = new ArrayList<>();
                 result.forEach((Consumer<? super Document>) document -> {
                     ObjectMap<String, Object> results = new HashObjectMap<>();

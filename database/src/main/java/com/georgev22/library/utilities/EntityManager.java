@@ -118,16 +118,11 @@ public class EntityManager<T extends EntityManager.Entity> {
                                     }
                                 }
                                 case MONGODB -> {
-                                    Document document = database.getCollection(collection).find(Filters.eq("entityId", entityId.toString())).first();
+                                    Document document = database.getCollection(collection).find(Filters.eq("entity_id", entityId)).first();
                                     if (document != null) {
-                                        String serializedEntity = document.getString("entity");
-                                        try {
-                                            T entity = (T) Utils.deserializeObjectFromString(serializedEntity);
-                                            loadedEntities.append(entityId, entity);
-                                            return entity;
-                                        } catch (IOException | ClassNotFoundException e) {
-                                            throw new RuntimeException(e);
-                                        }
+                                        T entity = (T) document.get("entity");
+                                        loadedEntities.append(entityId, entity);
+                                        return entity;
                                     } else {
                                         throw new RuntimeException("No entity found with id: " + entityId);
                                     }
@@ -191,12 +186,8 @@ public class EntityManager<T extends EntityManager.Entity> {
                 });
                 case MONGODB -> {
                     MongoCollection<Document> mongoCollection = database.getCollection(collection);
-                    try {
-                        Document document = Document.parse(Utils.serializeObjectToString(entity));
-                        mongoCollection.insertOne(document);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Document document = new Document("entity_id", entity.entityId).append("entity", entity);
+                    mongoCollection.insertOne(document);
                 }
             }
         });
@@ -250,7 +241,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                     }
                 }
                 case MONGODB -> {
-                    Document entity = database.getMongoDB().getCollection(collection).find(Filters.eq("entityId", entityId)).first();
+                    Document entity = database.getCollection(collection).find(Filters.eq("entity_id", entityId)).first();
                     return entity != null;
                 }
                 default -> {
@@ -313,7 +304,7 @@ public class EntityManager<T extends EntityManager.Entity> {
             }
             case MONGODB -> {
                 for (Document doc : database.getCollection(collection).find()) {
-                    entityIDs.add((UUID) doc.get("entity_id"));
+                    entityIDs.add(doc.get("entity_id", UUID.class));
                 }
             }
         }

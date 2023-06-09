@@ -1,7 +1,9 @@
 package com.georgev22.library.yaml.serialization;
 
 import com.georgev22.library.yaml.Configuration;
-import org.apache.commons.lang.Validate;
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,10 +20,9 @@ import java.util.logging.Logger;
 public class ConfigurationSerialization {
     public static final String SERIALIZED_TYPE_KEY = "==";
     private static Map<String, Class<? extends ConfigurationSerializable>> aliases = new HashMap<>();
-
     private final Class<? extends ConfigurationSerializable> clazz;
 
-    protected ConfigurationSerialization(Class<? extends ConfigurationSerializable> clazz) {
+    protected ConfigurationSerialization(@NotNull Class<? extends ConfigurationSerializable> clazz) {
         this.clazz = clazz;
     }
 
@@ -40,7 +41,8 @@ public class ConfigurationSerialization {
      * @param clazz Class to deserialize into
      * @return New instance of the specified class
      */
-    public static ConfigurationSerializable deserializeObject(Map<String, ?> args, Class<? extends ConfigurationSerializable> clazz) {
+    @Nullable
+    public static ConfigurationSerializable deserializeObject(@NotNull Map<String, ?> args, @NotNull Class<? extends ConfigurationSerializable> clazz) {
         return new ConfigurationSerialization(clazz).deserialize(args);
     }
 
@@ -58,7 +60,8 @@ public class ConfigurationSerialization {
      * @param args Arguments for deserialization
      * @return New instance of the specified class
      */
-    public static ConfigurationSerializable deserializeObject(Map<String, ?> args) {
+    @Nullable
+    public static ConfigurationSerializable deserializeObject(@NotNull Map<String, ?> args) {
         Class<? extends ConfigurationSerializable> clazz = null;
 
         if (args.containsKey(SERIALIZED_TYPE_KEY)) {
@@ -89,7 +92,7 @@ public class ConfigurationSerialization {
      *
      * @param clazz Class to register
      */
-    public static void registerClass(Class<? extends ConfigurationSerializable> clazz) {
+    public static void registerClass(@NotNull Class<? extends ConfigurationSerializable> clazz) {
         DelegateDeserialization delegate = clazz.getAnnotation(DelegateDeserialization.class);
 
         if (delegate == null) {
@@ -106,7 +109,7 @@ public class ConfigurationSerialization {
      * @param alias Alias to register as
      * @see SerializableAs
      */
-    public static void registerClass(Class<? extends ConfigurationSerializable> clazz, String alias) {
+    public static void registerClass(@NotNull Class<? extends ConfigurationSerializable> clazz, @NotNull String alias) {
         aliases.put(alias, clazz);
     }
 
@@ -115,7 +118,7 @@ public class ConfigurationSerialization {
      *
      * @param alias Alias to unregister
      */
-    public static void unregisterClass(String alias) {
+    public static void unregisterClass(@NotNull String alias) {
         aliases.remove(alias);
     }
 
@@ -125,7 +128,7 @@ public class ConfigurationSerialization {
      *
      * @param clazz Class to unregister
      */
-    public static void unregisterClass(Class<? extends ConfigurationSerializable> clazz) {
+    public static void unregisterClass(@NotNull Class<? extends ConfigurationSerializable> clazz) {
         while (aliases.values().remove(clazz)) {
             ;
         }
@@ -138,7 +141,8 @@ public class ConfigurationSerialization {
      * @param alias Alias of the serializable
      * @return Registered class, or null if not found
      */
-    public static Class<? extends ConfigurationSerializable> getClassByAlias(String alias) {
+    @Nullable
+    public static Class<? extends ConfigurationSerializable> getClassByAlias(@NotNull String alias) {
         return aliases.get(alias);
     }
 
@@ -149,7 +153,8 @@ public class ConfigurationSerialization {
      * @param clazz Class to get alias for
      * @return Alias to use for the class
      */
-    public static String getAlias(Class<? extends ConfigurationSerializable> clazz) {
+    @NotNull
+    public static String getAlias(@NotNull Class<? extends ConfigurationSerializable> clazz) {
         DelegateDeserialization delegate = clazz.getAnnotation(DelegateDeserialization.class);
 
         if (delegate != null) {
@@ -171,7 +176,8 @@ public class ConfigurationSerialization {
         return clazz.getName();
     }
 
-    protected Method getMethod(String name, boolean isStatic) {
+    @Nullable
+    protected Method getMethod(@NotNull String name, boolean isStatic) {
         try {
             Method method = clazz.getDeclaredMethod(name, Map.class);
 
@@ -188,6 +194,7 @@ public class ConfigurationSerialization {
         }
     }
 
+    @Nullable
     protected Constructor<? extends ConfigurationSerializable> getConstructor() {
         try {
             return clazz.getConstructor(Map.class);
@@ -196,7 +203,8 @@ public class ConfigurationSerialization {
         }
     }
 
-    protected ConfigurationSerializable deserializeViaMethod(Method method, Map<String, ?> args) {
+    @Nullable
+    protected ConfigurationSerializable deserializeViaMethod(@NotNull Method method, @NotNull Map<String, ?> args) {
         try {
             ConfigurationSerializable result = (ConfigurationSerializable) method.invoke(null, args);
 
@@ -215,7 +223,8 @@ public class ConfigurationSerialization {
         return null;
     }
 
-    protected ConfigurationSerializable deserializeViaCtor(Constructor<? extends ConfigurationSerializable> ctor, Map<String, ?> args) {
+    @Nullable
+    protected ConfigurationSerializable deserializeViaCtor(@NotNull Constructor<? extends ConfigurationSerializable> ctor, @NotNull Map<String, ?> args) {
         try {
             return ctor.newInstance(args);
         } catch (Throwable ex) {
@@ -228,8 +237,9 @@ public class ConfigurationSerialization {
         return null;
     }
 
-    public ConfigurationSerializable deserialize(Map<String, ?> args) {
-        Validate.notNull(args, "Args must not be null");
+    @Nullable
+    public ConfigurationSerializable deserialize(@NotNull Map<String, ?> args) {
+        Preconditions.checkArgument(args != null, "Args must not be null");
 
         ConfigurationSerializable result = null;
         Method method = null;

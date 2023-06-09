@@ -1,5 +1,7 @@
 package com.georgev22.library.yaml.serialization;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 /**
@@ -31,5 +33,6 @@ public interface ConfigurationSerializable {
      *
      * @return Map containing the current state of this class
      */
+    @NotNull
     public Map<String, Object> serialize();
 }

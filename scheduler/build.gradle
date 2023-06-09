@@ -1,5 +1,10 @@
 apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
+
+dependencies {
+    compileOnly "com.google.guava:guava:${guavaVersion}"
+}
+
 tasks.build.dependsOn(shadowJar)
 tasks.publish.dependsOn(shadowJar)
 tasks.shadowJar.dependsOn(jar)

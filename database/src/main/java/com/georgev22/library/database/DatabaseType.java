@@ -8,15 +8,9 @@ public enum DatabaseType {
     MONGO("MongoDB");
 
     private final String name;
-    private final Object[] data;
 
-    DatabaseType(String name, Object... data) {
+    DatabaseType(String name) {
         this.name = name;
-        this.data = data;
-    }
-
-    public Object[] getData() {
-        return data;
     }
 
     public String getName() {

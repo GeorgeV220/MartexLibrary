@@ -5,6 +5,7 @@ import com.georgev22.library.exceptions.InvalidDescriptionException;
 import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -22,34 +23,40 @@ import java.util.regex.Pattern;
 public final class ExtensionDescriptionFile {
     private static final Pattern VALID_NAME = Pattern.compile("^[A-Za-z0-9 _.-]+$");
     private static ExtensionAwareness extensionAwareness;
-    private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> new Yaml(new SafeConstructor() {
-        {
-            yamlConstructors.put(null, new AbstractConstruct() {
-                @NotNull
-                @Override
-                public Object construct(@NotNull final Node node) {
-                    if (!node.getTag().startsWith("!@")) {
-                        return SafeConstructor.undefinedConstructor.construct(node);
-                    }
-                    return extensionAwareness = new ExtensionAwareness() {
+    private static final ThreadLocal<Yaml> YAML = new ThreadLocal<Yaml>() {
+        @Override
+        @NotNull
+        protected Yaml initialValue() {
+            return new Yaml(new SafeConstructor(new LoaderOptions()) {
+                {
+                    yamlConstructors.put(null, new AbstractConstruct() {
+                        @NotNull
                         @Override
-                        public String toString() {
-                            return node.toString();
+                        public Object construct(@NotNull final Node node) {
+                            if (!node.getTag().startsWith("!@")) {
+                                return SafeConstructor.undefinedConstructor.construct(node);
+                            }
+                            return extensionAwareness = new ExtensionAwareness() {
+                                @Override
+                                public String toString() {
+                                    return node.toString();
+                                }
+                            };
                         }
-                    };
+                    });
+                    for (final ExtensionAwareness.Flags flag : ExtensionAwareness.Flags.values()) {
+                        yamlConstructors.put(new Tag("!@" + flag.name()), new AbstractConstruct() {
+                            @NotNull
+                            @Override
+                            public ExtensionAwareness.Flags construct(@NotNull final Node node) {
+                                return flag;
+                            }
+                        });
+                    }
                 }
             });
-            for (final ExtensionAwareness.Flags flag : ExtensionAwareness.Flags.values()) {
-                yamlConstructors.put(new Tag("!@" + flag.name()), new AbstractConstruct() {
-                    @NotNull
-                    @Override
-                    public ExtensionAwareness.Flags construct(@NotNull final Node node) {
-                        return flag;
-                    }
-                });
-            }
         }
-    }));
+    };
 
     public static ExtensionAwareness getAwareness() {
         return extensionAwareness;

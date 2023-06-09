@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 class Task implements com.georgev22.library.scheduler.interfaces.Task, Runnable {
 
-    private volatile Task next = null;
+    protected volatile Task next = null;
     public static final int ERROR = 0;
     public static final int NO_REPEATING = -1;
     public static final int CANCEL = -2;

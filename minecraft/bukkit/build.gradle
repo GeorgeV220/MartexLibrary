@@ -7,8 +7,8 @@ dependencies {
     compileOnly project(path: ':maps')
     compileOnly project(path: ':utilities')
     compileOnly project(path: ':yaml')
-    implementation 'de.tr7zw:item-nbt-api-plugin:2.11.1'
-    implementation 'com.github.cryptomorin:XSeries:9.3.0'
+    implementation 'de.tr7zw:item-nbt-api-plugin:2.11.3'
+    implementation 'com.github.cryptomorin:XSeries:9.3.1'
 }
 
 shadowJar {

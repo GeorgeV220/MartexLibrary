@@ -311,6 +311,44 @@ public abstract class Database {
                 condition;
     }
 
+    public int getColumnDataType(String tableName, String columnName, @NotNull Connection connection) throws SQLException {
+        if (this instanceof SQLite) {
+            try (PreparedStatement statement = connection.prepareStatement("PRAGMA table_info(" + tableName + ")")) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String name = resultSet.getString("name");
+                        String type = resultSet.getString("type");
+                        if (name.equalsIgnoreCase(columnName)) {
+                            return mapSQLiteDataTypeToJDBCType(type);
+                        }
+                    }
+                }
+            }
+        } else {
+            DatabaseMetaData metaData = connection.getMetaData();
+            try (ResultSet resultSet = metaData.getColumns(null, null, tableName, columnName)) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("DATA_TYPE");
+                }
+            }
+        }
+        return Types.NULL;
+    }
+
+    private int mapSQLiteDataTypeToJDBCType(@NotNull String type) {
+        // Map SQLite data type to JDBC Types
+        if (type.equalsIgnoreCase("INTEGER") || type.equalsIgnoreCase("INT")) {
+            return Types.INTEGER;
+        } else if (type.equalsIgnoreCase("REAL")) {
+            return Types.REAL;
+        } else if (type.equalsIgnoreCase("TEXT")) {
+            return Types.VARCHAR;
+        } else if (type.equalsIgnoreCase("BLOB")) {
+            return Types.BLOB;
+        } else {
+            return Types.NULL;
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

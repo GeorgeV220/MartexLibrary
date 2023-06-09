@@ -7,13 +7,17 @@ import com.georgev22.library.database.sql.sqlite.SQLite;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObjectMap.Pair;
+import com.georgev22.library.utilities.Utils;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Consumer;
@@ -33,6 +37,7 @@ public class DatabaseWrapper {
     private final Logger logger;
     private Connection sqlConnection;
     private MongoDatabase mongoDatabase;
+    private MongoClient mongoClient;
     private Database sqlDatabase;
 
     /**
@@ -77,8 +82,12 @@ public class DatabaseWrapper {
                     this.sqlDatabase = new PostgreSQL(host, port, username, password, Optional.ofNullable(database));
                     this.sqlConnection = sqlDatabase.openConnection();
                 }
-                case MONGO ->
-                        this.mongoDatabase = new MongoDB(host, port, username, password, database).getMongoDatabase();
+                case MONGO -> {
+                    MongoDB mongoDB = new MongoDB(host, port, username, password, database);
+                    this.mongoDatabase = mongoDB.getMongoDatabase();
+                    this.mongoClient = mongoDB.getMongoClient();
+                }
+
                 default ->
                         this.logger.log(Level.SEVERE, "[DatabaseWrapper]:", new IllegalArgumentException("Invalid database type"));
             }
@@ -129,7 +138,12 @@ public class DatabaseWrapper {
                     for (Map.Entry<String, Object> entry : columnValues.entrySet()) {
                         String key = entry.getKey();
                         Object value = entry.getValue();
-                        statement.setObject(parameterIndex, value);
+                        int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
+                        if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
+                            statement.setObject(parameterIndex, Utils.serializeObjectToString(value));
+                        } else {
+                            statement.setString(parameterIndex, String.valueOf(value));
+                        }
                         parameterIndex++;
                     }
 
@@ -237,20 +251,25 @@ public class DatabaseWrapper {
         }
         switch (dbType) {
             case MYSQL, POSTGRESQL, SQLITE -> {
-                String filterCondition = filterPair.key() + " " + condition + " " + filterPair.value();
+                String filterCondition = filterPair.key() + " " + condition + " '" + filterPair.value() + "'";
                 Map<String, Object> updateColumnValues = updatePair.value();
                 String updateQuery = this.sqlDatabase.buildUpdateStatement(collectionName, updateColumnValues, filterCondition);
+                this.logger.info(updateQuery);
                 try (PreparedStatement statement = sqlConnection.prepareStatement(updateQuery)) {
                     int parameterIndex = 1;
                     for (Map.Entry<String, Object> entry : updatePair.value().entrySet()) {
                         String key = entry.getKey();
                         Object value = entry.getValue();
-                        statement.setObject(parameterIndex, value);
+                        int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
+                        if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
+                            statement.setObject(parameterIndex, Utils.serializeObjectToString(value));
+                        } else {
+                            statement.setString(parameterIndex, String.valueOf(value));
+                        }
                         parameterIndex++;
                     }
-                    this.logger.info(updateQuery);
                     statement.executeUpdate();
-                } catch (SQLException e) {
+                } catch (SQLException | IOException e) {
                     this.logger.log(Level.SEVERE, "[DatabaseWrapper]:", e);
                 }
             }
@@ -272,47 +291,58 @@ public class DatabaseWrapper {
      * <pre>{@code
      * String collectionName = "users";
      * Pair<String, Object> conditionPair = new Pair<>("name", "John");
-     * String condition = "="; // Optional condition
-     * Pair<String, List<DatabaseObject>> result = databaseWrapper.retrieveData(collectionName, conditionPair, condition);
+     * Pair<String, List<DatabaseObject>> result = databaseWrapper.retrieveData(collectionName, conditionPair);
      * }</pre>
      * <p>
      * Example usage for retrieving data from the database using the retrieveData method for MongoDB.
      * <pre>{@code
      * String collectionName = "users";
      * Pair<String, Object> conditionPair = new Pair<>("name", "John");
-     * String condition = "$eq"; // Optional condition
-     * Pair<String, List<DatabaseObject>> result = databaseWrapper.retrieveData(collectionName, conditionPair, condition);
+     * Pair<String, List<DatabaseObject>> result = databaseWrapper.retrieveData(collectionName, conditionPair);
      * }</pre>
      *
      * @param collectionName the name of the collection or table
      * @param conditionPair  the Pair object containing the key-value pair for the condition
-     * @param condition      the condition for retrieving data (e.g., "=" for SQL, "$eq" for MongoDB. optional, can be null)
      * @return a Pair object containing the collection name and a List of DatabaseObject
      * @throws IllegalArgumentException if an invalid database type is specified
      */
-    public Pair<String, List<DatabaseObject>> retrieveData(String collectionName, @Nullable Pair<String, Object> conditionPair, @Nullable String condition) {
-        if (condition == null || condition.equals("")) {
-            condition = dbType.equals(DatabaseType.MONGO) ? "$eq" : "=";
-        }
+    public Pair<String, List<DatabaseObject>> retrieveData(String collectionName, Pair<String, @Nullable Object> conditionPair) {
         final Pair<String, List<DatabaseObject>> stringDatabaseObjectPair = new Pair<>(collectionName, new ArrayList<>());
         switch (dbType) {
             case MYSQL, POSTGRESQL, SQLITE -> {
-                String selectQuery = "SELECT * FROM " + collectionName + (conditionPair == null ? "" : " WHERE " + conditionPair.key() + " " + condition + " " + conditionPair.value());
-                try (ResultSet resultSet = sqlDatabase.querySQL(selectQuery)) {
-                    ResultSetMetaData metaData = resultSet.getMetaData();
-                    int columnCount = metaData.getColumnCount();
-                    List<DatabaseObject> databaseObjects = new ArrayList<>();
-                    while (resultSet.next()) {
-                        ObjectMap<String, Object> results = new HashObjectMap<>();
-                        for (int i = 1; i <= columnCount; i++) {
-                            String columnName = metaData.getColumnName(i);
-                            Object value = resultSet.getObject(i);
-                            results.append(columnName, value);
+                String selectQuery;
+                if (conditionPair.value() == null) {
+                    selectQuery = "SELECT " + conditionPair.key() + " FROM " + collectionName;
+                } else {
+                    selectQuery = "SELECT * FROM " + collectionName + " WHERE " + conditionPair.key() + " = ?";
+                }
+                try (PreparedStatement statement = Objects.requireNonNull(this.getSQLConnection()).prepareStatement(selectQuery)) {
+                    if (conditionPair.value() != null)
+                        statement.setObject(1, conditionPair.value());
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        ResultSetMetaData metaData = resultSet.getMetaData();
+                        int columnCount = metaData.getColumnCount();
+                        List<DatabaseObject> databaseObjects = new ArrayList<>();
+                        while (resultSet.next()) {
+                            ObjectMap<String, Object> results = new HashObjectMap<>();
+                            for (int i = 1; i <= columnCount; i++) {
+                                String columnName = metaData.getColumnName(i);
+                                int columnType = this.sqlDatabase.getColumnDataType(collectionName, columnName, sqlConnection);
+                                Object value = resultSet.getObject(i);
+                                if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
+                                    results.append(columnName, Utils.deserializeObjectFromString(String.valueOf(value)));
+                                } else {
+                                    results.append(columnName, value);
+                                }
+                            }
+                            databaseObjects.add(new DatabaseObject(results));
                         }
-                        databaseObjects.add(new DatabaseObject(results));
+                        return new Pair<>(collectionName, databaseObjects);
+                    } catch (SQLException | IOException | ClassNotFoundException e) {
+                        logger.log(Level.SEVERE, "[DatabaseWrapper]:", e);
+                        return stringDatabaseObjectPair;
                     }
-                    return new Pair<>(collectionName, databaseObjects);
-                } catch (SQLException | ClassNotFoundException e) {
+                } catch (SQLException e) {
                     logger.log(Level.SEVERE, "[DatabaseWrapper]:", e);
                     return stringDatabaseObjectPair;
                 }
@@ -320,11 +350,10 @@ public class DatabaseWrapper {
             case MONGO -> {
                 MongoCollection<Document> collection = mongoDatabase.getCollection(collectionName);
                 FindIterable<Document> result;
-                if (conditionPair == null) {
-                    result = collection.find();
+                if (conditionPair.value() == null) {
+                    result = collection.find(Filters.all(conditionPair.key()));
                 } else {
-                    Document filter = new Document(conditionPair.key(), new Document(condition, conditionPair.value()));
-                    result = collection.find(filter);
+                    result = collection.find(Filters.eq(conditionPair.key(), conditionPair.value()));
                 }
                 List<DatabaseObject> databaseObjects = new ArrayList<>();
                 result.forEach((Consumer<? super Document>) document -> {
@@ -372,7 +401,7 @@ public class DatabaseWrapper {
         }
         switch (dbType) {
             case MYSQL, POSTGRESQL, SQLITE -> {
-                String conditionQuery = pair.key() + " " + condition + " " + pair.value();
+                String conditionQuery = pair.key() + " " + condition + " '" + pair.value() + "';";
                 String selectQuery = "SELECT COUNT(*) FROM " + collectionName + " WHERE " + conditionQuery;
                 try (Statement statement = sqlConnection.createStatement();
                      ResultSet resultSet = statement.executeQuery(selectQuery)) {
@@ -416,11 +445,31 @@ public class DatabaseWrapper {
             }
             case MONGO -> {
                 if (mongoDatabase != null) {
+                    mongoClient.close();
                     mongoDatabase = null;
+                    mongoClient = null;
                 }
             }
             default ->
                     this.logger.log(Level.SEVERE, "[DatabaseWrapper]:", new IllegalArgumentException("Invalid database type"));
+        }
+    }
+
+    public boolean isConnected() {
+        switch (dbType) {
+            case SQLITE, MYSQL, POSTGRESQL -> {
+                try {
+                    return (getSQLDatabase() != null && getSQLConnection() != null) && getSQLDatabase().isClosed();
+                } catch (SQLException e) {
+                    return false;
+                }
+            }
+            case MONGO -> {
+                return getMongoDatabase() != null;
+            }
+            default -> {
+                return false;
+            }
         }
     }
 

@@ -1,22 +1,15 @@
 package com.georgev22.library.yaml.file;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-
 import com.georgev22.library.yaml.Configuration;
 import com.georgev22.library.yaml.InvalidConfigurationException;
 import com.georgev22.library.yaml.MemoryConfiguration;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.*;
 
 /**
  * This is a base class for all File based implementations of {@link
@@ -37,7 +30,7 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *
      * @param defaults Default value provider
      */
-    public FileConfiguration(Configuration defaults) {
+    public FileConfiguration(@Nullable Configuration defaults) {
         super(defaults);
     }
 
@@ -56,33 +49,15 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                  any reason.
      * @throws IllegalArgumentException Thrown when file is null.
      */
-    public void save(File file) throws IOException {
+    public void save(@NotNull File file) throws IOException {
         Validate.notNull(file, "File cannot be null");
 
-        createParentDirs(file);
+        Files.createParentDirs(file);
 
         String data = saveToString();
 
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), Charsets.UTF_8)) {
             writer.write(data);
-        }
-    }
-
-    private void createParentDirs(@NotNull File file) throws IOException {
-        File parent = file.getCanonicalFile().getParentFile();
-        if (parent == null) {
-            /*
-             * The given directory is a filesystem root. All zero of its ancestors
-             * exist. This doesn't mean that the root itself exists -- consider x:\ on
-             * a Windows machine without such a drive -- or even that the caller can
-             * create it, but this method makes no such guarantees even for non-root
-             * files.
-             */
-            return;
-        }
-        parent.mkdirs();
-        if (!parent.isDirectory()) {
-            throw new IOException("Unable to create parent directories of " + file);
         }
     }
 
@@ -101,7 +76,7 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                  any reason.
      * @throws IllegalArgumentException Thrown when file is null.
      */
-    public void save(String file) throws IOException {
+    public void save(@NotNull String file) throws IOException {
         Validate.notNull(file, "File cannot be null");
 
         save(new File(file));
@@ -112,6 +87,7 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *
      * @return String containing this configuration.
      */
+    @NotNull
     public abstract String saveToString();
 
     /**
@@ -132,12 +108,12 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                       a valid Configuration.
      * @throws IllegalArgumentException      Thrown when file is null.
      */
-    public void load(File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
+    public void load(@NotNull File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
         Validate.notNull(file, "File cannot be null");
 
         final FileInputStream stream = new FileInputStream(file);
 
-        load(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        load(new InputStreamReader(stream, Charsets.UTF_8));
     }
 
     /**
@@ -153,7 +129,7 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                       represent a valid Configuration
      * @throws IllegalArgumentException      thrown when reader is null
      */
-    public void load(Reader reader) throws IOException, InvalidConfigurationException {
+    public void load(@NotNull Reader reader) throws IOException, InvalidConfigurationException {
         BufferedReader input = reader instanceof BufferedReader ? (BufferedReader) reader : new BufferedReader(reader);
 
         StringBuilder builder = new StringBuilder();
@@ -190,7 +166,7 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                       a valid Configuration.
      * @throws IllegalArgumentException      Thrown when file is null.
      */
-    public void load(String file) throws FileNotFoundException, IOException, InvalidConfigurationException {
+    public void load(@NotNull String file) throws FileNotFoundException, IOException, InvalidConfigurationException {
         Validate.notNull(file, "File cannot be null");
 
         load(new File(file));
@@ -211,20 +187,21 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      *                                       invalid.
      * @throws IllegalArgumentException      Thrown if contents is null.
      */
-    public abstract void loadFromString(String contents) throws InvalidConfigurationException;
+    public abstract void loadFromString(@NotNull String contents) throws InvalidConfigurationException;
 
     /**
-     * Compiles the header for this {@link FileConfiguration} and returns the
-     * result.
-     * <p>
-     * This will use the header from {@link #options()} -&gt; {@link
-     * FileConfigurationOptions#header()}, respecting the rules of {@link
-     * FileConfigurationOptions#copyHeader()} if set.
-     *
-     * @return Compiled header
+     * @return empty string
+     * @deprecated This method only exists for backwards compatibility. It will
+     * do nothing and should not be used! Please use
+     * {@link FileConfigurationOptions#getHeader()} instead.
      */
-    protected abstract String buildHeader();
+    @NotNull
+    @Deprecated
+    protected String buildHeader() {
+        return "";
+    }
 
+    @NotNull
     @Override
     public FileConfigurationOptions options() {
         if (options == null) {

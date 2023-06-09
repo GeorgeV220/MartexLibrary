@@ -21,28 +21,17 @@ import java.util.logging.Logger;
 public final class CFG {
 
     private final static Set<CFG> cachedFiles = new HashSet<>();
-
-    public static void reloadFiles() {
-        cachedFiles.forEach(CFG::reloadFile);
-    }
-
     /* The file's name (without the .yml) */
     private final String fileName;
-
+    private final Logger logger;
+    private final File dataFolder;
+    private final Class<?> clazz;
+    private final boolean saveResource;
+    private final boolean replace;
     /* The yml file configuration. */
     private FileConfiguration fileConfiguration;
     /* The file. */
     private File file;
-
-    private final Logger logger;
-
-    private final File dataFolder;
-
-    private final Class<?> clazz;
-
-    private final boolean saveResource;
-
-    private final boolean replace;
 
     public CFG(final String string, final File dataFolder, final boolean saveResource, final boolean replace, final Logger logger, Class<?> clazz) throws Exception {
         this.fileName = string + ".yml";
@@ -53,6 +42,10 @@ public final class CFG {
         this.clazz = clazz;
         this.setup();
         cachedFiles.add(this);
+    }
+
+    public static void reloadFiles() {
+        cachedFiles.forEach(CFG::reloadFile);
     }
 
     /**

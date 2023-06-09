@@ -13,7 +13,7 @@ You can have your project depend on MartexLibrary as a dependency through the fo
         <repository>
             <id>reposilite-repository</id>
             <name>GeorgeV22 Repository</name>
-            <url>https://repo.georgev22.com/{repository}</url>
+            <url>https://repo.georgev22.com/releases</url>
         </repository>
     </repositories>
 
@@ -35,7 +35,7 @@ You can include MartexLibrary into your gradle project using the following lines
 ```groovy
 repositories {
     maven {
-        url "https://repo.georgev22.com/{repository}"
+        url "https://repo.georgev22.com/releases"
     }
 }
 

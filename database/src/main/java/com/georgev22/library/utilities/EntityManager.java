@@ -1,26 +1,23 @@
 package com.georgev22.library.utilities;
 
 import com.georgev22.library.database.DatabaseWrapper;
+import com.georgev22.library.database.DatabaseWrapper.DatabaseObject;
 import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObjectMap.Pair;
 import com.georgev22.library.maps.ObservableObjectMap;
 import com.mongodb.annotations.Beta;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import org.bson.Document;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -35,36 +32,29 @@ public class EntityManager<T extends EntityManager.Entity> {
     private final File entitiesDirectory;
     private final DatabaseWrapper database;
     private final String collection;
-    private final Type type;
     private final Class<? extends Entity> entityClazz;
     private final ObservableObjectMap<UUID, T> loadedEntities = new ObservableObjectMap<>();
 
     /**
      * Constructor for the EntityManager class
      *
-     * @param type           the type of storage system to be used (FILE, SQL or MONGODB)
-     * @param obj            the object to be used for storage (File for FILE, Connection for SQL and MongoDB for MONGODB)
+     * @param obj            the object to be used for storage (DatabaseWrapper or File)
      * @param collectionName the name of the collection to be used for MONGODB and SQL, null for other types
      */
-    public EntityManager(@NotNull Type type, Object obj, @Nullable String collectionName, Class<? extends Entity> clazz) {
-        this.type = type;
+    public EntityManager(Object obj, @Nullable String collectionName, Class<? extends Entity> clazz) {
         this.collection = collectionName;
-        switch (type) {
-            case FILE -> {
-                this.entitiesDirectory = (File) obj;
-                this.database = null;
-                if (!this.entitiesDirectory.exists()) {
-                    this.entitiesDirectory.mkdirs();
-                }
+        if (obj instanceof File folder) {
+            this.entitiesDirectory = folder;
+            this.database = null;
+            if (!this.entitiesDirectory.exists()) {
+                this.entitiesDirectory.mkdirs();
             }
-            case SQL, MONGODB -> {
-                this.entitiesDirectory = null;
-                this.database = (DatabaseWrapper) obj;
-            }
-            default -> {
-                this.entitiesDirectory = null;
-                this.database = null;
-            }
+        } else if (obj instanceof DatabaseWrapper databaseWrapper) {
+            this.entitiesDirectory = null;
+            this.database = databaseWrapper;
+        } else {
+            this.entitiesDirectory = null;
+            this.database = null;
         }
         this.entityClazz = clazz;
     }
@@ -80,60 +70,35 @@ public class EntityManager<T extends EntityManager.Entity> {
                 .thenCompose(exists -> {
                     if (exists) {
                         return CompletableFuture.supplyAsync(() -> {
-                            switch (type) {
-                                case FILE -> {
-                                    File file = new File(entitiesDirectory, entityId + ".entity");
-                                    try {
-                                        T entity = (T) Utils.deserializeObject(file.getAbsolutePath());
-                                        loadedEntities.append(entityId, entity);
-                                        return entity;
-                                    } catch (IOException | ClassNotFoundException e) {
-                                        throw new RuntimeException(e);
-                                    }
+                            if (entitiesDirectory != null) {
+                                File file = new File(entitiesDirectory, entityId + ".entity");
+                                try {
+                                    T entity = (T) Utils.deserializeObject(file.getAbsolutePath());
+                                    loadedEntities.append(entityId, entity);
+                                    return entity;
+                                } catch (IOException | ClassNotFoundException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                case SQL -> {
-                                    String query = "SELECT * FROM " + collection + " WHERE entity_id = ?";
-                                    try {
-                                        T entity = (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
-                                        try (PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query)) {
-                                            statement.setString(1, entityId.toString());
-                                            try (ResultSet resultSet = statement.executeQuery()) {
-
-                                                ResultSetMetaData metaData = resultSet.getMetaData();
-                                                int columnCount = metaData.getColumnCount();
-
-                                                for (int i = 1; i <= columnCount; i++) {
-                                                    String columnName = metaData.getColumnName(i);
-                                                    Object columnValue = columnName.equalsIgnoreCase("entity_id") ? resultSet.getString(columnName) : Utils.deserializeObjectFromBytes(resultSet.getBytes(columnName));
-                                                    entity.addCustomData(columnName, columnValue);
-                                                }
-                                            }
-                                        }
-                                        loadedEntities.append(entityId, entity);
-                                        return entity;
-                                    } catch (InstantiationException | IllegalAccessException |
-                                             InvocationTargetException | NoSuchMethodException | SQLException |
-                                             IOException | ClassNotFoundException e) {
-                                        throw new RuntimeException(e);
-                                    }
+                            } else if (database != null) {
+                                Pair<String, List<DatabaseObject>> retrievedData = database.retrieveData(collection, Pair.create("entity_id", entityId.toString()));
+                                T entity;
+                                try {
+                                    entity = (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
+                                } catch (InstantiationException | IllegalAccessException |
+                                         InvocationTargetException | NoSuchMethodException e) {
+                                    throw new RuntimeException(e);
                                 }
-                                case MONGODB -> {
-                                    Document document = database.getCollection(collection).find(Filters.eq("entity_id", entityId)).first();
-                                    if (document != null) {
-                                        T entity = (T) document.get("entity");
-                                        loadedEntities.append(entityId, entity);
-                                        return entity;
-                                    } else {
-                                        throw new RuntimeException("No entity found with id: " + entityId);
-                                    }
-                                }
-                                default -> {
-                                    try {
-                                        return (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
-                                    } catch (InstantiationException | IllegalAccessException |
-                                             InvocationTargetException | NoSuchMethodException e) {
-                                        throw new RuntimeException(e);
-                                    }
+                                retrievedData.value().forEach(databaseObject -> {
+                                    ObjectMap<String, Object> databaseObjectData = databaseObject.data();
+                                    databaseObjectData.forEach(entity::addCustomData);
+                                });
+                                return entity;
+                            } else {
+                                try {
+                                    return (T) entityClazz.getDeclaredConstructor(UUID.class).newInstance(entityId);
+                                } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                                         NoSuchMethodException e) {
+                                    throw new RuntimeException(e);
                                 }
                             }
                         });
@@ -151,44 +116,22 @@ public class EntityManager<T extends EntityManager.Entity> {
      */
     public CompletableFuture<Void> save(Entity entity) {
         return CompletableFuture.runAsync(() -> {
-            switch (type) {
-                case FILE -> {
-                    File file = new File(entitiesDirectory, entity.getId() + ".entity");
-                    try {
-                        Utils.serializeObject(entity, file.getAbsolutePath());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+            if (entitiesDirectory != null) {
+                File file = new File(entitiesDirectory, entity.getId() + ".entity");
+                try {
+                    Utils.serializeObject(entity, file.getAbsolutePath());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-                case SQL -> exists(entity.getId()).thenAccept(result -> {
-                    ObjectMap<String, Object> customData = new HashObjectMap<>(entity.customData);
-                    String query = result ?
-                            database.getSQLDatabase().buildUpdateStatement(collection, customData.removeEntry("entity_id"), "entity_id = ?") :
-                            database.getSQLDatabase().buildInsertStatement(collection, customData.append("entity_id", entity.entityId.toString()));
-
-                    try (PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query)) {
-                        int parameterIndex = 1;
-                        for (Map.Entry<String, Object> entry : result ? customData.append("entity_id", entity.entityId.toString()).entrySet() : customData.entrySet()) {
-                            String key = entry.getKey();
-                            Object value = entry.getValue();
-                            if (key.equalsIgnoreCase("entity_id")) {
-                                statement.setString(parameterIndex, entity.entityId.toString());
-                            } else {
-                                statement.setBytes(parameterIndex, Utils.serializeObjectToBytes(value));
-                            }
-                            parameterIndex++;
-                        }
-
-                        statement.executeUpdate();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+            } else if (database != null) {
+                exists(entity.getId()).thenAccept(result -> {
+                    ObjectMap<String, Object> entityData = new HashObjectMap<>(entity.customData);
+                    if (result) {
+                        database.updateData(collection, Pair.create("entity_id", entity.getId().toString()), Pair.create("$set", entityData.removeEntry("entity_id")), null);
+                    } else {
+                        database.addData(collection, Pair.create(entity.entityId.toString(), entityData));
                     }
                 });
-                case MONGODB -> {
-                    MongoCollection<Document> mongoCollection = database.getCollection(collection);
-                    Document document = new Document("entity_id", entity.entityId).append("entity", entity);
-                    mongoCollection.insertOne(document);
-                }
             }
         });
     }
@@ -218,35 +161,12 @@ public class EntityManager<T extends EntityManager.Entity> {
      */
     public CompletableFuture<Boolean> exists(UUID entityId) {
         return CompletableFuture.supplyAsync(() -> {
-            switch (type) {
-                case FILE -> {
-                    return new File(entitiesDirectory, entityId + ".entity").exists();
-                }
-                case SQL -> {
-                    String query = "SELECT count(*) FROM " + collection + " WHERE entity_id = ?";
-                    try {
-                        PreparedStatement statement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query);
-                        statement.setString(1, entityId.toString());
-                        ResultSet resultSet = statement.executeQuery();
-                        if (resultSet.next()) {
-                            boolean returnValue = resultSet.getInt(1) > 0;
-                            resultSet.close();
-                            statement.close();
-                            return returnValue;
-                        } else {
-                            throw new RuntimeException("No entity found with id: " + entityId);
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                case MONGODB -> {
-                    Document entity = database.getCollection(collection).find(Filters.eq("entity_id", entityId)).first();
-                    return entity != null;
-                }
-                default -> {
-                    return false;
-                }
+            if (entitiesDirectory != null) {
+                return new File(entitiesDirectory, entityId + ".entity").exists();
+            } else if (database != null) {
+                return database.exists(collection, Pair.create("entity_id", entityId), null);
+            } else {
+                return false;
             }
         });
     }
@@ -281,32 +201,16 @@ public class EntityManager<T extends EntityManager.Entity> {
     @Beta
     public void loadAll() {
         List<UUID> entityIDs = new ArrayList<>();
-        switch (type) {
-            case FILE -> {
-                File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".entity"));
-                if (files != null) {
-                    Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".entity", ""))));
-                }
+        if (entitiesDirectory != null) {
+            File[] files = this.entitiesDirectory.listFiles((dir, name) -> name.endsWith(".entity"));
+            if (files != null) {
+                Arrays.stream(files).forEach(file -> entityIDs.add(UUID.fromString(file.getName().replace(".entity", ""))));
             }
-            case SQL -> {
-                String query = "SELECT entity_id FROM " + collection;
-                try {
-                    PreparedStatement preparedStatement = Objects.requireNonNull(database.getSQLConnection()).prepareStatement(query);
-                    ResultSet rs = preparedStatement.executeQuery();
-                    while (rs.next()) {
-                        entityIDs.add(UUID.fromString(rs.getString("entity_id")));
-                    }
-                    rs.close();
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            case MONGODB -> {
-                for (Document doc : database.getCollection(collection).find()) {
-                    entityIDs.add(doc.get("entity_id", UUID.class));
-                }
-            }
+        } else if (database != null) {
+            Pair<String, List<DatabaseObject>> data = database.retrieveData(collection, Pair.create("entity_id", null));
+            data.value().forEach(databaseObject -> {
+                entityIDs.add(UUID.fromString(String.valueOf(databaseObject.data().get("entity_id"))));
+            });
         }
         entityIDs.forEach(this::load);
     }
@@ -390,31 +294,6 @@ public class EntityManager<T extends EntityManager.Entity> {
                     "entityId=" + entityId +
                     ", customData=" + customData +
                     '}';
-        }
-    }
-
-    /**
-     * Represents the type of storage to use for entity data.
-     */
-    public enum Type {
-        /**
-         * Use a directory of FILE files for storage.
-         */
-        FILE,
-
-        /**
-         * Use a SQL database for storage.
-         */
-        SQL,
-
-        /**
-         * Use a MongoDB database for storage.
-         */
-        MONGODB,
-        ;
-
-        public Type getType() {
-            return this;
         }
     }
 }

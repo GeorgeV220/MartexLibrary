@@ -3,6 +3,9 @@ apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
 
 dependencies {
+    compileOnly "org.yaml:snakeyaml:${snakeyamlVersion}"
+    compileOnly "com.google.guava:guava:${guavaVersion}"
+
     compileOnly project(path: ':utilities')
     compileOnly project(path: ':maps')
     compileOnly project(path: ':yaml')

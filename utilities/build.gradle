@@ -1,7 +1,12 @@
 apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
 dependencies {
-    compileOnly 'org.jetbrains:annotations:24.0.0'
+    compileOnly "org.jetbrains:annotations:${jetbrainsAnnotationsVersion}"
+    compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
+    compileOnly "com.google.guava:guava:${guavaVersion}"
+    compileOnly "com.google.code.gson:gson:${gsonVersion}"
+
     compileOnly project(path: ':maps')
     compileOnly project(path: ':yaml')
 }

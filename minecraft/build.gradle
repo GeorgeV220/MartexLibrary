@@ -1,6 +1,16 @@
 apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
 
+subprojects {
+    dependencies {
+        compileOnly "io.papermc.paper:paper-api:${mcVersion}-R0.1-SNAPSHOT"
+        compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+        compileOnly 'com.velocitypowered:velocity-api:3.1.1'
+        compileOnly 'me.clip:placeholderapi:2.11.2'
+        compileOnly 'com.mojang:authlib:1.11'
+    }
+}
+
 dependencies {
     implementation project(path: ':minecraft:bukkit')
     implementation project(path: ':minecraft:bungee')

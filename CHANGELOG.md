@@ -1,3 +1,13 @@
+# [11.1.0](https://github.com/GeorgeV220/API/compare/v11.0.0...v11.1.0) (2023-06-09)
+
+
+### Features
+
+* add SectionPathData class to handle comments and data in configuration sections ([7c93e78](https://github.com/GeorgeV220/API/commit/7c93e78bdd82abe6a9e0ecd572b9a3c3b408563b))
+* **DatabaseWrapper:** Optimizations fixes and new methods ([e860949](https://github.com/GeorgeV220/API/commit/e860949b524f306b60dd2f45cbde25a5cee61592))
+* **DatabaseWrapper:** Rewriting the entire class ([75c3e00](https://github.com/GeorgeV220/API/commit/75c3e008b542c27c1ae908eeedc0b348a743883c))
+* **Yaml:** Upgrade to SnakeYaml 2.0 and updated from the latest bukkit ([abb61aa](https://github.com/GeorgeV220/API/commit/abb61aa29ce6b3235d05787b695e3315358ce38a))
+
 # [11.0.0](https://github.com/GeorgeV220/API/compare/v10.2.3...v11.0.0) (2023-05-30)
 
 

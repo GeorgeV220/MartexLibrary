@@ -254,7 +254,6 @@ public class DatabaseWrapper {
                 String filterCondition = filterPair.key() + " " + condition + " '" + filterPair.value() + "'";
                 Map<String, Object> updateColumnValues = updatePair.value();
                 String updateQuery = this.sqlDatabase.buildUpdateStatement(collectionName, updateColumnValues, filterCondition);
-                this.logger.info(updateQuery);
                 try (PreparedStatement statement = sqlConnection.prepareStatement(updateQuery)) {
                     int parameterIndex = 1;
                     for (Map.Entry<String, Object> entry : updatePair.value().entrySet()) {

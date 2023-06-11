@@ -140,7 +140,7 @@ public class DatabaseWrapper {
                         Object value = entry.getValue();
                         int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
                         if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
-                            statement.setString(parameterIndex, Utils.serializeObjectToString(value));
+                            statement.setBytes(parameterIndex, Utils.serializeObjectToBytes(value));
                         } else {
                             statement.setString(parameterIndex, String.valueOf(value));
                         }
@@ -262,7 +262,7 @@ public class DatabaseWrapper {
                         Object value = entry.getValue();
                         int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
                         if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
-                            statement.setString(parameterIndex, Utils.serializeObjectToString(value));
+                            statement.setBytes(parameterIndex, Utils.serializeObjectToBytes(value));
                         } else {
                             statement.setString(parameterIndex, String.valueOf(value));
                         }
@@ -328,10 +328,13 @@ public class DatabaseWrapper {
                             for (int i = 1; i <= columnCount; i++) {
                                 String columnName = metaData.getColumnName(i);
                                 int columnType = this.sqlDatabase.getColumnDataType(collectionName, columnName, sqlConnection);
-                                Object value = resultSet.getObject(i);
                                 if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
-                                    results.append(columnName, Utils.deserializeObjectFromString(String.valueOf(value)));
+                                    byte[] value = resultSet.getBytes(i);
+                                    if (value != null) {
+                                        results.append(columnName, Utils.deserializeObjectFromBytes(value));
+                                    }
                                 } else {
+                                    Object value = resultSet.getObject(i);
                                     results.append(columnName, value);
                                 }
                             }

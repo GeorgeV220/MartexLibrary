@@ -1,3 +1,10 @@
+# [11.2.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.1.1...v11.2.0) (2023-06-11)
+
+
+### Features
+
+* **database:** Use Base64 encoding instead of ISO_8859_1 in serialization methods ([cd62ba4](https://github.com/GeorgeV220/MartexLibrary/commit/cd62ba444170e862450d3bf1b428d9c5b6a057d4))
+
 ## [11.1.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.1.0...v11.1.1) (2023-06-11)
 
 

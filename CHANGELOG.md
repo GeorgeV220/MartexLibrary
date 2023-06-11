@@ -1,3 +1,10 @@
+## [11.1.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.1.0...v11.1.1) (2023-06-11)
+
+
+### Bug Fixes
+
+* Relocate org.yaml.snakeyaml package into com.georgev22.library.snakeyaml ([37aafbd](https://github.com/GeorgeV220/MartexLibrary/commit/37aafbd8c7d6719847c06ec7a7b9e446bf94dde4))
+
 # [11.1.0](https://github.com/GeorgeV220/API/compare/v11.0.0...v11.1.0) (2023-06-09)
 
 

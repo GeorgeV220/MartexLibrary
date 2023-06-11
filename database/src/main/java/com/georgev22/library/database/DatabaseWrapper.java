@@ -140,7 +140,7 @@ public class DatabaseWrapper {
                         Object value = entry.getValue();
                         int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
                         if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
-                            statement.setObject(parameterIndex, Utils.serializeObjectToString(value));
+                            statement.setString(parameterIndex, Utils.serializeObjectToString(value));
                         } else {
                             statement.setString(parameterIndex, String.valueOf(value));
                         }
@@ -262,7 +262,7 @@ public class DatabaseWrapper {
                         Object value = entry.getValue();
                         int columnType = this.sqlDatabase.getColumnDataType(collectionName, key, sqlConnection);
                         if (columnType == Types.BLOB || columnType == Types.LONGVARBINARY) {
-                            statement.setObject(parameterIndex, Utils.serializeObjectToString(value));
+                            statement.setString(parameterIndex, Utils.serializeObjectToString(value));
                         } else {
                             statement.setString(parameterIndex, String.valueOf(value));
                         }

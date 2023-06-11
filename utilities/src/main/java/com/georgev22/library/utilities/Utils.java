@@ -474,14 +474,16 @@ public final class Utils {
      * @throws IOException if there is an error during serialization
      */
     @Contract("_ -> new")
-    public static @NotNull String serializeObjectToString(Object obj) throws IOException {
+    public static @NotNull String serializeObjectToString(@NotNull Object obj) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(obj);
         objectOutputStream.flush();
         objectOutputStream.close();
         byteArrayOutputStream.close();
-        return byteArrayOutputStream.toString(StandardCharsets.ISO_8859_1);
+
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
@@ -493,7 +495,7 @@ public final class Utils {
      * @return the serialized data as a  byte array
      * @throws IOException if there is an error during serialization
      */
-    public static byte[] serializeObjectToBytes(Object obj) throws IOException {
+    public static byte @NotNull [] serializeObjectToBytes(@NotNull Object obj) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(obj);
@@ -535,8 +537,15 @@ public final class Utils {
      * @throws IOException            if there is an error accessing or reading from the serialized data
      * @throws ClassNotFoundException if the class of the serialized object cannot be found
      */
-    public static Object deserializeObjectFromString(String serializedData) throws IOException, ClassNotFoundException {
-        return deserializeObjectFromBytes(serializedData.getBytes(StandardCharsets.ISO_8859_1));
+    public static Object deserializeObjectFromString(@NotNull String serializedData) throws IOException, ClassNotFoundException {
+        byte[] bytes = Base64.getDecoder().decode(serializedData);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        byteArrayInputStream.close();
+
+        return obj;
     }
 
     /**
@@ -550,7 +559,7 @@ public final class Utils {
      * @throws IOException            if there is an error accessing or reading from the serialized data
      * @throws ClassNotFoundException if the class of the serialized object cannot be found
      */
-    public static Object deserializeObjectFromBytes(byte[] byteArray) throws IOException, ClassNotFoundException {
+    public static Object deserializeObjectFromBytes(byte @NotNull [] byteArray) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         Object obj = objectInputStream.readObject();

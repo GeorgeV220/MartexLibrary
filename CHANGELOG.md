@@ -1,3 +1,10 @@
+## [11.3.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.3.0...v11.3.1) (2023-06-27)
+
+
+### Bug Fixes
+
+* Removed JavaExtension from BukkitMinecraftUtils ([47218fc](https://github.com/GeorgeV220/MartexLibrary/commit/47218fc39205ae406cdbe01d23374901016a5862))
+
 # [11.3.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.2.0...v11.3.0) (2023-06-11)
 
 

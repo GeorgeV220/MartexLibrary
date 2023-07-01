@@ -1,9 +1,8 @@
 package com.georgev22.library.minecraft.inventory;
 
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.utilities.Utils;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.minecraft.colors.Animation;
-import com.georgev22.library.utilities.Color;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryClickHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryCloseHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventorySwitchPageHandler;
@@ -12,10 +11,10 @@ import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.NextNavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.library.minecraft.inventory.utils.InventoryUtil;
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.utilities.Color;
+import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.gson.reflect.TypeToken;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
@@ -24,6 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.IOException;
 import java.util.*;
 
 public class PagedInventory implements IPagedInventory {
@@ -274,8 +274,13 @@ public class PagedInventory implements IPagedInventory {
 
                         if (!nbtItem.hasKey("colors") & !nbtItem.hasKey("animation")) continue;
 
-                        List<String> color = Utils.deserialize(nbtItem.getString("colors"), new TypeToken<List<String>>() {
-                        }.getType());
+                        List<String> color;
+                        try {
+                            color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
+                        } catch (IOException | ClassNotFoundException e) {
+                            e.printStackTrace();
+                            color = Lists.newArrayList();
+                        }
 
                         if (color.isEmpty()) continue;
                         List<Color> colorsList = Lists.newArrayList();

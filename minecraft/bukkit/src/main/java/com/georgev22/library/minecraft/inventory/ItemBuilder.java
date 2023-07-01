@@ -2,10 +2,10 @@ package com.georgev22.library.minecraft.inventory;
 
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
-import com.georgev22.library.minecraft.inventory.utils.actions.Action;
-import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.minecraft.inventory.utils.actions.Action;
+import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -19,6 +19,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -375,7 +378,11 @@ public class ItemBuilder {
 
     public ItemBuilder colors(@NotNull List<String> colors) {
         if (colors.size() >= 2) {
-            this.nbtItem.setString("colors", Utils.serialize(colors));
+            try {
+                this.nbtItem.setString("colors", Utils.serializeObjectToString(colors));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return this;
     }
@@ -391,7 +398,11 @@ public class ItemBuilder {
     }
 
     public ItemBuilder commands(List<ItemCommand> itemCommands) {
-        this.nbtItem.setString("commands", Utils.serialize(itemCommands));
+        try {
+            this.nbtItem.setString("commands", Utils.serializeObjectToString(itemCommands));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -410,7 +421,11 @@ public class ItemBuilder {
     }
 
     public ItemBuilder customNBT(String key, Object value) {
-        this.nbtItem.setString(key, Utils.serialize(value));
+        try {
+            this.nbtItem.setString(key, Utils.serializeObjectToString(value));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
@@ -503,7 +518,11 @@ public class ItemBuilder {
         MIDDLE,
     }
 
-    public static class ItemCommand {
+    public static class ItemCommand implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private final ItemCommandType type;
         private final String[] commands;
         private final int cooldown;

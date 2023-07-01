@@ -1,3 +1,10 @@
+## [11.4.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.2...v11.4.3) (2023-07-01)
+
+
+### Bug Fixes
+
+* **ItemBuilder:** Update serialization method for colors and commands ([3c33de3](https://github.com/GeorgeV220/MartexLibrary/commit/3c33de3200979907f72d1c45f88c7a168f6538a4))
+
 ## [11.4.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.1...v11.4.2) (2023-07-01)
 
 

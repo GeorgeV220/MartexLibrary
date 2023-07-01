@@ -22,7 +22,6 @@ dependencies {
 shadowJar {
     archiveClassifier = ''
     exclude("plugin.yml")
-    relocate 'com.cryptomorin.xseries', 'com.georgev22.library.minecraft.xseries'
 }
 
 tasks.build.dependsOn(shadowJar)

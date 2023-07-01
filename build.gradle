@@ -73,7 +73,6 @@ dependencies {
 shadowJar {
     archiveClassifier = ''
     exclude("plugin.yml")
-    relocate 'com.cryptomorin.xseries', 'com.georgev22.library.minecraft.xseries'
     relocate 'org.yaml.snakeyaml', 'com.georgev22.library.snakeyaml'
 }
 

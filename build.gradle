@@ -72,9 +72,7 @@ dependencies {
 
 shadowJar {
     archiveClassifier = ''
-    exclude("de/tr7zw/nbtapi/plugin/**")
     exclude("plugin.yml")
-    relocate 'de.tr7zw', 'com.georgev22.library.minecraft.nbt'
     relocate 'com.cryptomorin.xseries', 'com.georgev22.library.minecraft.xseries'
     relocate 'org.yaml.snakeyaml', 'com.georgev22.library.snakeyaml'
 }

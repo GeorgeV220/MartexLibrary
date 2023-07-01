@@ -1,3 +1,10 @@
+## [11.4.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.1...v11.4.2) (2023-07-01)
+
+
+### Bug Fixes
+
+* remove unnecessary exclusions and relocations in build.gradle 2 ([d65e567](https://github.com/GeorgeV220/MartexLibrary/commit/d65e567ac3afeab6f3b992882dd8d6d7b2169f5d))
+
 ## [11.4.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.0...v11.4.1) (2023-07-01)
 
 

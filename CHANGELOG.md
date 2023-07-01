@@ -1,3 +1,10 @@
+# [11.4.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.3.2...v11.4.0) (2023-07-01)
+
+
+### Features
+
+* **database:** Add delete method to EntityManager class ([f0614c5](https://github.com/GeorgeV220/MartexLibrary/commit/f0614c5a9f2f5bb319c90c2a8d9d06016f94d2b8))
+
 ## [11.3.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.3.1...v11.3.2) (2023-06-28)
 
 

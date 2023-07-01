@@ -137,6 +137,30 @@ public class EntityManager<T extends EntityManager.Entity> {
     }
 
     /**
+     * Deletes the specified entity.
+     *
+     * @param entity the {@link Entity} to delete
+     * @return a {@link CompletableFuture} that completes when the {@link Entity} is deleted
+     */
+    public CompletableFuture<Void> delete(Entity entity) {
+        return CompletableFuture.runAsync(() -> {
+            if (entitiesDirectory != null) {
+                File file = new File(entitiesDirectory, entity.getId() + ".entity");
+                if (file.exists()) {
+                    file.delete();
+                }
+            } else if (database != null) {
+                exists(entity.getId()).thenAccept(result -> {
+                    ObjectMap<String, Object> entityData = new HashObjectMap<>(entity.customData);
+                    if (result) {
+                        database.removeData(collection, Pair.create("entity_id", entity.getId()), null);
+                    }
+                });
+            }
+        });
+    }
+
+    /**
      * Creates a new {@link Entity} with the specified entity ID.
      *
      * @param entityId the {@link UUID} of the entity to create

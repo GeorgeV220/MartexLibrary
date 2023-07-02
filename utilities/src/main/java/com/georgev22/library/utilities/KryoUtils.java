@@ -18,13 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 public class KryoUtils {
-    private final Kryo kryo;
+    private static final Kryo kryo = createKryoInstance();
 
-    public KryoUtils() {
-        kryo = createKryoInstance();
-    }
-
-    public byte[] serialize(Object object) {
+    public static byte[] serialize(Object object) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Output output = new Output(byteArrayOutputStream);
         kryo.writeClassAndObject(output, object);
@@ -33,7 +29,7 @@ public class KryoUtils {
         return byteArrayOutputStream.toByteArray();
     }
 
-    public <T> T deserialize(byte[] bytes) {
+    public static <T> T deserialize(byte[] bytes) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Input input = new Input(byteArrayInputStream);
         T object = (T) kryo.readClassAndObject(input);
@@ -42,19 +38,19 @@ public class KryoUtils {
         return object;
     }
 
-    public void registerClass(Class<?> clazz) {
+    public static void registerClass(Class<?> clazz) {
         kryo.register(clazz);
     }
 
-    public void registerClass(Class<?> clazz, int id) {
+    public static void registerClass(Class<?> clazz, int id) {
         kryo.register(clazz, id);
     }
 
-    public <T> void setDefaultSerializer(Class<? extends Serializer<T>> serializerClass) {
+    public static <T> void setDefaultSerializer(Class<? extends Serializer<T>> serializerClass) {
         kryo.setDefaultSerializer(serializerClass);
     }
 
-    private @NotNull Kryo createKryoInstance() {
+    private static @NotNull Kryo createKryoInstance() {
         Kryo kryo = new Kryo();
         kryo.setReferences(true);
         kryo.setRegistrationRequired(false);

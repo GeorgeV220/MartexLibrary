@@ -1,42 +1,61 @@
 package com.georgev22.library.minecraft.inventory.utils.actions;
 
-import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.exceptions.ActionRunException;
+import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ActionManager {
 
-    public static void runActions(@NotNull OfflinePlayer offlinePlayer, @NotNull JavaPlugin plugin, boolean error, @NotNull List<Action> actions) {
+    private List<Action> actions = new ArrayList<>();
+
+    public ActionManager() {
+    }
+
+    public ActionManager(Action action) {
+        this.actions.add(action);
+    }
+
+    public ActionManager(List<Action> actions) {
+        this.actions.addAll(actions);
+    }
+
+    public ActionManager(@NotNull Action action, ObjectMap.Pair<String, List<Object>> data) {
+        action.data().add(data);
+        this.actions.add(action);
+    }
+
+
+    public void runActions(@NotNull OfflinePlayer offlinePlayer, @NotNull JavaPlugin plugin) {
         for (Action action : actions) {
             try {
                 action.runAction(offlinePlayer);
             } catch (ActionRunException actionRunException) {
-                if (error)
-                    actionRunException.printStackTrace();
-                else
-                    BukkitMinecraftUtils.debug(plugin, actionRunException.getMessage());
+                BukkitMinecraftUtils.debug(plugin, actionRunException.getMessage());
                 break;
             }
         }
     }
 
-    private final String actionName;
-    private final Object[] data;
-
-    public ActionManager(String actionName, Object... data) {
-        this.actionName = actionName;
-        this.data = data;
+    public Action addAction(Action action) {
+        this.actions.add(action);
+        return action;
     }
 
-    public String getActionName() {
-        return actionName;
+    public List<Action> addAction(List<Action> actions) {
+        this.actions.addAll(actions);
+        return actions;
     }
 
-    public Object[] getData() {
-        return data;
+    public Action addAction(@NotNull Action action, ObjectMap.Pair<String, List<Object>> data) {
+        action.data().add(data);
+        this.actions.add(action);
+        return action;
     }
+
 }

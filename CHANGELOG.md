@@ -1,3 +1,13 @@
+# [11.6.0-beta.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.5.0...v11.6.0-beta.1) (2023-07-02)
+
+
+### Features
+
+* Add KryoUtils class for serializing and deserializing objects ([28bde30](https://github.com/GeorgeV220/MartexLibrary/commit/28bde308727bf07be68b6b49ddf5cf4fde2cb084))
+* Add support for Kryo serialization in ItemBuilder ([e1cecce](https://github.com/GeorgeV220/MartexLibrary/commit/e1cecce63ebd725f726d550b3098bdc5ae58682c))
+* **build.gradle:** Add shadow configuration for dependencies ([3f14089](https://github.com/GeorgeV220/MartexLibrary/commit/3f14089568ea1e8dab30c7c8be68ecd89ac3f337))
+* **inventory:** Add kryo enablement for PagedInventory ([8d5e7bb](https://github.com/GeorgeV220/MartexLibrary/commit/8d5e7bb3f285fcd599ea314511a4e76e31739888))
+
 # [11.5.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.3...v11.5.0) (2023-07-02)
 
 

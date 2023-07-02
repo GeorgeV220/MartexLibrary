@@ -57,22 +57,6 @@ public class PagedInventory implements IPagedInventory {
      * {@inheritDoc}
      */
     @Override
-    public boolean kryo() {
-        return kryo;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void kryo(boolean kryo) {
-        this.kryo = kryo;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void addHandler(PagedInventoryClickHandler handler) {
         clickHandlers.add(handler);
     }
@@ -294,7 +278,7 @@ public class PagedInventory implements IPagedInventory {
                         if (!nbtItem.hasKey("colors") & !nbtItem.hasKey("animation")) continue;
 
                         List<String> color;
-                        if (kryo()) {
+                        if (registrar.kryo()) {
                             color = KryoUtils.deserialize(nbtItem.getByteArray("colors"));
                         } else {
                             try {

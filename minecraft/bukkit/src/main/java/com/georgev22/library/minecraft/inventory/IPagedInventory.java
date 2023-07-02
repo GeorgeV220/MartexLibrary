@@ -17,21 +17,6 @@ public interface IPagedInventory {
     int MIN_INV_SIZE = 18;
 
     /**
-     * Checks if Kryo is enabled.
-     *
-     * @return {@code true} if Kryo is enabled, {@code false} if it is disabled.
-     */
-    boolean kryo();
-
-    /**
-     * Sets the Kryo enablement.
-     *
-     * @param kryo {@code true} to enable Kryo, {@code false} to disable it.
-     */
-    void kryo(boolean kryo);
-
-
-    /**
      * Add a click handler
      *
      * @param handler The handler

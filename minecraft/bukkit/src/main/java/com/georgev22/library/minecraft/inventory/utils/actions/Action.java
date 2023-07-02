@@ -1,10 +1,17 @@
 package com.georgev22.library.minecraft.inventory.utils.actions;
 
 import com.georgev22.library.exceptions.ActionRunException;
+import com.georgev22.library.maps.ObjectMap;
 import org.bukkit.OfflinePlayer;
 
-public abstract class Action {
+import java.util.List;
 
-    public abstract void runAction(OfflinePlayer offlinePlayer) throws ActionRunException;
+public interface Action {
+
+    void runAction(OfflinePlayer offlinePlayer) throws ActionRunException;
+
+    String name();
+
+    List<ObjectMap.Pair<String, List<Object>>> data();
 
 }

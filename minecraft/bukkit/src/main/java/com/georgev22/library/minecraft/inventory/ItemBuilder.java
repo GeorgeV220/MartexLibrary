@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -22,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -168,15 +168,31 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
         List<Action> actions = Lists.newArrayList();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
+        if (!fileConfiguration.isSet(path + ".actions")) {
+            return actions;
+        }
+        com.georgev22.library.yaml.ConfigurationSection configurationSection = fileConfiguration.getConfigurationSection(path + ".actions");
+        if (configurationSection == null) {
+            return actions;
+        }
 
-        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false).isEmpty()) {
+        if (!configurationSection.getKeys(false).isEmpty()) {
             for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
+                actions.add(actionManager.addAction(
+                                action,
+                                ObjectMap.Pair.create(
+                                        key,
+                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
+                                                .map(str -> (Object) str)
+                                                .toList()
+                                )
+                        )
+                );
             }
         }
 
@@ -270,15 +286,31 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
         List<Action> actions = Lists.newArrayList();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
+        if (!fileConfiguration.isSet(path + ".actions")) {
+            return actions;
+        }
+        ConfigurationSection configurationSection = fileConfiguration.getConfigurationSection(path + ".actions");
+        if (configurationSection == null) {
+            return actions;
+        }
 
-        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false).isEmpty()) {
+        if (!configurationSection.getKeys(false).isEmpty()) {
             for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
+                actions.add(actionManager.addAction(
+                                action,
+                                ObjectMap.Pair.create(
+                                        key,
+                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
+                                                .map(str -> (Object) str)
+                                                .toList()
+                                )
+                        )
+                );
             }
         }
 

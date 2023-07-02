@@ -12,6 +12,7 @@ import com.georgev22.library.minecraft.inventory.navigationitems.NextNavigationI
 import com.georgev22.library.minecraft.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.library.minecraft.inventory.utils.InventoryUtil;
 import com.georgev22.library.utilities.Color;
+import com.georgev22.library.utilities.KryoUtils;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -36,6 +37,8 @@ public class PagedInventory implements IPagedInventory {
     private final List<PagedInventoryCloseHandler> closeHandlers;
     private final List<PagedInventorySwitchPageHandler> switchHandlers;
 
+    private boolean kryo = false;
+
     protected PagedInventory(InventoryRegistrar registrar, NavigationRow navigationRow) {
         this.registrar = registrar;
         this.pages = new ArrayList<>();
@@ -48,6 +51,22 @@ public class PagedInventory implements IPagedInventory {
     @Deprecated
     protected PagedInventory(InventoryRegistrar registrar, Map<Integer, NavigationItem> navigation) {
         this(registrar, getFromMap(navigation));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean kryo() {
+        return kryo;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void kryo(boolean kryo) {
+        this.kryo = kryo;
     }
 
     /**
@@ -275,11 +294,15 @@ public class PagedInventory implements IPagedInventory {
                         if (!nbtItem.hasKey("colors") & !nbtItem.hasKey("animation")) continue;
 
                         List<String> color;
-                        try {
-                            color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
-                            color = Lists.newArrayList();
+                        if (kryo()) {
+                            color = KryoUtils.deserialize(nbtItem.getByteArray("colors"));
+                        } else {
+                            try {
+                                color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
+                            } catch (IOException | ClassNotFoundException e) {
+                                e.printStackTrace();
+                                color = Lists.newArrayList();
+                            }
                         }
 
                         if (color.isEmpty()) continue;

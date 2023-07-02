@@ -1,3 +1,10 @@
+# [11.6.0-beta.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.1...v11.6.0-beta.2) (2023-07-02)
+
+
+### Features
+
+* **inventory:** Add Kryo enablement to InventoryRegistrar ([b1a33b4](https://github.com/GeorgeV220/MartexLibrary/commit/b1a33b42450679c7effccc02ed7ddaed45e545ef))
+
 # [11.6.0-beta.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.5.0...v11.6.0-beta.1) (2023-07-02)
 
 

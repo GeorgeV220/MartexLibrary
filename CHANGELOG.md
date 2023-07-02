@@ -1,3 +1,12 @@
+# [11.5.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.3...v11.5.0) (2023-07-02)
+
+
+### Features
+
+* **action:** add ability to add multiple actions to ActionManager ([58c47ec](https://github.com/GeorgeV220/MartexLibrary/commit/58c47ece18eb8184810445bc28ed990de417ade6))
+* **inventory:** Change Action class to interface ([5919ef9](https://github.com/GeorgeV220/MartexLibrary/commit/5919ef942d6f3482c3730ad9c2f099aa1142ec51))
+* **ItemBuilder:** Simplify code for building actions from config files ([9dd0d1e](https://github.com/GeorgeV220/MartexLibrary/commit/9dd0d1e9627ca18ae2255785341c7af7cf87efd8))
+
 ## [11.4.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.4.2...v11.4.3) (2023-07-01)
 
 

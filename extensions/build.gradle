@@ -6,9 +6,9 @@ dependencies {
     compileOnly "org.yaml:snakeyaml:${snakeyamlVersion}"
     compileOnly "com.google.guava:guava:${guavaVersion}"
 
-    compileOnly project(path: ':utilities')
+    compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':maps')
-    compileOnly project(path: ':yaml')
+    compileOnly project(path: ':yaml', configuration: 'shadow')
 }
 
 tasks.build.dependsOn(shadowJar)

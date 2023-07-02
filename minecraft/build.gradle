@@ -12,11 +12,11 @@ subprojects {
 }
 
 dependencies {
-    implementation project(path: ':minecraft:bukkit')
-    implementation project(path: ':minecraft:bungee')
-    implementation project(path: ':minecraft:velocity')
-    implementation project(path: ':minecraft:sponge7')
-    implementation project(path: ':minecraft:sponge8')
+    implementation project(path: ':minecraft:bukkit', configuration: 'shadow')
+    implementation project(path: ':minecraft:bungee', configuration: 'shadow')
+    implementation project(path: ':minecraft:velocity', configuration: 'shadow')
+    implementation project(path: ':minecraft:sponge7', configuration: 'shadow')
+    implementation project(path: ':minecraft:sponge8', configuration: 'shadow')
 }
 
 shadowJar {

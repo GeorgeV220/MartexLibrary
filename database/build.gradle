@@ -3,7 +3,7 @@ apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library'
 
 dependencies {
-    compileOnly project(path: ':utilities')
+    compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':maps')
 }
 

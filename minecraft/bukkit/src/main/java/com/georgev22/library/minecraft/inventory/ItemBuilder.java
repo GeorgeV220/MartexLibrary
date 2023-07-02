@@ -26,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
@@ -90,7 +91,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
@@ -106,7 +108,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
@@ -114,7 +117,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
@@ -129,16 +133,19 @@ public class ItemBuilder {
 
     private static @NotNull List<ItemCommand> buildItemCommandFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
         List<ItemCommand> itemCommands = Lists.newArrayList();
-        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !fileConfiguration.getConfigurationSection(path + ".commands").getKeys(true).isEmpty()) {
-            if (fileConfiguration.getStringList(path + ".commands.RIGHT") != null && !fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
+        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".commands")).getKeys(true).isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.RIGHT");
+            if (!fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.RIGHT, fileConfiguration.getInt(path + ".commands cooldown.RIGHT"), fileConfiguration.getStringList(path + ".commands.RIGHT"));
                 itemCommands.add(itemCommand);
             }
-            if (fileConfiguration.getStringList(path + ".commands.LEFT") != null && !fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.LEFT");
+            if (!fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.LEFT, fileConfiguration.getInt(path + ".commands cooldown.LEFT"), fileConfiguration.getStringList(path + ".commands.LEFT"));
                 itemCommands.add(itemCommand);
             }
-            if (fileConfiguration.getStringList(path + ".commands.MIDDLE") != null && !fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.MIDDLE");
+            if (!fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.MIDDLE, fileConfiguration.getInt(path + ".commands cooldown.MIDDLE"), fileConfiguration.getStringList(path + ".commands.MIDDLE"));
                 itemCommands.add(itemCommand);
             }
@@ -148,12 +155,13 @@ public class ItemBuilder {
 
     public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         List<ItemStack> itemStacks = Lists.newArrayList();
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
         }
-        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
+        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".frames")).getKeys(false).isEmpty()) {
             itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
-            for (String b : fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false)) {
+            for (String b : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".frames")).getKeys(false)) {
                 itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial()).build());
             }
         }
@@ -162,12 +170,12 @@ public class ItemBuilder {
 
     public static @NotNull List<Action> buildActionsFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         List<Action> actions = Lists.newArrayList();
-        if (fileConfiguration == null || fileConfiguration.get(path) == null) {
+        if (fileConfiguration.get(path) == null) {
             return actions;
         }
 
-        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false).isEmpty()) {
-            for (String key : fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false)) {
+        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false).isEmpty()) {
+            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
                 actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
             }
         }
@@ -185,7 +193,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
@@ -201,7 +210,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         return new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial())
@@ -209,7 +219,8 @@ public class ItemBuilder {
     }
 
     public static ItemBuilder buildSimpleItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null || fileConfiguration.get(path + ".amount") == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
         }
         if (fileConfiguration.get(path + ".title") == null || fileConfiguration.get(path + ".lores") == null || fileConfiguration.get(path + ".enchantments") == null)
@@ -224,16 +235,19 @@ public class ItemBuilder {
 
     private static @NotNull List<ItemCommand> buildItemCommandFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
         List<ItemCommand> itemCommands = Lists.newArrayList();
-        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !fileConfiguration.getConfigurationSection(path + ".commands").getKeys(true).isEmpty()) {
-            if (fileConfiguration.getStringList(path + ".commands.RIGHT") != null && !fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
+        if (fileConfiguration.getConfigurationSection(path + ".commands") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".commands")).getKeys(true).isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.RIGHT");
+            if (!fileConfiguration.getStringList(path + ".commands.RIGHT").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.RIGHT, fileConfiguration.getInt(path + ".commands cooldown.RIGHT"), fileConfiguration.getStringList(path + ".commands.RIGHT"));
                 itemCommands.add(itemCommand);
             }
-            if (fileConfiguration.getStringList(path + ".commands.LEFT") != null && !fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.LEFT");
+            if (!fileConfiguration.getStringList(path + ".commands.LEFT").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.LEFT, fileConfiguration.getInt(path + ".commands cooldown.LEFT"), fileConfiguration.getStringList(path + ".commands.LEFT"));
                 itemCommands.add(itemCommand);
             }
-            if (fileConfiguration.getStringList(path + ".commands.MIDDLE") != null && !fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
+            fileConfiguration.getStringList(path + ".commands.MIDDLE");
+            if (!fileConfiguration.getStringList(path + ".commands.MIDDLE").isEmpty()) {
                 ItemCommand itemCommand = new ItemCommand(ItemCommandType.MIDDLE, fileConfiguration.getInt(path + ".commands cooldown.MIDDLE"), fileConfiguration.getStringList(path + ".commands.MIDDLE"));
                 itemCommands.add(itemCommand);
             }
@@ -243,12 +257,13 @@ public class ItemBuilder {
 
     public static @NotNull List<ItemStack> buildFramesFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
         List<ItemStack> itemStacks = Lists.newArrayList();
-        if (notNull("fileConfiguration", fileConfiguration) == null || fileConfiguration.get(notNull("path", path)) == null) {
+        notNull("fileConfiguration", fileConfiguration);
+        if (fileConfiguration.get(notNull("path", path)) == null) {
             return Lists.newArrayList(new ItemBuilder(Material.ANVIL).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!")).build());
         }
-        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false).isEmpty()) {
+        if (fileConfiguration.getConfigurationSection(path + ".frames") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".frames")).getKeys(false).isEmpty()) {
             itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".item")).parseMaterial()).build());
-            for (String b : fileConfiguration.getConfigurationSection(path + ".frames").getKeys(false)) {
+            for (String b : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".frames")).getKeys(false)) {
                 itemStacks.add(new ItemBuilder(XMaterial.valueOf(fileConfiguration.getString(path + ".frames." + b + ".item")).parseMaterial()).build());
             }
         }
@@ -257,12 +272,12 @@ public class ItemBuilder {
 
     public static @NotNull List<Action> buildActionsFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Class<? extends Action> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         List<Action> actions = Lists.newArrayList();
-        if (fileConfiguration == null || fileConfiguration.get(path) == null) {
+        if (fileConfiguration.get(path) == null) {
             return actions;
         }
 
-        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false).isEmpty()) {
-            for (String key : fileConfiguration.getConfigurationSection(path + ".actions").getKeys(false)) {
+        if (fileConfiguration.getConfigurationSection(path + ".actions") != null && !Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false).isEmpty()) {
+            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
                 actions.add(clazz.getDeclaredConstructor(ActionManager.class).newInstance(new ActionManager(key, fileConfiguration.getStringList(path + ".actions." + key).toArray())));
             }
         }
@@ -367,8 +382,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder skull(String owner) {
-        if (this.itemStack.getItemMeta() != null && this.itemStack.getItemMeta() instanceof SkullMeta) {
-            SkullMeta skullMeta = (SkullMeta) this.itemStack.getItemMeta();
+        if (this.itemStack.getItemMeta() != null && this.itemStack.getItemMeta() instanceof SkullMeta skullMeta) {
+            //noinspection deprecation
             skullMeta.setOwner(owner);
             this.itemStack.setItemMeta(skullMeta);
         }
@@ -462,6 +477,7 @@ public class ItemBuilder {
 
         ItemMeta meta = itemStack.getItemMeta();
         if (meta.hasLore()) {
+            //noinspection deprecation
             meta.setLore(Lists.newArrayList());
         }
         if (this.unbreakable) {
@@ -473,14 +489,17 @@ public class ItemBuilder {
         }
 
         if (this.durability != null) {
+            //noinspection deprecation
             itemStack.setDurability(this.durability);
         }
 
         if (this.title != null) {
+            //noinspection deprecation
             meta.setDisplayName(BukkitMinecraftUtils.colorize(this.title));
         }
 
         if (this.lores != null && this.lores.size() > 0) {
+            //noinspection deprecation
             meta.setLore(BukkitMinecraftUtils.colorize(this.lores));
         }
 

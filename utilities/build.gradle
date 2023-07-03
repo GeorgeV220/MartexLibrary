@@ -6,17 +6,10 @@ dependencies {
     compileOnly "org.slf4j:slf4j-api:${slf4jVersion}"
     compileOnly "com.google.guava:guava:${guavaVersion}"
     compileOnly "com.google.code.gson:gson:${gsonVersion}"
+    compileOnly 'com.esotericsoftware:kryo:5.5.0'
 
     compileOnly project(path: ':maps')
     compileOnly project(path: ':yaml', configuration: 'shadow')
-
-    implementation 'com.esotericsoftware:kryo:5.5.0'
-}
-
-shadowJar {
-    archiveClassifier = ''
-    relocate "com.esotericsoftware.kryo", "com.georgev22.library.kryo"
-    relocate "org.objenesis",  "com.georgev22.library.objenesis"
 }
 
 tasks.build.dependsOn(shadowJar)

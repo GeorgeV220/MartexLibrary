@@ -1,3 +1,10 @@
+# [11.6.0-beta.5](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.4...v11.6.0-beta.5) (2023-07-03)
+
+
+### Bug Fixes
+
+* Update List to ArrayList in ItemCommandSerializer ([6daaf5a](https://github.com/GeorgeV220/MartexLibrary/commit/6daaf5ab2fb371c9cdbd5cf9ccce1bc860858eca))
+
 # [11.6.0-beta.4](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.3...v11.6.0-beta.4) (2023-07-03)
 
 

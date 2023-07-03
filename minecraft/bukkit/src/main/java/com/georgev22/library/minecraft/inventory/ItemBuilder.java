@@ -4,6 +4,9 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.minecraft.inventory.kryo.ItemCommandSerializer;
+import com.georgev22.library.minecraft.inventory.kryo.ItemStackSerializer;
+import com.georgev22.library.minecraft.inventory.kryo.MaterialSerializer;
 import com.georgev22.library.minecraft.inventory.utils.actions.Action;
 import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
 import com.georgev22.library.utilities.KryoUtils;
@@ -24,10 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
@@ -65,10 +65,10 @@ public class ItemBuilder {
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer(KryoUtils.getKryo()));
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
         KryoUtils.registerClass(Enchantment.class);
-        KryoUtils.registerClass(ItemStack.class);
-        KryoUtils.registerClass(Material.class);
+        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
+        KryoUtils.registerClass(Material.class, new MaterialSerializer());
     }
 
     public ItemBuilder(ItemStack itemStack) {
@@ -85,10 +85,10 @@ public class ItemBuilder {
         this.itemStack = itemStack;
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer(KryoUtils.getKryo()));
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
         KryoUtils.registerClass(Enchantment.class);
-        KryoUtils.registerClass(ItemStack.class);
-        KryoUtils.registerClass(Material.class);
+        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
+        KryoUtils.registerClass(Material.class, new MaterialSerializer());
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration,
@@ -610,27 +610,44 @@ public class ItemBuilder {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        ItemCommandType type;
-        String[] commands;
-        int cooldown;
+        private ItemCommandType type;
+        private List<String> commands;
+        private int cooldown;
+
+        public ItemCommand() {
+            this.type = ItemCommandType.MIDDLE;
+            this.commands = new ArrayList<>();
+        }
 
         public ItemCommand(ItemCommandType type, int cooldown, @NotNull List<String> commands) {
             this.type = type;
+            this.commands = commands;
             this.cooldown = cooldown;
-            this.commands = commands.toArray(new String[0]);
         }
 
         public ItemCommand(ItemCommandType type, int cooldown, String... commands) {
             this.type = type;
+            this.commands = Arrays.asList(commands);
             this.cooldown = cooldown;
+        }
+
+        public void setType(ItemCommandType type) {
+            this.type = type;
+        }
+
+        public void setCommands(List<String> commands) {
             this.commands = commands;
+        }
+
+        public void setCooldown(int cooldown) {
+            this.cooldown = cooldown;
         }
 
         public ItemCommandType getType() {
             return type;
         }
 
-        public String[] getCommands() {
+        public List<String> getCommands() {
             return commands;
         }
 
@@ -642,7 +659,7 @@ public class ItemBuilder {
         public String toString() {
             return "ItemCommand{" +
                     "type=" + type +
-                    ", commands=" + Arrays.toString(commands) +
+                    ", commands=" + commands +
                     ", cooldown=" + cooldown +
                     '}';
         }

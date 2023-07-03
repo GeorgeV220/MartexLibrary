@@ -1,3 +1,12 @@
+# [11.6.0-beta.4](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.3...v11.6.0-beta.4) (2023-07-03)
+
+
+### Features
+
+* Add 'com.esotericsoftware:kryo:5.5.0' as a compileOnly dependency ([1857292](https://github.com/GeorgeV220/MartexLibrary/commit/185729202df6d4ef92fd35b42141ab0e0506cc5e))
+* Add serializers for ItemCommand, ItemStack, and Material ([10f30ab](https://github.com/GeorgeV220/MartexLibrary/commit/10f30aba8cd0c833fff7917ec311d1e1a2f24718))
+* **inventory:** Add ItemCommandSerializer for ItemBuilder ([1c8f1d3](https://github.com/GeorgeV220/MartexLibrary/commit/1c8f1d34b19215a6a9cf3aec37614d5e407af80d))
+
 # [11.6.0-beta.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.2...v11.6.0-beta.3) (2023-07-03)
 
 

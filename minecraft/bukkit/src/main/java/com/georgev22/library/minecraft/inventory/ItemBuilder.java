@@ -65,7 +65,7 @@ public class ItemBuilder {
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class);
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer(KryoUtils.getKryo()));
         KryoUtils.registerClass(Enchantment.class);
         KryoUtils.registerClass(ItemStack.class);
         KryoUtils.registerClass(Material.class);
@@ -85,7 +85,7 @@ public class ItemBuilder {
         this.itemStack = itemStack;
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class);
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer(KryoUtils.getKryo()));
         KryoUtils.registerClass(Enchantment.class);
         KryoUtils.registerClass(ItemStack.class);
         KryoUtils.registerClass(Material.class);
@@ -610,9 +610,9 @@ public class ItemBuilder {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        private final ItemCommandType type;
-        private final String[] commands;
-        private final int cooldown;
+        ItemCommandType type;
+        String[] commands;
+        int cooldown;
 
         public ItemCommand(ItemCommandType type, int cooldown, @NotNull List<String> commands) {
             this.type = type;

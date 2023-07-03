@@ -15,7 +15,7 @@ dependencies {
 
 shadowJar {
     archiveClassifier = ''
-    relocate "com.esotericsoftware", "com.georgev22.library.kryo"
+    relocate "com.esotericsoftware.kryo", "com.georgev22.library.kryo"
     relocate "org.objenesis",  "com.georgev22.library.objenesis"
 }
 

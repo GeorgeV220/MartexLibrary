@@ -1,3 +1,10 @@
+# [11.6.0-beta.6](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.5...v11.6.0-beta.6) (2023-07-03)
+
+
+### Features
+
+* Add ActionSerializer for Kryo serialization ([062ab97](https://github.com/GeorgeV220/MartexLibrary/commit/062ab97f79dd2f06f2f277c28f9b3cb5ad491530))
+
 # [11.6.0-beta.5](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.4...v11.6.0-beta.5) (2023-07-03)
 
 

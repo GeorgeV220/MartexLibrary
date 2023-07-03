@@ -1,3 +1,10 @@
+# [11.6.0-beta.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.2...v11.6.0-beta.3) (2023-07-03)
+
+
+### Features
+
+* **KryoUtils:** Add new methods ([4a42228](https://github.com/GeorgeV220/MartexLibrary/commit/4a42228f6b393d341b9b5821c0fe9d4ff23f068a))
+
 # [11.6.0-beta.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.1...v11.6.0-beta.2) (2023-07-02)
 
 

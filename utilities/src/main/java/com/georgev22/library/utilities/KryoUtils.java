@@ -4,7 +4,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.DefaultSerializers;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.esotericsoftware.kryo.util.ObjectMap;
 import com.georgev22.library.maps.*;
@@ -39,11 +38,19 @@ public class KryoUtils {
     }
 
     public static void registerClass(Class<?> clazz) {
-        kryo.register(clazz);
+        kryo.register(clazz, getKryo().getDefaultSerializer(clazz));
     }
 
     public static void registerClass(Class<?> clazz, int id) {
-        kryo.register(clazz, id);
+        kryo.register(clazz, getKryo().getDefaultSerializer(clazz), id);
+    }
+
+    public static <T> void registerClass(Class<?> clazz, Serializer<T> serializer) {
+        kryo.register(clazz, serializer);
+    }
+
+    public static <T> void registerClass(Class<?> clazz, Serializer<T> serializer, int id) {
+        kryo.register(clazz, serializer, id);
     }
 
     public static <T> void setDefaultSerializer(Class<? extends Serializer<T>> serializerClass) {
@@ -108,9 +115,10 @@ public class KryoUtils {
         kryo.register(UnmodifiableObjectMap.class);
         kryo.register(UnmodifiableObjectMap[].class);
 
+        return kryo;
+    }
 
-        kryo.setDefaultSerializer(DefaultSerializers.StringSerializer.class);
-
+    public static Kryo getKryo() {
         return kryo;
     }
 }

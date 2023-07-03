@@ -32,6 +32,14 @@ import java.util.*;
 import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
 public class ItemBuilder {
+
+    static {
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
+        KryoUtils.registerClass(Enchantment.class);
+        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
+        KryoUtils.registerClass(Material.class, new MaterialSerializer());
+    }
+
     private final ItemStack itemStack;
     private Material material;
     private Short durability;
@@ -65,10 +73,6 @@ public class ItemBuilder {
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
-        KryoUtils.registerClass(Enchantment.class);
-        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
-        KryoUtils.registerClass(Material.class, new MaterialSerializer());
     }
 
     public ItemBuilder(ItemStack itemStack) {

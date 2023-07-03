@@ -4,11 +4,11 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.minecraft.inventory.kryo.ActionSerializer;
 import com.georgev22.library.minecraft.inventory.kryo.ItemCommandSerializer;
 import com.georgev22.library.minecraft.inventory.kryo.ItemStackSerializer;
 import com.georgev22.library.minecraft.inventory.kryo.MaterialSerializer;
 import com.georgev22.library.minecraft.inventory.utils.actions.Action;
-import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
 import com.georgev22.library.utilities.KryoUtils;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
@@ -38,6 +38,7 @@ public class ItemBuilder {
         KryoUtils.registerClass(Enchantment.class);
         KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
         KryoUtils.registerClass(Material.class, new MaterialSerializer());
+        KryoUtils.registerClass(Action.class, new ActionSerializer());
     }
 
     private final ItemStack itemStack;
@@ -89,10 +90,6 @@ public class ItemBuilder {
         this.itemStack = itemStack;
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
-        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
-        KryoUtils.registerClass(Enchantment.class);
-        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
-        KryoUtils.registerClass(Material.class, new MaterialSerializer());
     }
 
     public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration,
@@ -189,8 +186,8 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
-        List<Action> actions = Lists.newArrayList();
+    public static @NotNull List<Action> buildActionsFromConfig(com.georgev22.library.yaml.file.@NotNull FileConfiguration fileConfiguration, String path, Action action) {
+        List<Action> actions = new ArrayList<>();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
@@ -203,17 +200,9 @@ public class ItemBuilder {
         }
 
         if (!configurationSection.getKeys(false).isEmpty()) {
-            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(actionManager.addAction(
-                                action,
-                                ObjectMap.Pair.create(
-                                        key,
-                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
-                                                .map(str -> (Object) str)
-                                                .toList()
-                                )
-                        )
-                );
+            for (String key : configurationSection.getKeys(false)) {
+                action.getData().put(key, Objects.requireNonNull(fileConfiguration.get(path + ".actions." + key)));
+                actions.add(action);
             }
         }
 
@@ -316,8 +305,8 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
-        List<Action> actions = Lists.newArrayList();
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Action action) {
+        List<Action> actions = new ArrayList<>();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
@@ -330,17 +319,9 @@ public class ItemBuilder {
         }
 
         if (!configurationSection.getKeys(false).isEmpty()) {
-            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(actionManager.addAction(
-                                action,
-                                ObjectMap.Pair.create(
-                                        key,
-                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
-                                                .map(str -> (Object) str)
-                                                .toList()
-                                )
-                        )
-                );
+            for (String key : configurationSection.getKeys(false)) {
+                action.getData().put(key, Objects.requireNonNull(fileConfiguration.get(path + ".actions." + key)));
+                actions.add(action);
             }
         }
 

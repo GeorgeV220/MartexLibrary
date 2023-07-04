@@ -1,3 +1,10 @@
+# [11.6.0-beta.8](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.7...v11.6.0-beta.8) (2023-07-04)
+
+
+### Bug Fixes
+
+* **EntityManager:** Fix saveAll() method to correctly iterate over loadedEntities ([2839b06](https://github.com/GeorgeV220/MartexLibrary/commit/2839b063902c6942d295002c8aeb1926fccba58b))
+
 # [11.6.0-beta.7](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.6...v11.6.0-beta.7) (2023-07-04)
 
 

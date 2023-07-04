@@ -133,6 +133,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                     }
                 });
             }
+            this.loadedEntities.append(entity.entityId, (T) entity);
         });
     }
 
@@ -219,7 +220,8 @@ public class EntityManager<T extends EntityManager.Entity> {
      * this method calls the {@link #save(Entity)} method to persist the {@link Entity}.
      */
     public void saveAll() {
-        loadedEntities.forEach((uuid, entity) -> save(entity));
+        ObjectMap<UUID, T> entities = new ObservableObjectMap<UUID, T>().append(loadedEntities);
+        entities.forEach((uuid, entity) -> save(entity));
     }
 
     @Beta
@@ -232,9 +234,7 @@ public class EntityManager<T extends EntityManager.Entity> {
             }
         } else if (database != null) {
             Pair<String, List<DatabaseObject>> data = database.retrieveData(collection, Pair.create("entity_id", null));
-            data.value().forEach(databaseObject -> {
-                entityIDs.add(UUID.fromString(String.valueOf(databaseObject.data().get("entity_id"))));
-            });
+            data.value().forEach(databaseObject -> entityIDs.add(UUID.fromString(String.valueOf(databaseObject.data().get("entity_id")))));
         }
         entityIDs.forEach(this::load);
     }

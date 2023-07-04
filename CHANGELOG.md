@@ -1,3 +1,10 @@
+# [11.6.0-beta.7](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.6...v11.6.0-beta.7) (2023-07-04)
+
+
+### Bug Fixes
+
+* Change parameter type in placeholderAPI method from CommandSender to ServerOperator ([8fd4e71](https://github.com/GeorgeV220/MartexLibrary/commit/8fd4e713d3828fc5ad46a03ab9675860d83a2e68))
+
 # [11.6.0-beta.6](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.5...v11.6.0-beta.6) (2023-07-03)
 
 

@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -691,7 +692,7 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string with the placeholders replaced
      */
-    public static String placeholderAPI(final CommandSender target, String str, final Map<String, String> map, final boolean ignoreCase) {
+    public static String placeholderAPI(final ServerOperator target, String str, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(target, "The target can't be null!");
         Validate.notNull(str, "The string can't be null!");
         if (map == null) {
@@ -721,7 +722,7 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string array with the placeholders replaced
      */
-    public static String @NotNull [] placeholderAPI(final CommandSender target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
+    public static String @NotNull [] placeholderAPI(final ServerOperator target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
         final String[] newArray = Arrays.copyOf(array, array.length);
@@ -744,7 +745,7 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string list with the placeholders replaced
      */
-    public static List<String> placeholderAPI(final CommandSender target, final List<String> coll, final Map<String, String> map,
+    public static List<String> placeholderAPI(final ServerOperator target, final List<String> coll, final Map<String, String> map,
                                               final boolean ignoreCase) {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");

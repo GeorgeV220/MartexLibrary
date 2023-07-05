@@ -313,6 +313,15 @@ public class EntityManager<T extends EntityManager.Entity> {
             return (T) customData.get(key);
         }
 
+        /**
+         * Returns the {@link ConcurrentObjectMap} that contains the Entity data
+         *
+         * @return the {@link ConcurrentObjectMap} that contains the Entity data
+         */
+        public ConcurrentObjectMap<String, Object> getCustomData() {
+            return customData;
+        }
+
         @Override
         public String toString() {
             return "Entity{" +

@@ -1,9 +1,13 @@
 package com.georgev22.library.scheduler;
 
 
+import java.io.Serial;
 import java.util.concurrent.*;
 
 class Future<T> extends Task implements java.util.concurrent.Future<T> {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final Callable<T> callable;
     private T value;

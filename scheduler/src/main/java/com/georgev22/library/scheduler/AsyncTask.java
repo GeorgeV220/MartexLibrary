@@ -3,11 +3,15 @@ package com.georgev22.library.scheduler;
 import com.georgev22.library.scheduler.interfaces.Worker;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 class AsyncTask extends Task {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final LinkedList<Worker> workers = new LinkedList<>();
     private final Map<Integer, Task> runners;

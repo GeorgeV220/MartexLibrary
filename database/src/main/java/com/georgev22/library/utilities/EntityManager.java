@@ -158,6 +158,7 @@ public class EntityManager<T extends EntityManager.Entity> {
                     }
                 });
             }
+            this.loadedEntities.remove(entity.getId());
         });
     }
 

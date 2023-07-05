@@ -254,7 +254,7 @@ public class EntityManager<T extends EntityManager.Entity> {
      */
     public static class Entity implements Serializable {
         private final UUID entityId;
-        private ObjectMap<String, Object> customData;
+        private ConcurrentObjectMap<String, Object> customData;
 
         /**
          * Constructs a new entity with a random UUID.

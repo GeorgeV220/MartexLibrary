@@ -1,3 +1,11 @@
+# [11.6.0-beta.10](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.9...v11.6.0-beta.10) (2023-07-05)
+
+
+### Features
+
+* **Entity:** Add getCustomData method ([8a129af](https://github.com/GeorgeV220/MartexLibrary/commit/8a129af5055e558d896b3914c7dd1342e4eb20c1))
+* Remove entity from loadedEntities when deleting it ([c906181](https://github.com/GeorgeV220/MartexLibrary/commit/c906181da811842c14224b482d78aa119bec009f))
+
 # [11.6.0-beta.9](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.8...v11.6.0-beta.9) (2023-07-05)
 
 

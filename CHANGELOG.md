@@ -1,3 +1,10 @@
+# [11.6.0-beta.9](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.8...v11.6.0-beta.9) (2023-07-05)
+
+
+### Features
+
+* **task:** Add serialVersionUID to serializable classes ([a64f4be](https://github.com/GeorgeV220/MartexLibrary/commit/a64f4be6f07fa590c23343d4231f0ea0c2c22d31))
+
 # [11.6.0-beta.8](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.7...v11.6.0-beta.8) (2023-07-04)
 
 

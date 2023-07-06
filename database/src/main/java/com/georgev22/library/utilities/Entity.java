@@ -39,7 +39,7 @@ public interface Entity extends Serializable {
      * @return the updated entity with the added custom data (if the key did not already exist)
      */
     default Entity addCustomDataIfNotExists(String key, Object value) {
-        this.getCustomData().appendIfTrue(key, value, this.getCustomData().containsKey(key));
+        this.getCustomData().appendIfTrue(key, value, !this.getCustomData().containsKey(key));
         return this;
     }
 

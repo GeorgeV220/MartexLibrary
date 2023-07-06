@@ -1,3 +1,10 @@
+# [11.6.0-beta.13](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.12...v11.6.0-beta.13) (2023-07-06)
+
+
+### Bug Fixes
+
+* **Entity:** Fix logic error in addCustomDataIfNotExists method ([ba45b46](https://github.com/GeorgeV220/MartexLibrary/commit/ba45b468fa184c8900a3b5885e1212e43ad4e2ac))
+
 # [11.6.0-beta.12](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.11...v11.6.0-beta.12) (2023-07-06)
 
 

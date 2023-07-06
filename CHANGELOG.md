@@ -1,3 +1,10 @@
+# [11.6.0-beta.12](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.11...v11.6.0-beta.12) (2023-07-06)
+
+
+### Bug Fixes
+
+* **Entity:** remove unnecessary import and add SerialVersionUID ([869e0b0](https://github.com/GeorgeV220/MartexLibrary/commit/869e0b0f8225da39cd7463a5fbfbc118b8c25b80))
+
 # [11.6.0-beta.11](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.10...v11.6.0-beta.11) (2023-07-06)
 
 

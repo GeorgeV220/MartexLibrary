@@ -1,3 +1,11 @@
+# [11.6.0-beta.11](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.10...v11.6.0-beta.11) (2023-07-06)
+
+
+### Features
+
+* Add EntityManager interface and Entity class ([a5c9f5a](https://github.com/GeorgeV220/MartexLibrary/commit/a5c9f5a0b002e1a0dcb042643aa7bef5563bfbd9))
+* **database:** implement EntityManagerImpl class for managing EntityImpl objects ([4531f35](https://github.com/GeorgeV220/MartexLibrary/commit/4531f352f95eb41976bca67ea49ab2e93dcb3f47))
+
 # [11.6.0-beta.10](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.9...v11.6.0-beta.10) (2023-07-05)
 
 

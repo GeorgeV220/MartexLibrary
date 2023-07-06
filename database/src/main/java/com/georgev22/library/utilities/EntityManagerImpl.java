@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -245,7 +245,11 @@ public class EntityManagerImpl implements EntityManager<EntityManagerImpl.Entity
     /**
      * A class representing an entity in the system.
      */
-    public static class EntityImpl implements Serializable, Entity {
+    public static class EntityImpl implements Entity {
+
+        @Serial
+        private static final long serialVersionUID = 2L;
+
         private final UUID entityId;
         private ConcurrentObjectMap<String, Object> customData;
 

@@ -2,6 +2,7 @@ package com.georgev22.library.utilities;
 
 import com.georgev22.library.maps.ConcurrentObjectMap;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -9,7 +10,7 @@ import java.util.UUID;
  * It provides methods for managing custom data associated with the entity.
  * Custom data can be added, retrieved, and accessed using key-value pairs.
  */
-public interface Entity {
+public interface Entity extends Serializable {
 
     /**
      * Returns the unique identifier of the entity.

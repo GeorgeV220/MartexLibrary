@@ -1,3 +1,16 @@
+# [11.6.0-beta.14](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.13...v11.6.0-beta.14) (2023-08-06)
+
+
+### Bug Fixes
+
+* **inventory:** Fix deprecated method in CustomNavigationItem ([fcd105b](https://github.com/GeorgeV220/MartexLibrary/commit/fcd105ba21ce530e6c678b1d900bc114f3508583))
+
+
+### Features
+
+* Add isFolia method to check for "Folia" environment ([cc75930](https://github.com/GeorgeV220/MartexLibrary/commit/cc7593025a13c38da6681ec96fcde1c9ad9f4d65))
+* **scheduler:** Add MinecraftBukkitScheduler and MinecraftFoliaScheduler classes ([13ca2cf](https://github.com/GeorgeV220/MartexLibrary/commit/13ca2cf53d20f1448a4df07c8f88d7798fcf98f7))
+
 # [11.6.0-beta.13](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.12...v11.6.0-beta.13) (2023-07-06)
 
 

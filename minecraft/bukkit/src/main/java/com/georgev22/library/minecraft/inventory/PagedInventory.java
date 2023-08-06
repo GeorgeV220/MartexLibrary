@@ -11,6 +11,9 @@ import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.NextNavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.library.minecraft.inventory.utils.InventoryUtil;
+import com.georgev22.library.minecraft.scheduler.MinecraftBukkitScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftFoliaScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import com.georgev22.library.utilities.Color;
 import com.georgev22.library.utilities.KryoUtils;
 import com.georgev22.library.utilities.Utils;
@@ -37,6 +40,8 @@ public class PagedInventory implements IPagedInventory {
     private final List<PagedInventoryCloseHandler> closeHandlers;
     private final List<PagedInventorySwitchPageHandler> switchHandlers;
 
+    private final MinecraftScheduler minecraftScheduler;
+
     private boolean kryo = false;
 
     protected PagedInventory(InventoryRegistrar registrar, NavigationRow navigationRow) {
@@ -46,6 +51,7 @@ public class PagedInventory implements IPagedInventory {
         this.closeHandlers = new ArrayList<>(3);
         this.switchHandlers = new ArrayList<>(3);
         this.navigationRow = navigationRow;
+        this.minecraftScheduler = BukkitMinecraftUtils.isFolia() ? new MinecraftFoliaScheduler() : new MinecraftBukkitScheduler();
     }
 
     @Deprecated
@@ -231,7 +237,7 @@ public class PagedInventory implements IPagedInventory {
                 slotFrame.append(slot, 0);
             }
         }
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
+        minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
             if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
                 for (int i = 0; i < openInventory.getSize(); ++i) {
 
@@ -260,9 +266,9 @@ public class PagedInventory implements IPagedInventory {
                     }
                 }
             }
-        }, 0L, 20L);
+        }, 1L, 20L);
         if (animated) {
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
+            minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
                 if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
                     for (int i = 0; i < openInventory.getSize(); i++) {
                         ItemStack itemStack = openInventory.getItem(i);
@@ -303,7 +309,7 @@ public class PagedInventory implements IPagedInventory {
 
                     player.updateInventory();
                 }
-            }, 0L, 1L);
+            }, 1L, 1L);
         }
         return true;
     }

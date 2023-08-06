@@ -1,7 +1,6 @@
 package com.georgev22.library.minecraft.scheduler;
 
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A  non-extendable interface representing a scheduler for task scheduling and cancellation.
@@ -30,7 +29,7 @@ public interface MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed after the delay.
-     * @param delay  The delay (in milliseconds) before the task is executed.
+     * @param delay  The delay before the task is executed.
      */
     void createDelayedTask(Plugin plugin, Runnable task, long delay);
 
@@ -40,8 +39,8 @@ public interface MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed repeatedly.
-     * @param delay  The delay (in milliseconds) before the first execution.
-     * @param period The time (in milliseconds) between successive executions.
+     * @param delay  The delay before the first execution.
+     * @param period The time between successive executions.
      */
     void createRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 
@@ -51,7 +50,7 @@ public interface MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed after the delay.
-     * @param delay  The delay (in milliseconds) before the task is executed.
+     * @param delay  The delay before the task is executed.
      */
     void createAsyncDelayedTask(Plugin plugin, Runnable task, long delay);
 
@@ -62,8 +61,8 @@ public interface MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed repeatedly.
-     * @param delay  The delay (in milliseconds) before the first execution.
-     * @param period The time (in milliseconds) between successive executions.
+     * @param delay  The delay before the first execution.
+     * @param period The time between successive executions.
      */
     void createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 

@@ -35,7 +35,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed after the delay.
-     * @param delay  The delay (in milliseconds) before the task is executed.
+     * @param delay  The delay before the task is executed.
      */
     @Override
     public void createDelayedTask(Plugin plugin, Runnable task, long delay) {
@@ -48,8 +48,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed repeatedly.
-     * @param delay  The delay (in milliseconds) before the first execution.
-     * @param period The time (in milliseconds) between successive executions.
+     * @param delay  The delay before the first execution.
+     * @param period The time between successive executions.
      */
     @Override
     public void createRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
@@ -62,7 +62,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed after the delay.
-     * @param delay  The delay (in milliseconds) before the task is executed.
+     * @param delay  The delay before the task is executed.
      */
     @Override
     public void createAsyncDelayedTask(Plugin plugin, Runnable task, long delay) {
@@ -76,8 +76,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      *
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed repeatedly.
-     * @param delay  The delay (in milliseconds) before the first execution.
-     * @param period The time (in milliseconds) between successive executions.
+     * @param delay  The delay before the first execution.
+     * @param period The time between successive executions.
      */
     @Override
     public void createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {

@@ -1021,4 +1021,18 @@ public class BukkitMinecraftUtils {
         }
     }
 
+    /**
+     * Checks if the current environment is "Folia" by attempting to load the "io.papermc.paper.threadedregions.RegionizedServer" class.
+     *
+     * @return `true` if the environment is "Folia," otherwise `false`.
+     */
+    public static boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
 }

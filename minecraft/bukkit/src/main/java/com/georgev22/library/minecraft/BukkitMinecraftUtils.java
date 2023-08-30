@@ -696,7 +696,14 @@ public class BukkitMinecraftUtils {
         Validate.notNull(target, "The target can't be null!");
         Validate.notNull(str, "The string can't be null!");
         if (map == null) {
-            return str;
+            try {
+                if (target instanceof OfflinePlayer offlinePlayer) {
+                    return me.clip.placeholderapi.PlaceholderAPI.setBracketPlaceholders(offlinePlayer, str);
+                }
+                return str;
+            } catch (Throwable error) {
+                return str;
+            }
         }
         for (final Map.Entry<String, String> entry : map.entrySet()) {
             str = ignoreCase ? Utils.replaceIgnoreCase(str, entry.getKey(), entry.getValue())
@@ -726,9 +733,6 @@ public class BukkitMinecraftUtils {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
         final String[] newArray = Arrays.copyOf(array, array.length);
-        if (map == null) {
-            return newArray;
-        }
         for (int i = 0; i < newArray.length; i++) {
             newArray[i] = placeholderAPI(target, newArray[i], map, ignoreCase);
         }
@@ -749,8 +753,7 @@ public class BukkitMinecraftUtils {
                                               final boolean ignoreCase) {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
-        return map == null ? coll
-                : coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
+        return coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
     }
 
     public enum MinecraftVersion {

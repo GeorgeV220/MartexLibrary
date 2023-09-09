@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.0'
-    id 'io.freefair.lombok' version '6.6.3'
+    id 'io.freefair.lombok' version '8.3'
     id 'java'
     id 'jacoco'
     id 'idea'
@@ -50,8 +50,8 @@ allprojects {
 
     dependencies {
         compileOnly 'org.jetbrains:annotations:24.0.1'
-        compileOnly 'commons-codec:commons-codec:1.15'
-        compileOnly 'commons-io:commons-io:2.11.0'
+        compileOnly 'commons-codec:commons-codec:1.16.0'
+        compileOnly 'commons-io:commons-io:2.13.0'
         compileOnly 'commons-lang:commons-lang:2.6'
         compileOnly 'org.mongodb:mongodb-driver:3.12.14'
     }

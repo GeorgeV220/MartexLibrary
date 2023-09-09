@@ -1,9 +1,11 @@
 package com.georgev22.library.minecraft.inventory;
 
+import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryClickHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryCloseHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventorySwitchPageHandler;
 import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
+import com.georgev22.library.minecraft.scheduler.SchedulerTask;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -251,5 +253,19 @@ public interface IPagedInventory {
      * @return inventory pages.
      */
     List<Inventory> getPages();
+
+    /**
+     * Gets the map that associates players with scheduler tasks for frames.
+     *
+     * @return A map where keys are players and values are scheduler tasks for frames.
+     */
+    ObjectMap<Player, SchedulerTask> getPlayerSchedulerFramesMap();
+
+    /**
+     * Gets the map that associates players with scheduler tasks for animations.
+     *
+     * @return A map where keys are players and values are scheduler tasks for animations.
+     */
+    ObjectMap<Player, SchedulerTask> getPlayerSchedulerAnimatedMap();
 
 }

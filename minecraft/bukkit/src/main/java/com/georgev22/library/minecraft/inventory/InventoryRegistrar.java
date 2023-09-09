@@ -67,6 +67,8 @@ public class InventoryRegistrar {
     }
 
     void unregister(Player player) {
+        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerAnimatedMap().get(player).cancel();
+        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerFramesMap().get(player).cancel();
         registrar.remove(player.getUniqueId());
         pagedInventoryRegistrar.remove(player.getUniqueId());
     }

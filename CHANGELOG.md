@@ -1,3 +1,39 @@
+# [11.6.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.5.0...v11.6.0) (2023-09-09)
+
+
+### Bug Fixes
+
+* Change parameter type in placeholderAPI method from CommandSender to ServerOperator ([8fd4e71](https://github.com/GeorgeV220/MartexLibrary/commit/8fd4e713d3828fc5ad46a03ab9675860d83a2e68))
+* **Entity:** Fix logic error in addCustomDataIfNotExists method ([ba45b46](https://github.com/GeorgeV220/MartexLibrary/commit/ba45b468fa184c8900a3b5885e1212e43ad4e2ac))
+* **EntityManager:** Fix saveAll() method to correctly iterate over loadedEntities ([2839b06](https://github.com/GeorgeV220/MartexLibrary/commit/2839b063902c6942d295002c8aeb1926fccba58b))
+* **Entity:** remove unnecessary import and add SerialVersionUID ([869e0b0](https://github.com/GeorgeV220/MartexLibrary/commit/869e0b0f8225da39cd7463a5fbfbc118b8c25b80))
+* **inventory:** Fix deprecated method in CustomNavigationItem ([fcd105b](https://github.com/GeorgeV220/MartexLibrary/commit/fcd105ba21ce530e6c678b1d900bc114f3508583))
+* **minecraft:** Fix cancelling scheduler tasks when unregistering player ([3685281](https://github.com/GeorgeV220/MartexLibrary/commit/3685281e3f5e1bd39a0a6d7f9dcc318967beb4b2))
+* Update List to ArrayList in ItemCommandSerializer ([6daaf5a](https://github.com/GeorgeV220/MartexLibrary/commit/6daaf5ab2fb371c9cdbd5cf9ccce1bc860858eca))
+
+
+### Features
+
+* Add 'com.esotericsoftware:kryo:5.5.0' as a compileOnly dependency ([1857292](https://github.com/GeorgeV220/MartexLibrary/commit/185729202df6d4ef92fd35b42141ab0e0506cc5e))
+* Add ActionSerializer for Kryo serialization ([062ab97](https://github.com/GeorgeV220/MartexLibrary/commit/062ab97f79dd2f06f2f277c28f9b3cb5ad491530))
+* Add EntityManager interface and Entity class ([a5c9f5a](https://github.com/GeorgeV220/MartexLibrary/commit/a5c9f5a0b002e1a0dcb042643aa7bef5563bfbd9))
+* Add isFolia method to check for "Folia" environment ([cc75930](https://github.com/GeorgeV220/MartexLibrary/commit/cc7593025a13c38da6681ec96fcde1c9ad9f4d65))
+* Add KryoUtils class for serializing and deserializing objects ([28bde30](https://github.com/GeorgeV220/MartexLibrary/commit/28bde308727bf07be68b6b49ddf5cf4fde2cb084))
+* Add serializers for ItemCommand, ItemStack, and Material ([10f30ab](https://github.com/GeorgeV220/MartexLibrary/commit/10f30aba8cd0c833fff7917ec311d1e1a2f24718))
+* Add support for Kryo serialization in ItemBuilder ([e1cecce](https://github.com/GeorgeV220/MartexLibrary/commit/e1cecce63ebd725f726d550b3098bdc5ae58682c))
+* **build.gradle:** Add shadow configuration for dependencies ([3f14089](https://github.com/GeorgeV220/MartexLibrary/commit/3f14089568ea1e8dab30c7c8be68ecd89ac3f337))
+* **database:** implement EntityManagerImpl class for managing EntityImpl objects ([4531f35](https://github.com/GeorgeV220/MartexLibrary/commit/4531f352f95eb41976bca67ea49ab2e93dcb3f47))
+* **Entity:** Add getCustomData method ([8a129af](https://github.com/GeorgeV220/MartexLibrary/commit/8a129af5055e558d896b3914c7dd1342e4eb20c1))
+* **inventory:** Add ItemCommandSerializer for ItemBuilder ([1c8f1d3](https://github.com/GeorgeV220/MartexLibrary/commit/1c8f1d34b19215a6a9cf3aec37614d5e407af80d))
+* **inventory:** Add kryo enablement for PagedInventory ([8d5e7bb](https://github.com/GeorgeV220/MartexLibrary/commit/8d5e7bb3f285fcd599ea314511a4e76e31739888))
+* **inventory:** Add Kryo enablement to InventoryRegistrar ([b1a33b4](https://github.com/GeorgeV220/MartexLibrary/commit/b1a33b42450679c7effccc02ed7ddaed45e545ef))
+* **inventory:** Add setPage method to IPagedInventory ([9df3ca2](https://github.com/GeorgeV220/MartexLibrary/commit/9df3ca27c5f4fd6228bd91530521ebfa3a9fa102))
+* **KryoUtils:** Add new methods ([4a42228](https://github.com/GeorgeV220/MartexLibrary/commit/4a42228f6b393d341b9b5821c0fe9d4ff23f068a))
+* Remove entity from loadedEntities when deleting it ([c906181](https://github.com/GeorgeV220/MartexLibrary/commit/c906181da811842c14224b482d78aa119bec009f))
+* **scheduler:** Add MinecraftBukkitScheduler and MinecraftFoliaScheduler classes ([13ca2cf](https://github.com/GeorgeV220/MartexLibrary/commit/13ca2cf53d20f1448a4df07c8f88d7798fcf98f7))
+* **scheduler:** Add SchedulerTask interface and implement it in Bukkit and Folia schedulers ([9b5d648](https://github.com/GeorgeV220/MartexLibrary/commit/9b5d64805f10bc62218452b3ebba3637fbeafa50))
+* **task:** Add serialVersionUID to serializable classes ([a64f4be](https://github.com/GeorgeV220/MartexLibrary/commit/a64f4be6f07fa590c23343d4231f0ea0c2c22d31))
+
 # [11.6.0-beta.15](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.14...v11.6.0-beta.15) (2023-09-09)
 
 

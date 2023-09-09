@@ -152,6 +152,10 @@ public interface IPagedInventory {
      */
     int indexOf(Inventory inventory);
 
+    void setPage(Map<Integer, ItemStack> contents, String title, int size, int index);
+
+    void setPage(Inventory inventory, int index);
+
     /**
      * Add an inventory to the end of this paged inventory
      *

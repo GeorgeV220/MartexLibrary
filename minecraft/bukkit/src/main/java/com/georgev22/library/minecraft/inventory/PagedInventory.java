@@ -322,6 +322,77 @@ public class PagedInventory implements IPagedInventory {
         return pages.indexOf(inventory);
     }
 
+    @Override
+    public void setPage(Map<Integer, ItemStack> contents, String title, int size, int index) {
+        Preconditions.checkArgument(size >= MIN_INV_SIZE, "Inventory size must be >= " + MIN_INV_SIZE);
+        Inventory inventory = Bukkit.createInventory(null, size, title);
+        Preconditions.checkState(!pages.contains(inventory), "Cannot add duplicate inventory");
+
+        if (inventory.getContents().length != 0) {
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+                ItemStack itemStack = inventory.getItem(i);
+                if (itemStack != null)
+                    itemStack.setAmount(0);
+            }
+        }
+
+        if (!pages.isEmpty()) {
+            NavigationItem previousItem = navigationRow.getNavigationItem(NavigationType.PREVIOUS);
+            NavigationItem nextItem = navigationRow.getNavigationItem(NavigationType.NEXT);
+
+            inventory.setItem(previousItem.getSlot() + inventory.getSize() - 9, previousItem.getItemStack());
+            Inventory currentLast = pages.get(pages.size() - 1);
+            currentLast.setItem(nextItem.getSlot() + inventory.getSize() - 9, nextItem.getItemStack());
+        }
+
+        NavigationItem closeItem = navigationRow.getNavigationItem(NavigationType.CLOSE);
+        inventory.setItem(closeItem.getSlot() + inventory.getSize() - 9, closeItem.getItemStack());
+
+        for (int i = 0; i < 9; i++) {
+            NavigationItem item = navigationRow.get(i);
+
+            if (item != null && item.getNavigationType() == NavigationType.CUSTOM)
+                inventory.setItem(inventory.getSize() - 9 + i, item.getItemStack());
+        }
+
+        pages.set(index, inventory);
+    }
+
+    @Override
+    public void setPage(Inventory inventory, int index) {
+        Preconditions.checkArgument(inventory.getSize() >= MIN_INV_SIZE, "Inventory size must be >= " + MIN_INV_SIZE);
+        Preconditions.checkState(!pages.contains(inventory), "Cannot add duplicate inventory");
+
+        if (inventory.getContents().length != 0) {
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+                ItemStack itemStack = inventory.getItem(i);
+                if (itemStack != null)
+                    itemStack.setAmount(0);
+            }
+        }
+
+        if (!pages.isEmpty()) {
+            NavigationItem previousItem = navigationRow.getNavigationItem(NavigationType.PREVIOUS);
+            NavigationItem nextItem = navigationRow.getNavigationItem(NavigationType.NEXT);
+
+            inventory.setItem(previousItem.getSlot() + inventory.getSize() - 9, previousItem.getItemStack());
+            Inventory currentLast = pages.get(pages.size() - 1);
+            currentLast.setItem(nextItem.getSlot() + inventory.getSize() - 9, nextItem.getItemStack());
+        }
+
+        NavigationItem closeItem = navigationRow.getNavigationItem(NavigationType.CLOSE);
+        inventory.setItem(closeItem.getSlot() + inventory.getSize() - 9, closeItem.getItemStack());
+
+        for (int i = 0; i < 9; i++) {
+            NavigationItem item = navigationRow.get(i);
+
+            if (item != null && item.getNavigationType() == NavigationType.CUSTOM)
+                inventory.setItem(inventory.getSize() - 9 + i, item.getItemStack());
+        }
+
+        pages.set(index, inventory);
+    }
+
     /**
      * {@inheritDoc}
      */

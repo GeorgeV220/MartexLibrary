@@ -4,8 +4,12 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
+import com.georgev22.library.minecraft.inventory.kryo.ActionSerializer;
+import com.georgev22.library.minecraft.inventory.kryo.ItemCommandSerializer;
+import com.georgev22.library.minecraft.inventory.kryo.ItemStackSerializer;
+import com.georgev22.library.minecraft.inventory.kryo.MaterialSerializer;
 import com.georgev22.library.minecraft.inventory.utils.actions.Action;
-import com.georgev22.library.minecraft.inventory.utils.actions.ActionManager;
+import com.georgev22.library.utilities.KryoUtils;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -23,14 +27,20 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.georgev22.library.utilities.Utils.Assertions.notNull;
 
 public class ItemBuilder {
+
+    static {
+        KryoUtils.registerClass(ItemCommand.class, new ItemCommandSerializer());
+        KryoUtils.registerClass(Enchantment.class);
+        KryoUtils.registerClass(ItemStack.class, new ItemStackSerializer());
+        KryoUtils.registerClass(Material.class, new MaterialSerializer());
+        KryoUtils.registerClass(Action.class, new ActionSerializer());
+    }
+
     private final ItemStack itemStack;
     private Material material;
     private Short durability;
@@ -60,7 +70,7 @@ public class ItemBuilder {
         this.flags = Lists.newArrayList();
         this.enchantments = ObjectMap.newHashObjectMap();
         this.unbreakable = false;
-        Preconditions.checkArgument(material != null, "ItemStack cannot be null");
+        Preconditions.checkArgument(material != null, "Material cannot be null");
         this.itemStack = new ItemStack(material);
         this.showAllAttributes(showAllAttributes);
         this.nbtItem = new NBTItem(itemStack, true);
@@ -82,15 +92,23 @@ public class ItemBuilder {
         this.nbtItem = new NBTItem(itemStack, true);
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path) {
-        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap());
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration,
+                                                  @NotNull String path,
+                                                  boolean kryo) {
+        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap(), kryo);
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements) {
-        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap());
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration,
+                                                  @NotNull String path,
+                                                  @NotNull ObjectMap<String, String> loresReplacements,
+                                                  boolean kryo) {
+        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap(), kryo);
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+    public static ItemBuilder buildItemFromConfig(@NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration,
+                                                  @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements,
+                                                  @NotNull ObjectMap<String, String> titleReplacements,
+                                                  boolean kryo) {
         notNull("fileConfiguration", fileConfiguration);
         if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
@@ -101,9 +119,9 @@ public class ItemBuilder {
                 .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
                 .glow(fileConfiguration.getBoolean(path + ".glow"))
-                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
+                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"), kryo)
                 .animation(fileConfiguration.getString(path + ".animation"))
-                .commands(buildItemCommandFromConfig(fileConfiguration, path))
+                .commands(buildItemCommandFromConfig(fileConfiguration, path), kryo)
                 .frames(buildFramesFromConfig(fileConfiguration, path, loresReplacements, titleReplacements));
     }
 
@@ -168,8 +186,8 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull com.georgev22.library.yaml.file.FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
-        List<Action> actions = Lists.newArrayList();
+    public static @NotNull List<Action> buildActionsFromConfig(com.georgev22.library.yaml.file.@NotNull FileConfiguration fileConfiguration, String path, Action action) {
+        List<Action> actions = new ArrayList<>();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
@@ -182,17 +200,9 @@ public class ItemBuilder {
         }
 
         if (!configurationSection.getKeys(false).isEmpty()) {
-            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(actionManager.addAction(
-                                action,
-                                ObjectMap.Pair.create(
-                                        key,
-                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
-                                                .map(str -> (Object) str)
-                                                .toList()
-                                )
-                        )
-                );
+            for (String key : configurationSection.getKeys(false)) {
+                action.getData().put(key, Objects.requireNonNull(fileConfiguration.get(path + ".actions." + key)));
+                actions.add(action);
             }
         }
 
@@ -200,15 +210,24 @@ public class ItemBuilder {
     }
 
 
-    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path) {
-        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap());
+    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration,
+                                                  @NotNull String path,
+                                                  boolean kryo) {
+        return buildItemFromConfig(fileConfiguration, path, ObjectMap.newHashObjectMap(), ObjectMap.newHashObjectMap(), kryo);
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements) {
-        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap());
+    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration,
+                                                  @NotNull String path,
+                                                  @NotNull ObjectMap<String, String> loresReplacements,
+                                                  boolean kryo) {
+        return buildItemFromConfig(fileConfiguration, path, loresReplacements, ObjectMap.newHashObjectMap(), kryo);
     }
 
-    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull ObjectMap<String, String> loresReplacements, @NotNull ObjectMap<String, String> titleReplacements) {
+    public static ItemBuilder buildItemFromConfig(@NotNull FileConfiguration fileConfiguration,
+                                                  @NotNull String path,
+                                                  @NotNull ObjectMap<String, String> loresReplacements,
+                                                  @NotNull ObjectMap<String, String> titleReplacements,
+                                                  boolean kryo) {
         notNull("fileConfiguration", fileConfiguration);
         if (fileConfiguration.get(notNull("path", path)) == null) {
             return new ItemBuilder(Material.PAPER).title(BukkitMinecraftUtils.colorize("&c&l&nInvalid path!!"));
@@ -219,9 +238,9 @@ public class ItemBuilder {
                 .lores(BukkitMinecraftUtils.colorize(Utils.placeHolder(fileConfiguration.getStringList(path + ".lores"), notNull("loresReplacements", loresReplacements), true)))
                 .showAllAttributes(fileConfiguration.getBoolean(path + ".show all attributes"))
                 .glow(fileConfiguration.getBoolean(path + ".glow"))
-                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"))
+                .colors(fileConfiguration.getBoolean(path + ".animated") ? (fileConfiguration.getBoolean(path + ".random colors") ? Utils.randomColors(3) : fileConfiguration.getStringList(path + ".colors")) : Lists.newArrayList("NOT ANIMATED"), kryo)
                 .animation(fileConfiguration.getString(path + ".animation"))
-                .commands(buildItemCommandFromConfig(fileConfiguration, path))
+                .commands(buildItemCommandFromConfig(fileConfiguration, path), kryo)
                 .frames(buildFramesFromConfig(fileConfiguration, path, loresReplacements, titleReplacements));
     }
 
@@ -286,8 +305,8 @@ public class ItemBuilder {
         return itemStacks;
     }
 
-    public static @NotNull List<Action> buildActionsFromConfig(@NotNull ActionManager actionManager, @NotNull FileConfiguration fileConfiguration, @NotNull String path, @NotNull Action action) {
-        List<Action> actions = Lists.newArrayList();
+    public static @NotNull List<Action> buildActionsFromConfig(@NotNull FileConfiguration fileConfiguration, String path, Action action) {
+        List<Action> actions = new ArrayList<>();
         if (fileConfiguration.get(path) == null) {
             return actions;
         }
@@ -300,17 +319,9 @@ public class ItemBuilder {
         }
 
         if (!configurationSection.getKeys(false).isEmpty()) {
-            for (String key : Objects.requireNonNull(fileConfiguration.getConfigurationSection(path + ".actions")).getKeys(false)) {
-                actions.add(actionManager.addAction(
-                                action,
-                                ObjectMap.Pair.create(
-                                        key,
-                                        fileConfiguration.getStringList(path + ".actions." + key).stream()
-                                                .map(str -> (Object) str)
-                                                .toList()
-                                )
-                        )
-                );
+            for (String key : configurationSection.getKeys(false)) {
+                action.getData().put(key, Objects.requireNonNull(fileConfiguration.get(path + ".actions." + key)));
+                actions.add(action);
             }
         }
 
@@ -423,32 +434,38 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder colors(@NotNull List<String> colors) {
+    public ItemBuilder colors(@NotNull List<String> colors, boolean kryo) {
         if (colors.size() >= 2) {
-            try {
-                this.nbtItem.setString("colors", Utils.serializeObjectToString(colors));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (kryo) {
+                this.nbtItem.setByteArray("colors", KryoUtils.serialize(colors));
+            } else {
+                try {
+                    this.nbtItem.setString("colors", Utils.serializeObjectToString(colors));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return this;
     }
 
-    public ItemBuilder colors(String @NotNull ... colors) {
-        colors(Arrays.asList(colors));
-        return this;
+    public ItemBuilder colors(boolean kryo, String @NotNull ... colors) {
+        return colors(Arrays.asList(colors), kryo);
     }
 
-    public ItemBuilder commands(ItemCommand... itemCommands) {
-        commands(Arrays.asList(itemCommands));
-        return this;
+    public ItemBuilder commands(boolean kryo, ItemCommand... itemCommands) {
+        return commands(Arrays.asList(itemCommands), kryo);
     }
 
-    public ItemBuilder commands(List<ItemCommand> itemCommands) {
-        try {
-            this.nbtItem.setString("commands", Utils.serializeObjectToString(itemCommands));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public ItemBuilder commands(List<ItemCommand> itemCommands, boolean kryo) {
+        if (kryo) {
+            this.nbtItem.setByteArray("commands", KryoUtils.serialize(itemCommands));
+        } else {
+            try {
+                this.nbtItem.setString("commands", Utils.serializeObjectToString(itemCommands));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return this;
     }
@@ -467,11 +484,15 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder customNBT(String key, Object value) {
-        try {
-            this.nbtItem.setString(key, Utils.serializeObjectToString(value));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public ItemBuilder customNBT(String key, Object value, boolean kryo) {
+        if (kryo) {
+            this.nbtItem.setByteArray(key, KryoUtils.serialize(value));
+        } else {
+            try {
+                this.nbtItem.setString(key, Utils.serializeObjectToString(value));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return this;
     }
@@ -574,27 +595,44 @@ public class ItemBuilder {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        private final ItemCommandType type;
-        private final String[] commands;
-        private final int cooldown;
+        private ItemCommandType type;
+        private List<String> commands;
+        private int cooldown;
+
+        public ItemCommand() {
+            this.type = ItemCommandType.MIDDLE;
+            this.commands = new ArrayList<>();
+        }
 
         public ItemCommand(ItemCommandType type, int cooldown, @NotNull List<String> commands) {
             this.type = type;
+            this.commands = commands;
             this.cooldown = cooldown;
-            this.commands = commands.toArray(new String[0]);
         }
 
         public ItemCommand(ItemCommandType type, int cooldown, String... commands) {
             this.type = type;
+            this.commands = Arrays.asList(commands);
             this.cooldown = cooldown;
+        }
+
+        public void setType(ItemCommandType type) {
+            this.type = type;
+        }
+
+        public void setCommands(List<String> commands) {
             this.commands = commands;
+        }
+
+        public void setCooldown(int cooldown) {
+            this.cooldown = cooldown;
         }
 
         public ItemCommandType getType() {
             return type;
         }
 
-        public String[] getCommands() {
+        public List<String> getCommands() {
             return commands;
         }
 
@@ -606,7 +644,7 @@ public class ItemBuilder {
         public String toString() {
             return "ItemCommand{" +
                     "type=" + type +
-                    ", commands=" + Arrays.toString(commands) +
+                    ", commands=" + commands +
                     ", cooldown=" + cooldown +
                     '}';
         }

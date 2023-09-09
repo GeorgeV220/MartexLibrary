@@ -1,5 +1,6 @@
 package com.georgev22.library.minecraft.inventory;
 
+import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.minecraft.colors.Animation;
@@ -11,7 +12,12 @@ import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.NextNavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.PreviousNavigationItem;
 import com.georgev22.library.minecraft.inventory.utils.InventoryUtil;
+import com.georgev22.library.minecraft.scheduler.MinecraftBukkitScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftFoliaScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
+import com.georgev22.library.minecraft.scheduler.SchedulerTask;
 import com.georgev22.library.utilities.Color;
+import com.georgev22.library.utilities.KryoUtils;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -25,6 +31,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class PagedInventory implements IPagedInventory {
 
@@ -36,6 +43,13 @@ public class PagedInventory implements IPagedInventory {
     private final List<PagedInventoryCloseHandler> closeHandlers;
     private final List<PagedInventorySwitchPageHandler> switchHandlers;
 
+    private final MinecraftScheduler minecraftScheduler;
+
+    private final ObjectMap<Player, SchedulerTask> playerSchedulerFramesMap;
+    private final ObjectMap<Player, SchedulerTask> playerSchedulerAnimatedMap;
+
+    private boolean kryo = false;
+
     protected PagedInventory(InventoryRegistrar registrar, NavigationRow navigationRow) {
         this.registrar = registrar;
         this.pages = new ArrayList<>();
@@ -43,6 +57,9 @@ public class PagedInventory implements IPagedInventory {
         this.closeHandlers = new ArrayList<>(3);
         this.switchHandlers = new ArrayList<>(3);
         this.navigationRow = navigationRow;
+        this.minecraftScheduler = BukkitMinecraftUtils.isFolia() ? new MinecraftFoliaScheduler() : new MinecraftBukkitScheduler();
+        this.playerSchedulerFramesMap = new ConcurrentObjectMap<>();
+        this.playerSchedulerAnimatedMap = new ConcurrentObjectMap<>();
     }
 
     @Deprecated
@@ -215,7 +232,7 @@ public class PagedInventory implements IPagedInventory {
 
         ObjectMap<Integer, Integer> slotFrame = ObjectMap.newConcurrentObjectMap();
 
-        if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+        if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
             for (int slot = 0; slot < openInventory.getSize(); ++slot) {
                 ItemStack itemStack = openInventory.getItem(slot);
 
@@ -228,8 +245,8 @@ public class PagedInventory implements IPagedInventory {
                 slotFrame.append(slot, 0);
             }
         }
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
-            if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+        playerSchedulerFramesMap.append(player, minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
+            if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
                 for (int i = 0; i < openInventory.getSize(); ++i) {
 
                     ItemStack itemStack = openInventory.getItem(i);
@@ -242,7 +259,10 @@ public class PagedInventory implements IPagedInventory {
 
                     List<ItemStack> itemStacks = BukkitMinecraftUtils.itemStackListFromBase64(nbtItem.getString("frames"));
 
-                    int size = itemStacks.size() - 1;
+                    int size = 0;
+                    if (itemStacks != null) {
+                        size = itemStacks.size() - 1;
+                    }
                     if (size > 0 & slotFrame.get(i) <= size) {
                         ItemStack item = itemStacks.get(slotFrame.get(i));
                         item.setItemMeta(itemStack.getItemMeta());
@@ -257,10 +277,10 @@ public class PagedInventory implements IPagedInventory {
                     }
                 }
             }
-        }, 0L, 20L);
+        }, 1L, 20L));
         if (animated) {
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(registrar.getPlugin(), () -> {
-                if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+            playerSchedulerAnimatedMap.append(player, minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
+                if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
                     for (int i = 0; i < openInventory.getSize(); i++) {
                         ItemStack itemStack = openInventory.getItem(i);
 
@@ -275,11 +295,15 @@ public class PagedInventory implements IPagedInventory {
                         if (!nbtItem.hasKey("colors") & !nbtItem.hasKey("animation")) continue;
 
                         List<String> color;
-                        try {
-                            color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
-                            color = Lists.newArrayList();
+                        if (registrar.kryo()) {
+                            color = KryoUtils.deserialize(nbtItem.getByteArray("colors"));
+                        } else {
+                            try {
+                                color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
+                            } catch (IOException | ClassNotFoundException e) {
+                                registrar.getPlugin().getLogger().log(Level.SEVERE, "Error: ", e);
+                                color = Lists.newArrayList();
+                            }
                         }
 
                         if (color.isEmpty()) continue;
@@ -296,7 +320,7 @@ public class PagedInventory implements IPagedInventory {
 
                     player.updateInventory();
                 }
-            }, 0L, 1L);
+            }, 1L, 1L));
         }
         return true;
     }
@@ -307,6 +331,77 @@ public class PagedInventory implements IPagedInventory {
     @Override
     public int indexOf(Inventory inventory) {
         return pages.indexOf(inventory);
+    }
+
+    @Override
+    public void setPage(Map<Integer, ItemStack> contents, String title, int size, int index) {
+        Preconditions.checkArgument(size >= MIN_INV_SIZE, "Inventory size must be >= " + MIN_INV_SIZE);
+        Inventory inventory = Bukkit.createInventory(null, size, title);
+        Preconditions.checkState(!pages.contains(inventory), "Cannot add duplicate inventory");
+
+        if (inventory.getContents().length != 0) {
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+                ItemStack itemStack = inventory.getItem(i);
+                if (itemStack != null)
+                    itemStack.setAmount(0);
+            }
+        }
+
+        if (!pages.isEmpty()) {
+            NavigationItem previousItem = navigationRow.getNavigationItem(NavigationType.PREVIOUS);
+            NavigationItem nextItem = navigationRow.getNavigationItem(NavigationType.NEXT);
+
+            inventory.setItem(previousItem.getSlot() + inventory.getSize() - 9, previousItem.getItemStack());
+            Inventory currentLast = pages.get(pages.size() - 1);
+            currentLast.setItem(nextItem.getSlot() + inventory.getSize() - 9, nextItem.getItemStack());
+        }
+
+        NavigationItem closeItem = navigationRow.getNavigationItem(NavigationType.CLOSE);
+        inventory.setItem(closeItem.getSlot() + inventory.getSize() - 9, closeItem.getItemStack());
+
+        for (int i = 0; i < 9; i++) {
+            NavigationItem item = navigationRow.get(i);
+
+            if (item != null && item.getNavigationType() == NavigationType.CUSTOM)
+                inventory.setItem(inventory.getSize() - 9 + i, item.getItemStack());
+        }
+
+        pages.set(index, inventory);
+    }
+
+    @Override
+    public void setPage(Inventory inventory, int index) {
+        Preconditions.checkArgument(inventory.getSize() >= MIN_INV_SIZE, "Inventory size must be >= " + MIN_INV_SIZE);
+        Preconditions.checkState(!pages.contains(inventory), "Cannot add duplicate inventory");
+
+        if (inventory.getContents().length != 0) {
+            for (int i = inventory.getSize() - 9; i < inventory.getSize(); i++) {
+                ItemStack itemStack = inventory.getItem(i);
+                if (itemStack != null)
+                    itemStack.setAmount(0);
+            }
+        }
+
+        if (!pages.isEmpty()) {
+            NavigationItem previousItem = navigationRow.getNavigationItem(NavigationType.PREVIOUS);
+            NavigationItem nextItem = navigationRow.getNavigationItem(NavigationType.NEXT);
+
+            inventory.setItem(previousItem.getSlot() + inventory.getSize() - 9, previousItem.getItemStack());
+            Inventory currentLast = pages.get(pages.size() - 1);
+            currentLast.setItem(nextItem.getSlot() + inventory.getSize() - 9, nextItem.getItemStack());
+        }
+
+        NavigationItem closeItem = navigationRow.getNavigationItem(NavigationType.CLOSE);
+        inventory.setItem(closeItem.getSlot() + inventory.getSize() - 9, closeItem.getItemStack());
+
+        for (int i = 0; i < 9; i++) {
+            NavigationItem item = navigationRow.get(i);
+
+            if (item != null && item.getNavigationType() == NavigationType.CUSTOM)
+                inventory.setItem(inventory.getSize() - 9 + i, item.getItemStack());
+        }
+
+        pages.set(index, inventory);
     }
 
     /**
@@ -558,5 +653,21 @@ public class PagedInventory implements IPagedInventory {
         }
 
         return new NavigationRow(nextItem, previousItem, closeItem, navigationItems.toArray(new NavigationItem[0]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectMap<Player, SchedulerTask> getPlayerSchedulerFramesMap() {
+        return playerSchedulerFramesMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectMap<Player, SchedulerTask> getPlayerSchedulerAnimatedMap() {
+        return playerSchedulerAnimatedMap;
     }
 }

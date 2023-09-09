@@ -4,10 +4,11 @@ group 'com.georgev22.library.minecraft'
 
 dependencies {
     compileOnly project(path: ':maps')
-    compileOnly project(path: ':utilities')
-    compileOnly project(path: ':yaml')
+    compileOnly project(path: ':utilities', configuration: 'shadow')
+    compileOnly project(path: ':yaml', configuration: 'shadow')
     compileOnly "de.tr7zw:item-nbt-api:2.11.3"
     compileOnly 'com.github.cryptomorin:XSeries:9.5.0'
+    compileOnly 'com.esotericsoftware:kryo:5.5.0'
 }
 
 tasks.build.dependsOn(shadowJar)

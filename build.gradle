@@ -62,18 +62,14 @@ dependencies {
     implementation project(path: ':extensions')
     implementation project(path: ':maps')
     implementation project(path: ':scheduler')
-    implementation project(path: ':yaml')
-    implementation project(path: ':utilities')
-    implementation project(path: ':minecraft:bukkit')
-    implementation project(path: ':minecraft:bungee')
-    implementation project(path: ':minecraft:velocity')
-    implementation project(path: ':minecraft:sponge8')
+    implementation project(path: ':yaml', configuration: 'shadow')
+    implementation project(path: ':utilities', configuration: 'shadow')
+    implementation project(path: ':minecraft', configuration: 'shadow')
 }
 
 shadowJar {
     archiveClassifier = ''
     exclude("plugin.yml")
-    relocate 'org.yaml.snakeyaml', 'com.georgev22.library.snakeyaml'
 }
 
 tasks.shadowJar.dependsOn(jar)

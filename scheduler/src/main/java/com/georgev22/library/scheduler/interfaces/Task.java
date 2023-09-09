@@ -2,10 +2,12 @@ package com.georgev22.library.scheduler.interfaces;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+
 /**
  * Represents a task being executed by the scheduler
  */
-public interface Task {
+public interface Task extends Serializable {
 
     /**
      * Returns the taskId for the task.

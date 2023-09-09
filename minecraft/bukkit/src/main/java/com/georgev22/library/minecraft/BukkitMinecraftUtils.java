@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.ServerOperator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -691,11 +692,18 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string with the placeholders replaced
      */
-    public static String placeholderAPI(final CommandSender target, String str, final Map<String, String> map, final boolean ignoreCase) {
+    public static String placeholderAPI(final ServerOperator target, String str, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(target, "The target can't be null!");
         Validate.notNull(str, "The string can't be null!");
         if (map == null) {
-            return str;
+            try {
+                if (target instanceof OfflinePlayer offlinePlayer) {
+                    return me.clip.placeholderapi.PlaceholderAPI.setBracketPlaceholders(offlinePlayer, str);
+                }
+                return str;
+            } catch (Throwable error) {
+                return str;
+            }
         }
         for (final Map.Entry<String, String> entry : map.entrySet()) {
             str = ignoreCase ? Utils.replaceIgnoreCase(str, entry.getKey(), entry.getValue())
@@ -721,13 +729,10 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string array with the placeholders replaced
      */
-    public static String @NotNull [] placeholderAPI(final CommandSender target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
+    public static String @NotNull [] placeholderAPI(final ServerOperator target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
         Validate.notNull(array, "The string array can't be null!");
         Validate.noNullElements(array, "The string array can't have null elements!");
         final String[] newArray = Arrays.copyOf(array, array.length);
-        if (map == null) {
-            return newArray;
-        }
         for (int i = 0; i < newArray.length; i++) {
             newArray[i] = placeholderAPI(target, newArray[i], map, ignoreCase);
         }
@@ -744,12 +749,11 @@ public class BukkitMinecraftUtils {
      *                   in ignore case
      * @return the new string list with the placeholders replaced
      */
-    public static List<String> placeholderAPI(final CommandSender target, final List<String> coll, final Map<String, String> map,
+    public static List<String> placeholderAPI(final ServerOperator target, final List<String> coll, final Map<String, String> map,
                                               final boolean ignoreCase) {
         Validate.notNull(coll, "The string collection can't be null!");
         Validate.noNullElements(coll, "The string collection can't have null elements!");
-        return map == null ? coll
-                : coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
+        return coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
     }
 
     public enum MinecraftVersion {
@@ -1017,6 +1021,20 @@ public class BukkitMinecraftUtils {
                 weakLoc = new WeakReference<>(new Location(world, x, y, z, yaw, pitch));
             }
             return weakLoc.get();
+        }
+    }
+
+    /**
+     * Checks if the current environment is "Folia" by attempting to load the "io.papermc.paper.threadedregions.RegionizedServer" class.
+     *
+     * @return `true` if the environment is "Folia," otherwise `false`.
+     */
+    public static boolean isFolia() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

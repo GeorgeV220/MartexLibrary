@@ -1,11 +1,14 @@
 package com.georgev22.library.minecraft.inventory;
 
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryClickHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryCloseHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryCustomNavigationHandler;
 import com.georgev22.library.minecraft.inventory.navigationitems.CustomNavigationItem;
 import com.georgev22.library.minecraft.inventory.navigationitems.NavigationItem;
-import org.bukkit.Bukkit;
+import com.georgev22.library.minecraft.scheduler.MinecraftBukkitScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftFoliaScheduler;
+import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,16 +18,18 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 class PagedInventoryListener implements Listener {
 
     private final Plugin plugin;
     private final InventoryRegistrar registrar;
 
+    private final MinecraftScheduler minecraftScheduler;
+
     public PagedInventoryListener(Plugin plugin, InventoryRegistrar registrar) {
         this.plugin = plugin;
         this.registrar = registrar;
+        this.minecraftScheduler = BukkitMinecraftUtils.isFolia() ? new MinecraftFoliaScheduler() : new MinecraftBukkitScheduler();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -52,11 +57,11 @@ class PagedInventoryListener implements Listener {
             if (navigationItem != null) {
                 //Handlers automatically called inside of paged inventory methods
                 if (navigationItem.getNavigationType() == NavigationType.NEXT) {
-                    Bukkit.getScheduler().runTask(plugin, () -> pagedInventory.openNext(player, inventory));
+                    minecraftScheduler.runTask(plugin, () -> pagedInventory.openNext(player, inventory));
                 } else if (navigationItem.getNavigationType() == NavigationType.PREVIOUS) {
-                    Bukkit.getScheduler().runTask(plugin, () -> pagedInventory.openPrevious(player, inventory));
+                    minecraftScheduler.runTask(plugin, () -> pagedInventory.openPrevious(player, inventory));
                 } else if (navigationItem.getNavigationType() == NavigationType.CLOSE) {
-                    Bukkit.getScheduler().runTask(plugin, (@NotNull Runnable) player::closeInventory);
+                    minecraftScheduler.runTask(plugin, player::closeInventory);
                 } else {
                     CustomNavigationItem customNavigationItem = (CustomNavigationItem) navigationItem;
                     customNavigationItem.handleClick(new PagedInventoryCustomNavigationHandler(pagedInventory, event));

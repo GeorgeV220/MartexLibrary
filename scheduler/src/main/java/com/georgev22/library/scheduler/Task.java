@@ -2,9 +2,14 @@ package com.georgev22.library.scheduler;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serial;
 import java.util.function.Consumer;
 
 class Task implements com.georgev22.library.scheduler.interfaces.Task, Runnable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
 
     protected volatile Task next = null;
     public static final int ERROR = 0;

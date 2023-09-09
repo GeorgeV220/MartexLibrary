@@ -22,6 +22,8 @@ public class InventoryRegistrar {
     private final List<PagedInventoryCloseHandler> globalCloseHandlers;
     private final List<PagedInventorySwitchPageHandler> globalSwitchHandlers;
 
+    private boolean kryo = false;
+
     private final Plugin plugin;
 
     InventoryRegistrar(Plugin plugin) {
@@ -65,6 +67,8 @@ public class InventoryRegistrar {
     }
 
     void unregister(Player player) {
+        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerAnimatedMap().get(player).cancel();
+        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerFramesMap().get(player).cancel();
         registrar.remove(player.getUniqueId());
         pagedInventoryRegistrar.remove(player.getUniqueId());
     }
@@ -164,6 +168,25 @@ public class InventoryRegistrar {
 
     public Plugin getPlugin() {
         return plugin;
+    }
+
+    /**
+     * Checks if Kryo is enabled.
+     *
+     * @return {@code true} if Kryo is enabled, {@code false} if it is disabled.
+     */
+    public boolean kryo() {
+        return kryo;
+    }
+
+    /**
+     * Sets the Kryo enablement.
+     *
+     * @param kryo {@code true} to enable Kryo support, {@code false} to disable it.
+     */
+
+    public void kryo(boolean kryo) {
+        this.kryo = kryo;
     }
 
     @Override

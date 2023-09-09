@@ -15,6 +15,5 @@ public abstract class CustomNavigationItem extends NavigationItem {
         return NavigationType.CUSTOM;
     }
 
-    @Deprecated
     public abstract void handleClick(PagedInventoryCustomNavigationHandler handler);
 }

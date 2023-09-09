@@ -1,3 +1,16 @@
+# [11.6.0-beta.15](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.14...v11.6.0-beta.15) (2023-09-09)
+
+
+### Bug Fixes
+
+* **minecraft:** Fix cancelling scheduler tasks when unregistering player ([3685281](https://github.com/GeorgeV220/MartexLibrary/commit/3685281e3f5e1bd39a0a6d7f9dcc318967beb4b2))
+
+
+### Features
+
+* **inventory:** Add setPage method to IPagedInventory ([9df3ca2](https://github.com/GeorgeV220/MartexLibrary/commit/9df3ca27c5f4fd6228bd91530521ebfa3a9fa102))
+* **scheduler:** Add SchedulerTask interface and implement it in Bukkit and Folia schedulers ([9b5d648](https://github.com/GeorgeV220/MartexLibrary/commit/9b5d64805f10bc62218452b3ebba3637fbeafa50))
+
 # [11.6.0-beta.14](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0-beta.13...v11.6.0-beta.14) (2023-08-06)
 
 

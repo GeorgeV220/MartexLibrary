@@ -31,6 +31,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class PagedInventory implements IPagedInventory {
 
@@ -231,7 +232,7 @@ public class PagedInventory implements IPagedInventory {
 
         ObjectMap<Integer, Integer> slotFrame = ObjectMap.newConcurrentObjectMap();
 
-        if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+        if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
             for (int slot = 0; slot < openInventory.getSize(); ++slot) {
                 ItemStack itemStack = openInventory.getItem(slot);
 
@@ -245,7 +246,7 @@ public class PagedInventory implements IPagedInventory {
             }
         }
         playerSchedulerFramesMap.append(player, minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
-            if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+            if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
                 for (int i = 0; i < openInventory.getSize(); ++i) {
 
                     ItemStack itemStack = openInventory.getItem(i);
@@ -258,7 +259,10 @@ public class PagedInventory implements IPagedInventory {
 
                     List<ItemStack> itemStacks = BukkitMinecraftUtils.itemStackListFromBase64(nbtItem.getString("frames"));
 
-                    int size = itemStacks.size() - 1;
+                    int size = 0;
+                    if (itemStacks != null) {
+                        size = itemStacks.size() - 1;
+                    }
                     if (size > 0 & slotFrame.get(i) <= size) {
                         ItemStack item = itemStacks.get(slotFrame.get(i));
                         item.setItemMeta(itemStack.getItemMeta());
@@ -276,7 +280,7 @@ public class PagedInventory implements IPagedInventory {
         }, 1L, 20L));
         if (animated) {
             playerSchedulerAnimatedMap.append(player, minecraftScheduler.createRepeatingTask(registrar.getPlugin(), () -> {
-                if (player.getOpenInventory().getTopInventory() != null && player.getOpenInventory().getTopInventory().equals(openInventory)) {
+                if (player.getOpenInventory().getTopInventory().equals(openInventory)) {
                     for (int i = 0; i < openInventory.getSize(); i++) {
                         ItemStack itemStack = openInventory.getItem(i);
 
@@ -297,7 +301,7 @@ public class PagedInventory implements IPagedInventory {
                             try {
                                 color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));
                             } catch (IOException | ClassNotFoundException e) {
-                                e.printStackTrace();
+                                registrar.getPlugin().getLogger().log(Level.SEVERE, "Error: ", e);
                                 color = Lists.newArrayList();
                             }
                         }

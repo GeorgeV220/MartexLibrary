@@ -2,6 +2,7 @@ package com.georgev22.library.minecraft.scheduler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.NonExtendable
@@ -14,8 +15,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param task   The task to be executed.
      */
     @Override
-    public void runTask(Plugin plugin, Runnable task) {
-        Bukkit.getScheduler().runTask(plugin, task);
+    public SchedulerTask runTask(Plugin plugin, Runnable task) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
     }
 
     /**
@@ -26,8 +27,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param task   The task to be executed.
      */
     @Override
-    public void runAsyncTask(Plugin plugin, Runnable task) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
+    public SchedulerTask runAsyncTask(Plugin plugin, Runnable task) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskAsynchronously(plugin, task));
     }
 
     /**
@@ -38,8 +39,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param delay  The delay before the task is executed.
      */
     @Override
-    public void createDelayedTask(Plugin plugin, Runnable task, long delay) {
-        Bukkit.getScheduler().runTaskLater(plugin, task, delay);
+    public SchedulerTask createDelayedTask(Plugin plugin, Runnable task, long delay) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
     }
 
     /**
@@ -52,8 +53,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param period The time between successive executions.
      */
     @Override
-    public void createRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
-        Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period);
+    public SchedulerTask createRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
     }
 
     /**
@@ -65,8 +66,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param delay  The delay before the task is executed.
      */
     @Override
-    public void createAsyncDelayedTask(Plugin plugin, Runnable task, long delay) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
+    public SchedulerTask createAsyncDelayedTask(Plugin plugin, Runnable task, long delay) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay));
     }
 
     /**
@@ -80,8 +81,8 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
      * @param period The time between successive executions.
      */
     @Override
-    public void createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, delay, period);
+    public SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, delay, period));
     }
 
     /**
@@ -104,5 +105,19 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler {
     @Override
     public MinecraftScheduler getScheduler() {
         return this;
+    }
+
+    public static class BukkitSchedulerTask implements SchedulerTask {
+
+        private final BukkitTask bukkitTask;
+
+        public BukkitSchedulerTask(BukkitTask bukkitTask) {
+            this.bukkitTask = bukkitTask;
+        }
+
+        @Override
+        public void cancel() {
+            bukkitTask.cancel();
+        }
     }
 }

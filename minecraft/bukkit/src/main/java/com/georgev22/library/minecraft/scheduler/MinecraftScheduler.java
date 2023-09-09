@@ -13,7 +13,7 @@ public interface MinecraftScheduler {
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    void runTask(Plugin plugin, Runnable task);
+    SchedulerTask runTask(Plugin plugin, Runnable task);
 
     /**
      * Schedules a task to be executed asynchronously on a separate thread.
@@ -22,7 +22,7 @@ public interface MinecraftScheduler {
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    void runAsyncTask(Plugin plugin, Runnable task);
+    SchedulerTask runAsyncTask(Plugin plugin, Runnable task);
 
     /**
      * Creates a delayed task that will run the specified `task` after the given `delay`.
@@ -31,7 +31,7 @@ public interface MinecraftScheduler {
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    void createDelayedTask(Plugin plugin, Runnable task, long delay);
+    SchedulerTask createDelayedTask(Plugin plugin, Runnable task, long delay);
 
     /**
      * Creates a repeating task that will run the specified `task` after an initial `delay`,
@@ -42,7 +42,7 @@ public interface MinecraftScheduler {
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    void createRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
+    SchedulerTask createRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 
     /**
      * Schedules an asynchronous delayed task that will run the specified `task` after the given `delay`.
@@ -52,7 +52,7 @@ public interface MinecraftScheduler {
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    void createAsyncDelayedTask(Plugin plugin, Runnable task, long delay);
+    SchedulerTask createAsyncDelayedTask(Plugin plugin, Runnable task, long delay);
 
     /**
      * Schedules an asynchronous repeating task that will run the specified `task` after an initial `delay`,
@@ -64,7 +64,7 @@ public interface MinecraftScheduler {
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    void createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
+    SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 
     /**
      * Cancels all tasks associated with the given `plugin`.

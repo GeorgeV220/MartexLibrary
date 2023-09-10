@@ -58,10 +58,10 @@ allprojects {
 }
 
 dependencies {
-    implementation project(path: ':database')
-    implementation project(path: ':extensions')
-    implementation project(path: ':maps')
-    implementation project(path: ':scheduler')
+    implementation project(path: ':database', configuration: 'shadow')
+    implementation project(path: ':extensions', configuration: 'shadow')
+    implementation project(path: ':maps', configuration: 'shadow')
+    implementation project(path: ':scheduler', configuration: 'shadow')
     implementation project(path: ':yaml', configuration: 'shadow')
     implementation project(path: ':utilities', configuration: 'shadow')
     implementation project(path: ':minecraft', configuration: 'shadow')

@@ -4,7 +4,7 @@ group 'com.georgev22.library'
 
 dependencies {
     compileOnly project(path: ':utilities', configuration: 'shadow')
-    compileOnly project(path: ':maps')
+    compileOnly project(path: ':maps', configuration: 'shadow')
 }
 
 shadowJar {

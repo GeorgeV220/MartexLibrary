@@ -3,8 +3,8 @@ apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library.minecraft'
 
 dependencies {
-    compileOnly project(path: ':extensions')
-    compileOnly project(path: ':maps')
+    compileOnly project(path: ':extensions', configuration: 'shadow')
+    compileOnly project(path: ':maps', configuration: 'shadow')
     compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':yaml', configuration: 'shadow')
     compileOnly 'org.spongepowered:spongeapi:7.4.0'

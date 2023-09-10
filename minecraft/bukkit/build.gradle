@@ -3,7 +3,7 @@ apply from: "$rootDir/gradle/publish.gradle"
 group 'com.georgev22.library.minecraft'
 
 dependencies {
-    compileOnly project(path: ':maps')
+    compileOnly project(path: ':maps', configuration: 'shadow')
     compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':yaml', configuration: 'shadow')
     compileOnly "de.tr7zw:item-nbt-api:2.11.3"

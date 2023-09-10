@@ -8,7 +8,7 @@ dependencies {
     compileOnly "com.google.code.gson:gson:${gsonVersion}"
     compileOnly 'com.esotericsoftware:kryo:5.5.0'
 
-    compileOnly project(path: ':maps')
+    compileOnly project(path: ':maps', configuration: 'shadow')
     compileOnly project(path: ':yaml', configuration: 'shadow')
 }
 

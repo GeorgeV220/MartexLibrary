@@ -42,14 +42,6 @@ publishing {
         def isGitHub = System.getenv("GITHUB_REPOSITORY") ? true : false
         if (isGitHub) {
             maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/${project.findProperty("GITHUB_REPOSITORY") ?: System.getenv("GITHUB_REPOSITORY")}")
-                credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-                }
-            }
-            maven {
                 name = "GeorgeV22"
 
                 url = uri("https://repo.georgev22.com/releases")

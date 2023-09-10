@@ -2,8 +2,12 @@ package com.georgev22.library.minecraft.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -85,6 +89,87 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler {
     @Override
     public SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
         return new FoliaSchedulerTask(Bukkit.getAsyncScheduler().runAtFixedRate(plugin, (scheduledTask) -> task.run(), (delay / 20), (period / 20), TimeUnit.SECONDS));
+    }
+
+    /**
+     * Creates a delayed task for a specific world and chunk.
+     *
+     * @param plugin The plugin that owns this task.
+     * @param task   The runnable task to execute.
+     * @param world  The world in which the chunk is located.
+     * @param chunk  The chunk in which the task will be executed.
+     * @param delay  The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createDelayedTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().runDelayed(plugin, world, chunk.getX(), chunk.getZ(), (scheduledTask) -> task.run(), delay));
+    }
+
+    /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param plugin   The plugin that owns this task.
+     * @param task     The runnable task to execute.
+     * @param location The location at which the task will be executed.
+     * @param delay    The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createDelayedForLocation(Plugin plugin, Runnable task, Location location, long delay) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().runDelayed(plugin, location, (scheduledTask) -> task.run(), delay));
+    }
+
+    /**
+     * Creates a task for a specific world and chunk.
+     *
+     * @param plugin The plugin that owns this task.
+     * @param task   The runnable task to execute.
+     * @param world  The world in which the chunk is located.
+     * @param chunk  The chunk in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().run(plugin, world, chunk.getX(), chunk.getZ(), (scheduledTask) -> task.run()));
+    }
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param plugin   The plugin that owns this task.
+     * @param task     The runnable task to execute.
+     * @param location The location at which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().run(plugin, location, (scheduledTask) -> task.run()));
+    }
+
+    /**
+     * Creates a repeating task for a specific world and chunk.
+     *
+     * @param plugin The plugin that owns this task.
+     * @param task   The runnable task to execute.
+     * @param world  The world in which the chunk is located.
+     * @param chunk  The chunk in which the task will be executed.
+     * @param delay  The initial delay in ticks before the first execution.
+     * @param period The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createRepeatingTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay, long period) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().runAtFixedRate(plugin, world, chunk.getX(), chunk.getZ(), (scheduledTask) -> task.run(), delay, period));
+    }
+
+    /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param plugin   The plugin that owns this task.
+     * @param task     The runnable task to execute.
+     * @param location The location at which the task will be executed.
+     * @param delay    The initial delay in ticks before the first execution.
+     * @param period   The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    public SchedulerTask createRepeatingTaskForLocation(Plugin plugin, Runnable task, Location location, long delay, long period) {
+        return new FoliaSchedulerTask(Bukkit.getRegionScheduler().runAtFixedRate(plugin, location, (scheduledTask) -> task.run(), delay, period));
     }
 
     /**

@@ -1,9 +1,13 @@
 package com.georgev22.library.minecraft.scheduler;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.NonExtendable
 public class MinecraftBukkitScheduler implements MinecraftScheduler {

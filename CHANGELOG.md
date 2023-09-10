@@ -1,3 +1,11 @@
+# [11.7.0-beta.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0...v11.7.0-beta.1) (2023-09-10)
+
+
+### Features
+
+* **build.gradle:** Add shadow configuration for project dependencies ([38bab9f](https://github.com/GeorgeV220/MartexLibrary/commit/38bab9fba81cce195915c99b641358d347790a60))
+* **scheduler:** Add methods to create delayed, repeating tasks for specific world/chunk and location ([21baa8a](https://github.com/GeorgeV220/MartexLibrary/commit/21baa8a333a9e0c2c019c8a06341f1152115d1f6))
+
 # [11.6.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.5.0...v11.6.0) (2023-09-09)
 
 

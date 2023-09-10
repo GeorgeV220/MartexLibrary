@@ -10,6 +10,10 @@ dependencies {
     compileOnly 'org.spongepowered:spongeapi:9.0.0'
 }
 
+shadowJar {
+    archiveClassifier = ''
+}
+
 tasks.build.dependsOn(shadowJar)
 tasks.publish.dependsOn(shadowJar)
 tasks.shadowJar.dependsOn(jar)

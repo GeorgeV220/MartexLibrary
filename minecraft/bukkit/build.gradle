@@ -11,6 +11,10 @@ dependencies {
     compileOnly 'com.esotericsoftware:kryo:5.5.0'
 }
 
+shadowJar {
+    archiveClassifier = ''
+}
+
 tasks.build.dependsOn(shadowJar)
 tasks.publish.dependsOn(shadowJar)
 tasks.shadowJar.dependsOn(jar)

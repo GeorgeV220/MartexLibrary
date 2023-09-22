@@ -72,7 +72,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
     }
 
     /**
-     * Put/replace the given key/value pair into ConcurrentObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into TreeObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>

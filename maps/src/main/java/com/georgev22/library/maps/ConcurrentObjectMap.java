@@ -36,6 +36,25 @@ public class ConcurrentObjectMap<K, V> extends ConcurrentHashMap<K, V> implement
     }
 
     /**
+     * Constructs a new ConcurrentObjectMap with the specified initial capacity.
+     *
+     * @param initialCapacity The initial capacity of the ConcurrentObjectMap.
+     */
+    public ConcurrentObjectMap(final int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    /**
+     * Constructs a new ConcurrentObjectMap with the specified initial capacity and load factor.
+     *
+     * @param initialCapacity The initial capacity of the ConcurrentObjectMap.
+     * @param loadFactor     The load factor of the ConcurrentObjectMap.
+     */
+    public ConcurrentObjectMap(final int initialCapacity, final float loadFactor) {
+        super(initialCapacity, loadFactor);
+    }
+
+    /**
      * Put/replace the given key/value pair into this User and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1).append("b", 2)}

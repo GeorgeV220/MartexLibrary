@@ -37,6 +37,25 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
     }
 
     /**
+     * Constructs a new LinkedObjectMap with the specified initial capacity.
+     *
+     * @param initialCapacity The initial capacity of the LinkedObjectMap.
+     */
+    public LinkedObjectMap(final int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    /**
+     * Constructs a new LinkedObjectMap with the specified initial capacity and load factor.
+     *
+     * @param initialCapacity The initial capacity of the LinkedObjectMap.
+     * @param loadFactor      The load factor of the LinkedObjectMap.
+     */
+    public LinkedObjectMap(final int initialCapacity, final float loadFactor) {
+        super(initialCapacity, loadFactor);
+    }
+
+    /**
      * Put/replace the given key/value pair into this User and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1).append("b", 2)}
@@ -72,7 +91,7 @@ public class LinkedObjectMap<K, V> extends LinkedHashMap<K, V> implements Object
     }
 
     /**
-     * Put/replace the given key/value pair into ConcurrentObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into LinkedObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>

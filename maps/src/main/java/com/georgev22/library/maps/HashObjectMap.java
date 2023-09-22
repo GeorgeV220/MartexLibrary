@@ -37,6 +37,25 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
+     * Constructs a new HashObjectMap with the specified initial capacity.
+     *
+     * @param initialCapacity The initial capacity of the HashObjectMap.
+     */
+    public HashObjectMap(final int initialCapacity) {
+        super(initialCapacity);
+    }
+
+    /**
+     * Constructs a new HashObjectMap with the specified initial capacity and load factor.
+     *
+     * @param initialCapacity The initial capacity of the HashObjectMap.
+     * @param loadFactor     The load factor of the HashObjectMap.
+     */
+    public HashObjectMap(final int initialCapacity, final float loadFactor) {
+        super(initialCapacity, loadFactor);
+    }
+
+    /**
      * Put/replace the given key/value pair into this User and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1).append("b", 2)}
@@ -72,7 +91,7 @@ public class HashObjectMap<K, V> extends HashMap<K, V> implements ObjectMap<K, V
     }
 
     /**
-     * Put/replace the given key/value pair into ConcurrentObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
+     * Put/replace the given key/value pair into HashObjectMap if boolean is true and return this.  Useful for chaining puts in a single expression, e.g.
      * <pre>
      * user.append("a", 1, check1).append("b", 2, check2)}
      * </pre>

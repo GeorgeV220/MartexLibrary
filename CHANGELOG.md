@@ -1,3 +1,12 @@
+# [11.7.0-beta.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.1...v11.7.0-beta.2) (2023-09-22)
+
+
+### Features
+
+* Add ItemStackSerializer class for serializing and deserializing ItemStacks and Inventories ([e679336](https://github.com/GeorgeV220/MartexLibrary/commit/e67933670085e2cace48b4ca0052a384ba795171))
+* **constructor:** Add constructors to ConcurrentObjectMap, HashObjectMap, LinkedObjectMap, and TreeObjectMap ([68c2075](https://github.com/GeorgeV220/MartexLibrary/commit/68c207598e098c77095229481dc6f7ce00d80d4d))
+* **inventory:** add InventoryMap class for representing inventory contents ([7e6c706](https://github.com/GeorgeV220/MartexLibrary/commit/7e6c706ed595f95aac92ac5b3409ee2faff1ace5))
+
 # [11.7.0-beta.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0...v11.7.0-beta.1) (2023-09-10)
 
 

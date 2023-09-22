@@ -840,10 +840,20 @@ public class BukkitMinecraftUtils {
             return currentVersion;
         }
 
+        /**
+         * Get the version number of the Minecraft server.
+         *
+         * @return The version number of the Minecraft server.
+         */
         public static int getVersionNumber() {
             return versionNumber;
         }
 
+        /**
+         * Get the release number of the Minecraft server.
+         *
+         * @return The release number of the Minecraft server.
+         */
         public static int getReleaseNumber() {
             return releaseNumber;
         }

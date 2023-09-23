@@ -1,3 +1,10 @@
+# [11.7.0-beta.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.2...v11.7.0-beta.3) (2023-09-23)
+
+
+### Bug Fixes
+
+* Fix initialization of versionNumber and releaseNumber variables ([f09a0c0](https://github.com/GeorgeV220/MartexLibrary/commit/f09a0c0116f47e35067724683bfd450fe34969e6))
+
 # [11.7.0-beta.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.1...v11.7.0-beta.2) (2023-09-22)
 
 

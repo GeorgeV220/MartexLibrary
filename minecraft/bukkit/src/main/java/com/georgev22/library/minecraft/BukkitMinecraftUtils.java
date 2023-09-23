@@ -788,8 +788,7 @@ public class BukkitMinecraftUtils {
 
         private static MinecraftVersion currentVersion;
 
-        private static final int versionNumber = Integer.parseInt(currentVersion.name().split("_")[1]);
-        private static final int releaseNumber = Integer.parseInt(currentVersion.name().split("R")[1]);
+        private static int versionNumber, releaseNumber;
 
         /**
          * Check if the version is above or equal.
@@ -872,6 +871,8 @@ public class BukkitMinecraftUtils {
         static {
             try {
                 currentVersion = MinecraftVersion.valueOf(Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].toUpperCase());
+                versionNumber = Integer.parseInt(currentVersion.name().split("_")[1]);
+                releaseNumber = Integer.parseInt(currentVersion.name().split("R")[1]);
             } catch (Exception var2) {
                 currentVersion = UNKNOWN;
             }

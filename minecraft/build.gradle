@@ -6,7 +6,7 @@ subprojects {
         compileOnly "dev.folia:folia-api:${mcVersion}-R0.1-SNAPSHOT"
         compileOnly 'net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT'
         compileOnly 'com.velocitypowered:velocity-api:3.1.1'
-        compileOnly 'me.clip:placeholderapi:2.11.2'
+        compileOnly 'me.clip:placeholderapi:2.11.4'
         compileOnly 'com.mojang:authlib:1.11'
     }
 }

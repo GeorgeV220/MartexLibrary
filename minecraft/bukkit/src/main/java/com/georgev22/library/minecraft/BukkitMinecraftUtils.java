@@ -783,6 +783,7 @@ public class BukkitMinecraftUtils {
         V1_19_R2,
         V1_19_R3,
         V1_20_R1,
+        V1_20_R2,
         UNKNOWN,
         ;
 

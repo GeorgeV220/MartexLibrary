@@ -1,3 +1,10 @@
+# [11.7.0-beta.4](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.3...v11.7.0-beta.4) (2023-10-26)
+
+
+### Features
+
+* Add support for Minecraft version 1.20.2 ([17307cd](https://github.com/GeorgeV220/MartexLibrary/commit/17307cd057c32ef8e2ea396fa4378807b3d5bd23))
+
 # [11.7.0-beta.3](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.2...v11.7.0-beta.3) (2023-09-23)
 
 

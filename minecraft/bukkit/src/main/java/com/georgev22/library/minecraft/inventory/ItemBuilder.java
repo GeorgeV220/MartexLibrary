@@ -437,7 +437,11 @@ public class ItemBuilder {
     public ItemBuilder colors(@NotNull List<String> colors, boolean kryo) {
         if (colors.size() >= 2) {
             if (kryo) {
-                this.nbtItem.setByteArray("colors", KryoUtils.serialize(colors));
+                try {
+                    this.nbtItem.setByteArray("colors", KryoUtils.serialize(colors));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 try {
                     this.nbtItem.setString("colors", Utils.serializeObjectToString(colors));
@@ -459,7 +463,11 @@ public class ItemBuilder {
 
     public ItemBuilder commands(List<ItemCommand> itemCommands, boolean kryo) {
         if (kryo) {
-            this.nbtItem.setByteArray("commands", KryoUtils.serialize(itemCommands));
+            try {
+                this.nbtItem.setByteArray("commands", KryoUtils.serialize(itemCommands));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             try {
                 this.nbtItem.setString("commands", Utils.serializeObjectToString(itemCommands));
@@ -486,7 +494,11 @@ public class ItemBuilder {
 
     public ItemBuilder customNBT(String key, Object value, boolean kryo) {
         if (kryo) {
-            this.nbtItem.setByteArray(key, KryoUtils.serialize(value));
+            try {
+                this.nbtItem.setByteArray(key, KryoUtils.serialize(value));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             try {
                 this.nbtItem.setString(key, Utils.serializeObjectToString(value));

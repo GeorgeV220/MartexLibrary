@@ -1,3 +1,10 @@
+# [11.7.0-beta.5](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.4...v11.7.0-beta.5) (2023-11-10)
+
+
+### Bug Fixes
+
+* Modify KryoUtils to handle IOExceptions ([78e1d8e](https://github.com/GeorgeV220/MartexLibrary/commit/78e1d8e863428f30c2fa01295be07d9893630d98))
+
 # [11.7.0-beta.4](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.3...v11.7.0-beta.4) (2023-10-26)
 
 

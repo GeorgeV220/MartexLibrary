@@ -296,12 +296,7 @@ public class PagedInventory implements IPagedInventory {
 
                         List<String> color;
                         if (registrar.kryo()) {
-                            try {
-                                color = KryoUtils.deserialize(nbtItem.getByteArray("colors"));
-                            } catch (IOException e) {
-                                registrar.getPlugin().getLogger().log(Level.SEVERE, "Error: ", e);
-                                color = Lists.newArrayList();
-                            }
+                            color = KryoUtils.deserialize(nbtItem.getByteArray("colors"));
                         } else {
                             try {
                                 color = (List<String>) Utils.deserializeObjectFromString(nbtItem.getString("colors"));

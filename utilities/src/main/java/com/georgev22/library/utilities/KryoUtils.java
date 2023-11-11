@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -20,21 +19,22 @@ import java.util.Map;
 public class KryoUtils {
     private static final Kryo kryo = createKryoInstance();
 
-    public static byte[] serialize(Object object) throws IOException {
+    public static byte[] serialize(Object object) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         Output output = new Output(byteArrayOutputStream);
-        output.close();
         kryo.writeClassAndObject(output, object);
+        output.close();
 
         return byteArrayOutputStream.toByteArray();
     }
 
-    public static <T> T deserialize(byte[] bytes) throws IOException {
+    public static <T> T deserialize(byte[] bytes) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Input input = new Input(byteArrayInputStream);
+        T object = (T) kryo.readClassAndObject(input);
         input.close();
 
-        return (T) kryo.readClassAndObject(input);
+        return object;
     }
 
     public static void registerClass(Class<?> clazz) {

@@ -1,3 +1,10 @@
+# [11.7.0-beta.7](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.6...v11.7.0-beta.7) (2023-12-07)
+
+
+### Features
+
+* Add 1_20_R3 enum constant. ([7899b7f](https://github.com/GeorgeV220/MartexLibrary/commit/7899b7f278d869f67dcb2c5bc05c4c12962ec22b))
+
 # [11.7.0-beta.6](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.5...v11.7.0-beta.6) (2023-11-11)
 
 

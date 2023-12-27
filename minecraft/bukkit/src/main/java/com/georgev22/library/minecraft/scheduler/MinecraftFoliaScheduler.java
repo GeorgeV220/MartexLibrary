@@ -206,5 +206,15 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler {
         public void cancel() {
             scheduledTask.cancel();
         }
+
+        @Override
+        public boolean isCancelled() {
+            return scheduledTask.isCancelled();
+        }
+
+        @Override
+        public int getTaskId() {
+            return 0;
+        }
     }
 }

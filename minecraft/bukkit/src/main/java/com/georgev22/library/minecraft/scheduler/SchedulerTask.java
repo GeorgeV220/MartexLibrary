@@ -4,4 +4,8 @@ public interface SchedulerTask {
 
     void cancel();
 
+    boolean isCancelled();
+
+    int getTaskId();
+
 }

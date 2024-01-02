@@ -16,4 +16,6 @@ include 'minecraft:velocity'
 findProject(':minecraft:velocity')?.name = 'velocity'
 include 'minecraft:sponge7'
 findProject(':minecraft:sponge7')?.name = 'sponge7'
+include 'minecraft:shared'
+findProject(':minecraft:shared')?.name = 'shared'
 

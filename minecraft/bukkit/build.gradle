@@ -6,6 +6,7 @@ dependencies {
     compileOnly project(path: ':maps', configuration: 'shadow')
     compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':yaml', configuration: 'shadow')
+    compileOnly project(path: ':minecraft:shared', configuration: 'shadow')
     compileOnly "de.tr7zw:item-nbt-api:2.11.3"
     compileOnly 'com.github.cryptomorin:XSeries:9.5.0'
     compileOnly 'com.esotericsoftware:kryo:5.5.0'

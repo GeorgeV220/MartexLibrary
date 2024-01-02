@@ -1,16 +1,11 @@
 package com.georgev22.library.minecraft.scheduler;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-@ApiStatus.NonExtendable
-public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk> {
+/**
+ * A  non-extendable interface representing a scheduler for task scheduling and cancellation.
+ */
+public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -18,10 +13,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    @Override
-    public SchedulerTask runTask(Plugin plugin, Runnable task) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
-    }
+    SchedulerTask runTask(Plugin plugin, Runnable task);
 
     /**
      * Schedules a task to be executed asynchronously on a separate thread.
@@ -30,10 +22,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    @Override
-    public SchedulerTask runAsyncTask(Plugin plugin, Runnable task) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskAsynchronously(plugin, task));
-    }
+    SchedulerTask runAsyncTask(Plugin plugin, Runnable task);
 
     /**
      * Creates a delayed task that will run the specified `task` after the given `delay`.
@@ -42,10 +31,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    @Override
-    public SchedulerTask createDelayedTask(Plugin plugin, Runnable task, long delay) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
-    }
+    SchedulerTask createDelayedTask(Plugin plugin, Runnable task, long delay);
 
     /**
      * Creates a repeating task that will run the specified `task` after an initial `delay`,
@@ -56,10 +42,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    @Override
-    public SchedulerTask createRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
-    }
+    SchedulerTask createRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 
     /**
      * Schedules an asynchronous delayed task that will run the specified `task` after the given `delay`.
@@ -69,10 +52,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    @Override
-    public SchedulerTask createAsyncDelayedTask(Plugin plugin, Runnable task, long delay) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay));
-    }
+    SchedulerTask createAsyncDelayedTask(Plugin plugin, Runnable task, long delay);
 
     /**
      * Schedules an asynchronous repeating task that will run the specified `task` after an initial `delay`,
@@ -84,10 +64,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    @Override
-    public SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, delay, period));
-    }
+    SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
 
     /**
      * Creates a delayed task for a specific world and chunk.
@@ -99,10 +76,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param delay  The delay in ticks before the task is executed.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createDelayedTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
-    }
+    SchedulerTask createDelayedTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay);
 
     /**
      * Creates a delayed task for a specific location.
@@ -113,10 +87,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param delay    The delay in ticks before the task is executed.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createDelayedForLocation(Plugin plugin, Runnable task, Location location, long delay) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
-    }
+    SchedulerTask createDelayedForLocation(Plugin plugin, Runnable task, Location location, long delay);
 
     /**
      * Creates a task for a specific world and chunk.
@@ -127,10 +98,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param chunk  The chunk in which the task will be executed.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
-    }
+    SchedulerTask createTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk);
 
     /**
      * Creates a task for a specific location.
@@ -140,10 +108,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param location The location at which the task will be executed.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
-    }
+    SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location);
 
     /**
      * Creates a repeating task for a specific world and chunk.
@@ -156,10 +121,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param period The period in ticks between consecutive executions.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createRepeatingTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay, long period) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
-    }
+    SchedulerTask createRepeatingTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay, long period);
 
     /**
      * Creates a repeating task for a specific location.
@@ -171,54 +133,20 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @param period   The period in ticks between consecutive executions.
      * @return A SchedulerTask representing the created task.
      */
-    @Override
-    public SchedulerTask createRepeatingTaskForLocation(Plugin plugin, Runnable task, Location location, long delay, long period) {
-        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
-    }
+    SchedulerTask createRepeatingTaskForLocation(Plugin plugin, Runnable task, Location location, long delay, long period);
 
     /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param plugin The plugin whose tasks should be canceled.
      */
-    @Override
-    public void cancelTasks(Plugin plugin) {
-        Bukkit.getScheduler().cancelTasks(plugin);
-    }
+    void cancelTasks(Plugin plugin);
 
     /**
-     * Gets the scheduler instance for this class.
-     * Since this class is already a subclass of {@link MinecraftScheduler},
-     * it returns the current instance as the scheduler.
+     * Gets the scheduler
      *
-     * @return The scheduler instance for this class (i.e., this).
+     * @return The scheduler
      */
-    @Override
-    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
-        return this;
-    }
+    MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler();
 
-    public static class BukkitSchedulerTask implements SchedulerTask {
-
-        private final BukkitTask bukkitTask;
-
-        public BukkitSchedulerTask(BukkitTask bukkitTask) {
-            this.bukkitTask = bukkitTask;
-        }
-
-        @Override
-        public void cancel() {
-            bukkitTask.cancel();
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return bukkitTask.isCancelled();
-        }
-
-        @Override
-        public int getTaskId() {
-            return bukkitTask.getTaskId();
-        }
-    }
 }

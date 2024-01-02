@@ -1,15 +1,14 @@
 package com.georgev22.library.minecraft.scheduler;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class SchedulerRunnable implements Runnable {
+public abstract class SchedulerRunnable<Plugin, Location, World, Chunk> implements Runnable {
 
     private SchedulerTask task;
 
-    private final MinecraftScheduler minecraftScheduler;
+    private final MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler;
 
-    public SchedulerRunnable(MinecraftScheduler minecraftScheduler) {
+    public SchedulerRunnable(MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler) {
         this.minecraftScheduler = minecraftScheduler;
     }
 
@@ -37,15 +36,15 @@ public abstract class SchedulerRunnable implements Runnable {
     /**
      * Schedules this in the Bukkit scheduler to run on next tick.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
+     * @param plugin The Plugin associated with this task.
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
      */
     @NotNull
-    public synchronized SchedulerTask runTask(JavaPlugin javaPlugin) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTask(Plugin plugin) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.runTask(javaPlugin, this));
+        return setupTask(this.minecraftScheduler.runTask(plugin, this));
     }
 
     /**
@@ -54,30 +53,30 @@ public abstract class SchedulerRunnable implements Runnable {
      * <p>
      * Schedules this in the Bukkit scheduler to run asynchronously.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
+     * @param plugin The Plugin associated with this task.
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
      */
     @NotNull
-    public synchronized SchedulerTask runTaskAsynchronously(@NotNull JavaPlugin javaPlugin) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTaskAsynchronously(@NotNull Plugin plugin) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.runAsyncTask(javaPlugin, this));
+        return setupTask(this.minecraftScheduler.runAsyncTask(plugin, this));
     }
 
     /**
      * Schedules this to run after the specified number of server ticks.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
-     * @param delay      the ticks to wait before running the task
+     * @param plugin The Plugin associated with this task.
+     * @param delay  the ticks to wait before running the task
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
      */
     @NotNull
-    public synchronized SchedulerTask runTaskLater(@NotNull JavaPlugin javaPlugin, long delay) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTaskLater(@NotNull Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.createDelayedTask(javaPlugin, this, delay));
+        return setupTask(this.minecraftScheduler.createDelayedTask(plugin, this, delay));
     }
 
     /**
@@ -87,33 +86,33 @@ public abstract class SchedulerRunnable implements Runnable {
      * Schedules this to run asynchronously after the specified number of
      * server ticks.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
-     * @param delay      the ticks to wait before running the task
+     * @param plugin The Plugin associated with this task.
+     * @param delay  the ticks to wait before running the task
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
      */
     @NotNull
-    public synchronized SchedulerTask runTaskLaterAsynchronously(@NotNull JavaPlugin javaPlugin, long delay) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTaskLaterAsynchronously(@NotNull Plugin plugin, long delay) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.createAsyncDelayedTask(javaPlugin, this, delay));
+        return setupTask(this.minecraftScheduler.createAsyncDelayedTask(plugin, this, delay));
     }
 
     /**
      * Schedules this to repeatedly run until cancelled, starting after the
      * specified number of server ticks.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
-     * @param delay      the ticks to wait before running the task
-     * @param period     the ticks to wait between runs
+     * @param plugin The Plugin associated with this task.
+     * @param delay  the ticks to wait before running the task
+     * @param period the ticks to wait between runs
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
      */
     @NotNull
-    public synchronized SchedulerTask runTaskTimer(@NotNull JavaPlugin javaPlugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTaskTimer(@NotNull Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.createRepeatingTask(javaPlugin, this, delay, period));
+        return setupTask(this.minecraftScheduler.createRepeatingTask(plugin, this, delay, period));
     }
 
     /**
@@ -123,19 +122,18 @@ public abstract class SchedulerRunnable implements Runnable {
      * Schedules this to repeatedly run asynchronously until cancelled,
      * starting after the specified number of server ticks.
      *
-     * @param javaPlugin The JavaPlugin associated with this task.
-     * @param delay      the ticks to wait before running the task for the first
-     *                   time
-     * @param period     the ticks to wait between runs
+     * @param plugin The Plugin associated with this task.
+     * @param delay  the ticks to wait before running the task for the first
+     *               time
+     * @param period the ticks to wait between runs
      * @return a Task that contains the id number
      * @throws IllegalArgumentException if clazz, is null
      * @throws IllegalStateException    if this was already scheduled
-     *                                  long)
      */
     @NotNull
-    public synchronized SchedulerTask runTaskTimerAsynchronously(@NotNull JavaPlugin javaPlugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
+    public synchronized SchedulerTask runTaskTimerAsynchronously(@NotNull Plugin plugin, long delay, long period) throws IllegalArgumentException, IllegalStateException {
         checkNotYetScheduled();
-        return setupTask(this.minecraftScheduler.createAsyncRepeatingTask(javaPlugin, this, delay, period));
+        return setupTask(this.minecraftScheduler.createAsyncRepeatingTask(plugin, this, delay, period));
     }
 
     /**

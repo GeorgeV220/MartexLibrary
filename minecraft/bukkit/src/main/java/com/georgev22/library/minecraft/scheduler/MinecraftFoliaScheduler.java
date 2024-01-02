@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 @ApiStatus.NonExtendable
-public class MinecraftFoliaScheduler implements MinecraftScheduler {
+public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -190,7 +190,7 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler {
      * @return The scheduler instance for this class (i.e., this).
      */
     @Override
-    public MinecraftScheduler getScheduler() {
+    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
         return this;
     }
 

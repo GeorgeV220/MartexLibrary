@@ -17,6 +17,7 @@ dependencies {
     implementation project(path: ':minecraft:velocity', configuration: 'shadow')
     implementation project(path: ':minecraft:sponge7', configuration: 'shadow')
     implementation project(path: ':minecraft:sponge8', configuration: 'shadow')
+    implementation project(path: ':minecraft:shared', configuration: 'shadow')
 }
 
 shadowJar {

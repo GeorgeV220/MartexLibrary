@@ -7,6 +7,7 @@ dependencies {
     compileOnly project(path: ':maps', configuration: 'shadow')
     compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':yaml', configuration: 'shadow')
+    compileOnly project(path: ':minecraft:shared', configuration: 'shadow')
 }
 
 shadowJar {

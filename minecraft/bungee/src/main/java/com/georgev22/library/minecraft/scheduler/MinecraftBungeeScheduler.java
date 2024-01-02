@@ -1,16 +1,12 @@
 package com.georgev22.library.minecraft.scheduler;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * A  non-extendable interface representing a scheduler for task scheduling and cancellation.
- */
-public interface MinecraftScheduler {
+import java.util.concurrent.TimeUnit;
+
+public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements MinecraftScheduler<Plugin, Location, World, Chunk> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -18,7 +14,10 @@ public interface MinecraftScheduler {
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    SchedulerTask runTask(Plugin plugin, Runnable task);
+    @Override
+    public SchedulerTask runTask(@NotNull Plugin plugin, Runnable task) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
+    }
 
     /**
      * Schedules a task to be executed asynchronously on a separate thread.
@@ -27,7 +26,10 @@ public interface MinecraftScheduler {
      * @param plugin The plugin associated with this task.
      * @param task   The task to be executed.
      */
-    SchedulerTask runAsyncTask(Plugin plugin, Runnable task);
+    @Override
+    public SchedulerTask runAsyncTask(@NotNull Plugin plugin, Runnable task) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
+    }
 
     /**
      * Creates a delayed task that will run the specified `task` after the given `delay`.
@@ -36,7 +38,10 @@ public interface MinecraftScheduler {
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    SchedulerTask createDelayedTask(Plugin plugin, Runnable task, long delay);
+    @Override
+    public SchedulerTask createDelayedTask(@NotNull Plugin plugin, Runnable task, long delay) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), TimeUnit.SECONDS));
+    }
 
     /**
      * Creates a repeating task that will run the specified `task` after an initial `delay`,
@@ -47,7 +52,10 @@ public interface MinecraftScheduler {
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    SchedulerTask createRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
+    @Override
+    public SchedulerTask createRepeatingTask(@NotNull Plugin plugin, Runnable task, long delay, long period) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), (period / 20), TimeUnit.SECONDS));
+    }
 
     /**
      * Schedules an asynchronous delayed task that will run the specified `task` after the given `delay`.
@@ -57,7 +65,10 @@ public interface MinecraftScheduler {
      * @param task   The task to be executed after the delay.
      * @param delay  The delay before the task is executed.
      */
-    SchedulerTask createAsyncDelayedTask(Plugin plugin, Runnable task, long delay);
+    @Override
+    public SchedulerTask createAsyncDelayedTask(@NotNull Plugin plugin, Runnable task, long delay) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), TimeUnit.SECONDS));
+    }
 
     /**
      * Schedules an asynchronous repeating task that will run the specified `task` after an initial `delay`,
@@ -69,7 +80,10 @@ public interface MinecraftScheduler {
      * @param delay  The delay before the first execution.
      * @param period The time between successive executions.
      */
-    SchedulerTask createAsyncRepeatingTask(Plugin plugin, Runnable task, long delay, long period);
+    @Override
+    public SchedulerTask createAsyncRepeatingTask(@NotNull Plugin plugin, Runnable task, long delay, long period) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), (period / 20), TimeUnit.SECONDS));
+    }
 
     /**
      * Creates a delayed task for a specific world and chunk.
@@ -81,8 +95,9 @@ public interface MinecraftScheduler {
      * @param delay  The delay in ticks before the task is executed.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createDelayedTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
+    @Override
+    public SchedulerTask createDelayedTaskForWorld(@NotNull Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), TimeUnit.SECONDS));
     }
 
     /**
@@ -94,8 +109,9 @@ public interface MinecraftScheduler {
      * @param delay    The delay in ticks before the task is executed.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createDelayedForLocation(Plugin plugin, Runnable task, Location location, long delay) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
+    @Override
+    public SchedulerTask createDelayedForLocation(@NotNull Plugin plugin, Runnable task, Location location, long delay) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), TimeUnit.SECONDS));
     }
 
     /**
@@ -107,8 +123,9 @@ public interface MinecraftScheduler {
      * @param chunk  The chunk in which the task will be executed.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
+    @Override
+    public SchedulerTask createTaskForWorld(@NotNull Plugin plugin, Runnable task, World world, @NotNull Chunk chunk) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
     }
 
     /**
@@ -119,8 +136,9 @@ public interface MinecraftScheduler {
      * @param location The location at which the task will be executed.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
+    @Override
+    public SchedulerTask createTaskForLocation(@NotNull Plugin plugin, Runnable task, Location location) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
     }
 
     /**
@@ -134,8 +152,9 @@ public interface MinecraftScheduler {
      * @param period The period in ticks between consecutive executions.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createRepeatingTaskForWorld(Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay, long period) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
+    @Override
+    public SchedulerTask createRepeatingTaskForWorld(@NotNull Plugin plugin, Runnable task, World world, @NotNull Chunk chunk, long delay, long period) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), (period / 20), TimeUnit.SECONDS));
     }
 
     /**
@@ -148,8 +167,9 @@ public interface MinecraftScheduler {
      * @param period   The period in ticks between consecutive executions.
      * @return A SchedulerTask representing the created task.
      */
-    default SchedulerTask createRepeatingTaskForLocation(Plugin plugin, Runnable task, Location location, long delay, long period) {
-        return new MinecraftBukkitScheduler.BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
+    @Override
+    public SchedulerTask createRepeatingTaskForLocation(@NotNull Plugin plugin, Runnable task, Location location, long delay, long period) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), (period / 20), TimeUnit.SECONDS));
     }
 
     /**
@@ -157,13 +177,43 @@ public interface MinecraftScheduler {
      *
      * @param plugin The plugin whose tasks should be canceled.
      */
-    void cancelTasks(Plugin plugin);
+    @Override
+    public void cancelTasks(@NotNull Plugin plugin) {
+        plugin.getProxy().getScheduler().cancel(plugin);
+    }
 
     /**
      * Gets the scheduler
      *
      * @return The scheduler
      */
-    MinecraftScheduler getScheduler();
+    @Override
+    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
+        return null;
+    }
 
+    private static class BungeeSchedulerTask implements SchedulerTask {
+
+        private final ScheduledTask bungeeTask;
+
+        public BungeeSchedulerTask(ScheduledTask scheduledTask) {
+            this.bungeeTask = scheduledTask;
+        }
+
+
+        @Override
+        public void cancel() {
+            this.bungeeTask.cancel();
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public int getTaskId() {
+            return this.bungeeTask.getId();
+        }
+    }
 }

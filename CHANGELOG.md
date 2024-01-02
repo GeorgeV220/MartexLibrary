@@ -1,3 +1,10 @@
+# [11.7.0-beta.9](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.8...v11.7.0-beta.9) (2024-01-02)
+
+
+### Features
+
+* **minecraft:** add generic types and methods to scheduler classes (beta) ([95ba248](https://github.com/GeorgeV220/MartexLibrary/commit/95ba248c5bdb26d821653a158799dc782cce3f9e))
+
 # [11.7.0-beta.8](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.7...v11.7.0-beta.8) (2023-12-27)
 
 

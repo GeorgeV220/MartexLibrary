@@ -1,3 +1,11 @@
+# [11.7.0-beta.8](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.7...v11.7.0-beta.8) (2023-12-27)
+
+
+### Features
+
+* **minecraft/scheduler:** add isCancelled and getTaskId methods to SchedulerTask interface and implementations ([a293366](https://github.com/GeorgeV220/MartexLibrary/commit/a293366c8c9dce405fad5f844c5de56b8378a201))
+* **minecraft/scheduler:** add SchedulerRunnable class ([f074e15](https://github.com/GeorgeV220/MartexLibrary/commit/f074e15cf0e91e695a25c759912360a9698e9a71))
+
 # [11.7.0-beta.7](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.6...v11.7.0-beta.7) (2023-12-07)
 
 

@@ -1,3 +1,17 @@
+# [11.7.0-beta.10](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.9...v11.7.0-beta.10) (2024-01-05)
+
+
+### Bug Fixes
+
+* **inventory:** add generic type parameters to MinecraftScheduler ([cf0161b](https://github.com/GeorgeV220/MartexLibrary/commit/cf0161b05269f65f2d4d4309e0724d8d4011d7ba))
+* **inventory:** check for null tasks before cancelling ([b75ae53](https://github.com/GeorgeV220/MartexLibrary/commit/b75ae5322ae51e64afbf89b098c283c7f55a957d))
+
+
+### Features
+
+* **inventory:** add animated option to createPagedInventory methods ([6ae2e38](https://github.com/GeorgeV220/MartexLibrary/commit/6ae2e3800e9734268adc409e086a71fb84b958e4))
+* **inventory:** add animated property to paged inventory ([27f61d9](https://github.com/GeorgeV220/MartexLibrary/commit/27f61d949b29f067f202494d955a4d9e14107e9f))
+
 # [11.7.0-beta.9](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.8...v11.7.0-beta.9) (2024-01-02)
 
 

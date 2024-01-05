@@ -3,6 +3,7 @@ package com.georgev22.library.minecraft.inventory;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryClickHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventoryCloseHandler;
 import com.georgev22.library.minecraft.inventory.handlers.PagedInventorySwitchPageHandler;
+import com.georgev22.library.minecraft.scheduler.SchedulerTask;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
@@ -67,8 +68,14 @@ public class InventoryRegistrar {
     }
 
     void unregister(Player player) {
-        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerAnimatedMap().get(player).cancel();
-        pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerFramesMap().get(player).cancel();
+        SchedulerTask animatedTask = pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerAnimatedMap().get(player);
+        if (animatedTask != null) {
+            animatedTask.cancel();
+        }
+        SchedulerTask framesTask = pagedInventoryRegistrar.get(player.getUniqueId()).getPlayerSchedulerFramesMap().get(player);
+        if (framesTask != null) {
+            framesTask.cancel();
+        }
         registrar.remove(player.getUniqueId());
         pagedInventoryRegistrar.remove(player.getUniqueId());
     }

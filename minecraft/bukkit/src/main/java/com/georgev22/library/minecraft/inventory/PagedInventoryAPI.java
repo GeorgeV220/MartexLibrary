@@ -15,8 +15,8 @@ public class PagedInventoryAPI {
         Bukkit.getPluginManager().registerEvents(new PagedInventoryListener(plugin, registrar), plugin);
     }
 
-    public IPagedInventory createPagedInventory(NavigationRow navigationRow) {
-        return new PagedInventory(registrar, navigationRow);
+    public IPagedInventory createPagedInventory(NavigationRow navigationRow, boolean animated) {
+        return new PagedInventory(registrar, navigationRow, animated);
     }
 
     /**
@@ -24,11 +24,9 @@ public class PagedInventoryAPI {
      *
      * @param navigation The navigation for the paged inventory. Must contain next, previous, and close buttons
      * @return The newly created {@link IPagedInventory}
-     * @deprecated use {@link PagedInventoryAPI#createPagedInventory(NavigationRow)}
      */
-    @Deprecated
-    public IPagedInventory createPagedInventory(Map<Integer, NavigationItem> navigation) {
-        return new PagedInventory(registrar, navigation);
+    public IPagedInventory createPagedInventory(Map<Integer, NavigationItem> navigation, boolean animated) {
+        return new PagedInventory(registrar, navigation, animated);
     }
 
     /**

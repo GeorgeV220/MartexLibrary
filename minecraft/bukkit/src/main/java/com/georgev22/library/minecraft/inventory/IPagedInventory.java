@@ -92,6 +92,20 @@ public interface IPagedInventory {
     PageModifier getPageModifier(int index);
 
     /**
+     * Sets the animated property of the inventory.
+     *
+     * @param animated a boolean value indicating whether the inventory should be animated or not
+     */
+    void setAnimated(boolean animated);
+
+    /**
+     * Checks if the inventory is animated.
+     *
+     * @return true if the inventory is animated, false otherwise
+     */
+    boolean isAnimated();
+
+    /**
      * Opens the first page of this paged inventory
      *
      * @param player The player opening the paged inventory
@@ -107,16 +121,6 @@ public interface IPagedInventory {
      * @return {@code true} if successful, {@code false} otherwise
      */
     boolean open(Player player, int index);
-
-    /**
-     * Opens the page at the given index of this paged inventory, index starts at 0
-     *
-     * @param player   The player opening the inventory
-     * @param index    The index of the inventory to be opened
-     * @param animated If you want animated display names
-     * @return {@code true} if successful, {@code false} otherwise
-     */
-    boolean open(Player player, int index, boolean animated);
 
     /**
      * Opens the next inventory of this paged inventory

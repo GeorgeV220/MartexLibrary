@@ -4,13 +4,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.NonExtendable
-public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk> {
+public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk, Entity> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -119,6 +120,21 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
     }
 
     /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createDelayedForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskLater(plugin, task, delay));
+    }
+
+    /**
      * Creates a task for a specific world and chunk.
      *
      * @param plugin The plugin that owns this task.
@@ -142,6 +158,20 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      */
     @Override
     public SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
+    }
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity) {
         return new BukkitSchedulerTask(Bukkit.getScheduler().runTask(plugin, task));
     }
 
@@ -177,6 +207,22 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
     }
 
     /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The initial delay in ticks before the first execution.
+     * @param period  The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createRepeatingTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay, long period) {
+        return new BukkitSchedulerTask(Bukkit.getScheduler().runTaskTimer(plugin, task, delay, period));
+    }
+
+    /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param plugin The plugin whose tasks should be canceled.
@@ -194,7 +240,7 @@ public class MinecraftBukkitScheduler implements MinecraftScheduler<Plugin, Loca
      * @return The scheduler instance for this class (i.e., this).
      */
     @Override
-    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
+    public MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler() {
         return this;
     }
 

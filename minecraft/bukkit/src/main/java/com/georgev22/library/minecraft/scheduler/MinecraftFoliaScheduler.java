@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 @ApiStatus.NonExtendable
-public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk> {
+public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Location, World, Chunk, Entity> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -119,6 +120,21 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Locat
     }
 
     /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired – Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createDelayedForEntity(Plugin plugin, Runnable task, Runnable retired, @NotNull Entity entity, long delay) {
+        return new FoliaSchedulerTask(entity.getScheduler().runDelayed(plugin, (scheduledTask) -> task.run(), retired, delay));
+    }
+
+    /**
      * Creates a task for a specific world and chunk.
      *
      * @param plugin The plugin that owns this task.
@@ -141,6 +157,20 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Locat
      */
     public SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location) {
         return new FoliaSchedulerTask(Bukkit.getRegionScheduler().run(plugin, location, (scheduledTask) -> task.run()));
+    }
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createTaskForEntity(Plugin plugin, Runnable task, Runnable retired, @NotNull Entity entity) {
+        return new FoliaSchedulerTask(entity.getScheduler().run(plugin, (scheduledTask) -> task.run(), retired));
     }
 
     /**
@@ -173,6 +203,22 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Locat
     }
 
     /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The initial delay in ticks before the first execution.
+     * @param period  The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createRepeatingTaskForEntity(Plugin plugin, Runnable task, Runnable retired, @NotNull Entity entity, long delay, long period) {
+        return new FoliaSchedulerTask(entity.getScheduler().runAtFixedRate(plugin, (scheduledTask) -> task.run(), retired, delay, period));
+    }
+
+    /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param plugin The plugin whose tasks should be canceled.
@@ -190,7 +236,7 @@ public class MinecraftFoliaScheduler implements MinecraftScheduler<Plugin, Locat
      * @return The scheduler instance for this class (i.e., this).
      */
     @Override
-    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
+    public MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler() {
         return this;
     }
 

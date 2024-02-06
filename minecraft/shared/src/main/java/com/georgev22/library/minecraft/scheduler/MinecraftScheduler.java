@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A  non-extendable interface representing a scheduler for task scheduling and cancellation.
  */
-public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
+public interface MinecraftScheduler<Plugin, Location, World, Chunk, Entity> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -90,6 +90,18 @@ public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
     SchedulerTask createDelayedForLocation(Plugin plugin, Runnable task, Location location, long delay);
 
     /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    SchedulerTask createDelayedForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay);
+
+    /**
      * Creates a task for a specific world and chunk.
      *
      * @param plugin The plugin that owns this task.
@@ -109,6 +121,17 @@ public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
      * @return A SchedulerTask representing the created task.
      */
     SchedulerTask createTaskForLocation(Plugin plugin, Runnable task, Location location);
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    SchedulerTask createTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity);
 
     /**
      * Creates a repeating task for a specific world and chunk.
@@ -136,6 +159,19 @@ public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
     SchedulerTask createRepeatingTaskForLocation(Plugin plugin, Runnable task, Location location, long delay, long period);
 
     /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The initial delay in ticks before the first execution.
+     * @param period  The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    SchedulerTask createRepeatingTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay, long period);
+
+    /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param plugin The plugin whose tasks should be canceled.
@@ -147,6 +183,6 @@ public interface MinecraftScheduler<Plugin, Location, World, Chunk> {
      *
      * @return The scheduler
      */
-    MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler();
+    MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler();
 
 }

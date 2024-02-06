@@ -1,3 +1,32 @@
+# [11.7.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0...v11.7.0) (2024-02-06)
+
+
+### Bug Fixes
+
+* Fix initialization of versionNumber and releaseNumber variables ([f09a0c0](https://github.com/GeorgeV220/MartexLibrary/commit/f09a0c0116f47e35067724683bfd450fe34969e6))
+* **inventory:** add generic type parameters to MinecraftScheduler ([cf0161b](https://github.com/GeorgeV220/MartexLibrary/commit/cf0161b05269f65f2d4d4309e0724d8d4011d7ba))
+* **inventory:** check for null tasks before cancelling ([b75ae53](https://github.com/GeorgeV220/MartexLibrary/commit/b75ae5322ae51e64afbf89b098c283c7f55a957d))
+* **minecraft/scheduler:** Add the new changes to Bungee/Velocity schedulers and other classes ([b88c6d0](https://github.com/GeorgeV220/MartexLibrary/commit/b88c6d02320b9b98944946aaa778b6893543902a))
+* Modify KryoUtils to handle IOExceptions ([78e1d8e](https://github.com/GeorgeV220/MartexLibrary/commit/78e1d8e863428f30c2fa01295be07d9893630d98))
+* Revert "Modify KryoUtils to handle IOExceptions" ([0c146a7](https://github.com/GeorgeV220/MartexLibrary/commit/0c146a79f2be3d00b63c5d453ce505286407dc97))
+
+
+### Features
+
+* Add 1_20_R3 enum constant. ([7899b7f](https://github.com/GeorgeV220/MartexLibrary/commit/7899b7f278d869f67dcb2c5bc05c4c12962ec22b))
+* Add ItemStackSerializer class for serializing and deserializing ItemStacks and Inventories ([e679336](https://github.com/GeorgeV220/MartexLibrary/commit/e67933670085e2cace48b4ca0052a384ba795171))
+* Add support for Minecraft version 1.20.2 ([17307cd](https://github.com/GeorgeV220/MartexLibrary/commit/17307cd057c32ef8e2ea396fa4378807b3d5bd23))
+* **build.gradle:** Add shadow configuration for project dependencies ([38bab9f](https://github.com/GeorgeV220/MartexLibrary/commit/38bab9fba81cce195915c99b641358d347790a60))
+* **constructor:** Add constructors to ConcurrentObjectMap, HashObjectMap, LinkedObjectMap, and TreeObjectMap ([68c2075](https://github.com/GeorgeV220/MartexLibrary/commit/68c207598e098c77095229481dc6f7ce00d80d4d))
+* **inventory:** add animated option to createPagedInventory methods ([6ae2e38](https://github.com/GeorgeV220/MartexLibrary/commit/6ae2e3800e9734268adc409e086a71fb84b958e4))
+* **inventory:** add animated property to paged inventory ([27f61d9](https://github.com/GeorgeV220/MartexLibrary/commit/27f61d949b29f067f202494d955a4d9e14107e9f))
+* **inventory:** add InventoryMap class for representing inventory contents ([7e6c706](https://github.com/GeorgeV220/MartexLibrary/commit/7e6c706ed595f95aac92ac5b3409ee2faff1ace5))
+* **minecraft/scheduler:** Add entity scheduler wrapper for folia. ([e4f59f1](https://github.com/GeorgeV220/MartexLibrary/commit/e4f59f117bf160bd881a154fdf5065ccffb927af))
+* **minecraft/scheduler:** add isCancelled and getTaskId methods to SchedulerTask interface and implementations ([a293366](https://github.com/GeorgeV220/MartexLibrary/commit/a293366c8c9dce405fad5f844c5de56b8378a201))
+* **minecraft/scheduler:** add SchedulerRunnable class ([f074e15](https://github.com/GeorgeV220/MartexLibrary/commit/f074e15cf0e91e695a25c759912360a9698e9a71))
+* **minecraft:** add generic types and methods to scheduler classes (beta) ([95ba248](https://github.com/GeorgeV220/MartexLibrary/commit/95ba248c5bdb26d821653a158799dc782cce3f9e))
+* **scheduler:** Add methods to create delayed, repeating tasks for specific world/chunk and location ([21baa8a](https://github.com/GeorgeV220/MartexLibrary/commit/21baa8a333a9e0c2c019c8a06341f1152115d1f6))
+
 # [11.7.0-beta.10](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0-beta.9...v11.7.0-beta.10) (2024-01-05)
 
 

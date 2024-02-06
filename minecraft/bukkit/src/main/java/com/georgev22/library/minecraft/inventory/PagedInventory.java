@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -47,7 +48,7 @@ public class PagedInventory implements IPagedInventory {
     private final List<PagedInventoryCloseHandler> closeHandlers;
     private final List<PagedInventorySwitchPageHandler> switchHandlers;
 
-    private final MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler;
+    private final MinecraftScheduler<Plugin, Location, World, Chunk, Entity> minecraftScheduler;
 
     private final ObjectMap<Player, SchedulerTask> playerSchedulerFramesMap;
     private final ObjectMap<Player, SchedulerTask> playerSchedulerAnimatedMap;

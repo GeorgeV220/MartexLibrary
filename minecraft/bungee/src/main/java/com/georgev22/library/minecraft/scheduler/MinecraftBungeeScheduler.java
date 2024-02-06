@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements MinecraftScheduler<Plugin, Location, World, Chunk> {
+public class MinecraftBungeeScheduler<T, Location, World, Chunk, Entity> implements MinecraftScheduler<Plugin, Location, World, Chunk, Entity> {
 
     /**
      * Schedules a task to be executed synchronously on the server's main thread.
@@ -115,6 +115,21 @@ public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements Mine
     }
 
     /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createDelayedForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), TimeUnit.SECONDS));
+    }
+
+    /**
      * Creates a task for a specific world and chunk.
      *
      * @param plugin The plugin that owns this task.
@@ -138,6 +153,20 @@ public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements Mine
      */
     @Override
     public SchedulerTask createTaskForLocation(@NotNull Plugin plugin, Runnable task, Location location) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
+    }
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity) {
         return new BungeeSchedulerTask(plugin.getProxy().getScheduler().runAsync(plugin, task));
     }
 
@@ -173,6 +202,22 @@ public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements Mine
     }
 
     /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param plugin  The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The initial delay in ticks before the first execution.
+     * @param period  The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createRepeatingTaskForEntity(Plugin plugin, Runnable task, Runnable retired, Entity entity, long delay, long period) {
+        return new BungeeSchedulerTask(plugin.getProxy().getScheduler().schedule(plugin, task, (delay / 20), (period / 20), TimeUnit.SECONDS));
+    }
+
+    /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param plugin The plugin whose tasks should be canceled.
@@ -188,8 +233,8 @@ public class MinecraftBungeeScheduler<T, Location, World, Chunk> implements Mine
      * @return The scheduler
      */
     @Override
-    public MinecraftScheduler<Plugin, Location, World, Chunk> getScheduler() {
-        return null;
+    public MinecraftScheduler<Plugin, Location, World, Chunk, Entity> getScheduler() {
+        return this;
     }
 
     private static class BungeeSchedulerTask implements SchedulerTask {

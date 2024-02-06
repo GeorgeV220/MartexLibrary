@@ -2,13 +2,13 @@ package com.georgev22.library.minecraft.scheduler;
 
 import org.jetbrains.annotations.NotNull;
 
-public abstract class SchedulerRunnable<Plugin, Location, World, Chunk> implements Runnable {
+public abstract class SchedulerRunnable<Plugin, Location, World, Chunk, Entity> implements Runnable {
 
     private SchedulerTask task;
 
-    private final MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler;
+    private final MinecraftScheduler<Plugin, Location, World, Chunk, Entity> minecraftScheduler;
 
-    public SchedulerRunnable(MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler) {
+    public SchedulerRunnable(MinecraftScheduler<Plugin, Location, World, Chunk, Entity> minecraftScheduler) {
         this.minecraftScheduler = minecraftScheduler;
     }
 

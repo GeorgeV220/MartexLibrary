@@ -12,6 +12,7 @@ import com.georgev22.library.minecraft.scheduler.MinecraftScheduler;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,7 +28,7 @@ class PagedInventoryListener implements Listener {
     private final Plugin plugin;
     private final InventoryRegistrar registrar;
 
-    private final MinecraftScheduler<Plugin, Location, World, Chunk> minecraftScheduler;
+    private final MinecraftScheduler<Plugin, Location, World, Chunk, Entity> minecraftScheduler;
 
     public PagedInventoryListener(Plugin plugin, InventoryRegistrar registrar) {
         this.plugin = plugin;

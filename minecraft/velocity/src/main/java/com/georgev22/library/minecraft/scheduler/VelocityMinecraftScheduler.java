@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class VelocityMinecraftScheduler<T, Location, World, Chunk> implements MinecraftScheduler<Object, Location, World, Chunk> {
+public class VelocityMinecraftScheduler<T, Location, World, Chunk, Entity> implements MinecraftScheduler<Object, Location, World, Chunk, Entity> {
 
     private final ProxyServer proxyServer = VelocityMinecraftUtils.getServer();
 
@@ -123,6 +123,21 @@ public class VelocityMinecraftScheduler<T, Location, World, Chunk> implements Mi
     }
 
     /**
+     * Creates a delayed task for a specific location.
+     *
+     * @param o       The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The delay in ticks before the task is executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createDelayedForEntity(Object o, Runnable task, Runnable retired, Entity entity, long delay) {
+        return new VelocitySchedulerTask(proxyServer.getScheduler().buildTask(o, task).delay((delay / 20), TimeUnit.SECONDS).schedule());
+    }
+
+    /**
      * Creates a task for a specific world and chunk.
      *
      * @param o     The plugin that owns this task.
@@ -146,6 +161,20 @@ public class VelocityMinecraftScheduler<T, Location, World, Chunk> implements Mi
      */
     @Override
     public SchedulerTask createTaskForLocation(Object o, Runnable task, Location location) {
+        return new VelocitySchedulerTask(proxyServer.getScheduler().buildTask(o, task).schedule());
+    }
+
+    /**
+     * Creates a task for a specific location.
+     *
+     * @param o       The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createTaskForEntity(Object o, Runnable task, Runnable retired, Entity entity) {
         return new VelocitySchedulerTask(proxyServer.getScheduler().buildTask(o, task).schedule());
     }
 
@@ -181,6 +210,22 @@ public class VelocityMinecraftScheduler<T, Location, World, Chunk> implements Mi
     }
 
     /**
+     * Creates a repeating task for a specific location.
+     *
+     * @param o       The plugin that owns this task.
+     * @param task    The runnable task to execute.
+     * @param retired Retire callback to run if the entity is retired before the run callback can be invoked, may be null.
+     * @param entity  The entity in which the task will be executed.
+     * @param delay   The initial delay in ticks before the first execution.
+     * @param period  The period in ticks between consecutive executions.
+     * @return A SchedulerTask representing the created task.
+     */
+    @Override
+    public SchedulerTask createRepeatingTaskForEntity(Object o, Runnable task, Runnable retired, Entity entity, long delay, long period) {
+        return new VelocitySchedulerTask(proxyServer.getScheduler().buildTask(o, task).delay((delay / 20), TimeUnit.SECONDS).repeat((period / 20), TimeUnit.SECONDS).schedule());
+    }
+
+    /**
      * Cancels all tasks associated with the given `plugin`.
      *
      * @param o The plugin whose tasks should be canceled.
@@ -202,7 +247,7 @@ public class VelocityMinecraftScheduler<T, Location, World, Chunk> implements Mi
      * @return The scheduler
      */
     @Override
-    public MinecraftScheduler<Object, Location, World, Chunk> getScheduler() {
+    public MinecraftScheduler<Object, Location, World, Chunk, Entity> getScheduler() {
         return this;
     }
 

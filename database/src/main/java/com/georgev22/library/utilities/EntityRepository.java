@@ -1,11 +1,17 @@
 package com.georgev22.library.utilities;
 
+import com.georgev22.library.maps.HashObjectMap;
+import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.utilities.annotations.Column;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Interface for a repository managing entities.
@@ -81,4 +87,59 @@ public interface EntityRepository<V extends Entity> {
 
         throw new NoSuchConstructorException("No constructor with a single vararg String parameter found in class " + entityClass.getSimpleName());
     }
+
+    default List<Method> getMethods(@NotNull Class<?> entityClass) {
+        return Arrays.stream(entityClass.getDeclaredMethods()).filter(
+                method -> method.getAnnotation(Column.class) != null
+                        && method.getParameterCount() == 0
+                        && method.getReturnType() != void.class
+                        && !method.getName().startsWith("set")
+                        && !method.getName().equalsIgnoreCase("_id")
+        ).toList();
+    }
+
+    default List<Field> getFields(@NotNull Class<?> entityClass) {
+        return Arrays.stream(entityClass.getDeclaredFields()).filter(
+                field -> field.getAnnotation(Column.class) != null
+                        && !field.getName().equalsIgnoreCase("_id")
+        ).toList();
+    }
+
+    default ObjectMap<String, Object> getValuesMap(@NotNull V entity) {
+        ObjectMap<String, Object> values = new HashObjectMap<>();
+
+        for (Method method : getMethods(entity.getClass())) {
+            Column columnAnnotation = method.getAnnotation(Column.class);
+
+            if (columnAnnotation != null) {
+                Object result;
+                try {
+                    result = method.invoke(entity);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    this.getLogger().log(Level.SEVERE, "[EntityRepository]:", e);
+                    return null;
+                }
+                values.append(columnAnnotation.name(), result);
+                entity.setValue(columnAnnotation.name(), result);
+            }
+        }
+
+        for (Field field : getFields(entity.getClass())) {
+            Column columnAnnotation = field.getAnnotation(Column.class);
+            if (columnAnnotation != null) {
+                Object result;
+                try {
+                    result = field.get(entity);
+                } catch (IllegalAccessException e) {
+                    this.getLogger().log(Level.SEVERE, "[EntityRepository]:", e);
+                    return null;
+                }
+                values.append(columnAnnotation.name(), result);
+                entity.setValue(columnAnnotation.name(), result);
+            }
+        }
+        return values;
+    }
+
+    Logger getLogger();
 }

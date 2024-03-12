@@ -1,19 +1,14 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.utilities.annotations.Column;
-import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,59 +45,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      */
     @Override
     public V save(V entity) {
-        ObjectMap<String, Object> values = new HashObjectMap<>();
-        List<Method> methods = Arrays.stream(entity.getClass().getDeclaredMethods()).filter(
-                // Condition 1: Filter methods annotated with @Column
-                method -> method.getAnnotation(Column.class) != null
-                        // Condition 2: Exclude methods with parameters
-                        && method.getParameterCount() == 0
-                        // Condition 3: Exclude methods with a return type of void
-                        && method.getReturnType() != void.class
-                        // Condition 4: Exclude methods starting with "set"
-                        && !method.getName().startsWith("set")
-                        // Condition 5: Exclude methods with the name "_id" (case-insensitive)
-                        && !method.getName().equalsIgnoreCase("_id")
-        ).toList();
-
-        List<Field> fields = Arrays.stream(entity.getClass().getDeclaredFields()).filter(
-                // Condition 1: Filter fields annotated with @Column
-                field -> field.getAnnotation(Column.class) != null
-                        // Condition 2: Exclude fields with the name "_id" (case-insensitive)
-                        && !field.getName().equalsIgnoreCase("_id")
-        ).toList();
-
-        for (Method method : methods) {
-            Column columnAnnotation = method.getAnnotation(Column.class);
-
-            if (columnAnnotation != null) {
-                Object result;
-                try {
-                    result = method.invoke(entity);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-                    return null;
-                }
-                values.append(columnAnnotation.name(), result);
-                entity.setValue(columnAnnotation.name(), result);
-            }
-        }
-
-        for (Field field : fields) {
-            Column columnAnnotation = field.getAnnotation(Column.class);
-            if (columnAnnotation != null) {
-                Object result;
-                try {
-                    result = field.get(entity);
-                } catch (IllegalAccessException e) {
-                    this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-                    return null;
-                }
-                values.append(columnAnnotation.name(), result);
-                entity.setValue(columnAnnotation.name(), result);
-            }
-        }
-
-        Document document = new Document(values);
+        Document document = new Document(getValuesMap(entity));
 
         if (exists(entity._id(), true, false)) {
             MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
@@ -159,7 +102,9 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * Checks if an entity with the specified ID is already loaded.
      * If not in the cache, checks the database and loads it into the cache if found.
      *
-     * @param entityId The ID of the entity to check for existence.
+     * @param entityId  The ID of the entity to check for existence
+     * @param checkDb   Check if the entity exists in the database
+     * @param forceLoad Force load the entity
      * @return True if the entity is loaded, false otherwise.
      */
     @Override
@@ -220,5 +165,23 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
         for (V entity : loadedEntities.values()) {
             this.save(entity);
         }
+    }
+
+    /**
+     * Gets the MongoDB database associated with this repository.
+     *
+     * @return The MongoDB database.
+     */
+    public MongoDatabase getMongoDatabase() {
+        return mongoDatabase;
+    }
+
+    /**
+     * Gets the logger associated with this repository.
+     *
+     * @return The logger.
+     */
+    public Logger getLogger() {
+        return logger;
     }
 }

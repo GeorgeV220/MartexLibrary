@@ -1,3 +1,10 @@
+# [11.9.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.8.0...v11.9.0) (2024-03-12)
+
+
+### Features
+
+* **database:** add yaml support and create YamlEntityRepository ([912bdd0](https://github.com/GeorgeV220/MartexLibrary/commit/912bdd0cd087e8fb5f601aac45665bd43411db6f))
+
 # [11.8.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0...v11.8.0) (2024-03-12)
 
 

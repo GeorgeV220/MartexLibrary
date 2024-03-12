@@ -1,64 +1,66 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.maps.ConcurrentObjectMap;
+import com.georgev22.library.utilities.annotations.Column;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
- * The {@code Entity} interface represents an entity with a unique identifier.
- * It provides methods for managing custom data associated with the entity.
- * Custom data can be added, retrieved, and accessed using key-value pairs.
+ * The {@code Entity} abstract class represents an entity in a database context.
+ * Entities are expected to have an ID and support setting values for specific keys.
  */
-public interface Entity extends Serializable {
+public abstract class Entity {
 
-    /**
-     * Returns the unique identifier of the entity.
-     *
-     * @return the {@link UUID} representing the entity's ID
-     */
-    UUID getId();
+    private final String _id;
 
-    /**
-     * Adds custom data to the entity with the specified key and value.
-     *
-     * @param key   the key of the custom data
-     * @param value the value of the custom data
-     * @return the updated entity with the added custom data
-     */
-    default Entity addCustomData(String key, Object value) {
-        this.getCustomData().append(key, value);
-        return this;
+    public Entity(String _id) {
+        this._id = _id;
     }
 
     /**
-     * Adds custom data to the entity with the specified key and value if the key does not already exist.
+     * Returns the ID of the entity.
      *
-     * @param key   the key of the custom data
-     * @param value the value of the custom data
-     * @return the updated entity with the added custom data (if the key did not already exist)
+     * @return the ID of the entity
      */
-    default Entity addCustomDataIfNotExists(String key, Object value) {
-        this.getCustomData().appendIfTrue(key, value, !this.getCustomData().containsKey(key));
-        return this;
+    @Column(name = "_id", type = "VARCHAR(32)", unique = true)
+    public String _id() {
+        return this._id;
     }
 
     /**
-     * Retrieves the value of the custom data associated with the specified key.
+     * Sets the value for a specified key in the entity.
+     * The default implementation attempts to find and invoke the corresponding setter method based on the key.
+     * The "_id" key is excluded from this process.
      *
-     * @param key the key of the custom data
-     * @param <T> the type of the value to retrieve
-     * @return the value associated with the specified key, or {@code null} if the key does not exist
+     * <p>If a setter method is not found for the given key, the method attempts
+     * to directly set the field value using reflection. If both attempts fail, a {@link RuntimeException} is thrown,
+     * wrapping any encountered {@link IllegalAccessException} or {@link NoSuchFieldException}.
+     *
+     * @param key   the key for which the value should be set
+     * @param value the value to set
+     * @throws RuntimeException if setting the value encounters an error, including {@link IllegalAccessException}
+     *                          or {@link NoSuchFieldException}
      */
-    default <T> T getCustomData(String key) {
-        return (T) getCustomData().get(key);
+    public void setValue(@NotNull String key, Object value) {
+        if (key.equals("_id")) {
+            return;
+        }
+
+        try {
+            Method method = this.getClass().getDeclaredMethod("set" + key.substring(0, 1).toUpperCase() + key.substring(1), value.getClass());
+            method.invoke(this, value);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchMethodException e) {
+            try {
+                Field field = this.getClass().getDeclaredField(key);
+                field.setAccessible(true);
+                field.set(this, value);
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
-
-    /**
-     * Retrieves the map of custom data associated with the entity.
-     *
-     * @return the {@link ConcurrentObjectMap} containing the custom data of the entity
-     */
-    ConcurrentObjectMap<String, Object> getCustomData();
-
 }

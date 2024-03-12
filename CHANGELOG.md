@@ -1,3 +1,13 @@
+# [11.8.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.7.0...v11.8.0) (2024-03-12)
+
+
+### Features
+
+* **database:** add 'Column' annotation class ([4af567b](https://github.com/GeorgeV220/MartexLibrary/commit/4af567bcae4a5c2e4254e33cb8b6869113b63107))
+* **database:** add MongoDB and MySQL entity repositories ([8ac2c17](https://github.com/GeorgeV220/MartexLibrary/commit/8ac2c17c42d5ca3f63a29a0d9243872a1ecdab96))
+* **database:** remove deprecated getCollection method ([3e53557](https://github.com/GeorgeV220/MartexLibrary/commit/3e53557e8140c8b5088dd88deb1a886e7156423a))
+* **database:** Remove EntityManager and EntityManagerImpl ([695e004](https://github.com/GeorgeV220/MartexLibrary/commit/695e004b3ac45d2ea1e18e527e82793adbf2e011))
+
 # [11.7.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.6.0...v11.7.0) (2024-02-06)
 
 

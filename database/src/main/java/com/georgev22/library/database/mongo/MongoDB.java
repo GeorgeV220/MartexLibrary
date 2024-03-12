@@ -12,7 +12,6 @@ public class MongoDB {
 
     private final MongoClient mongoClient;
     private final MongoDatabase mongoDatabase;
-    private MongoCollection<Document> collection;
 
     /**
      * @param host         Host of the MongoDB (must contain port) format: localhost:27077
@@ -42,19 +41,6 @@ public class MongoDB {
         return mongoClient;
     }
 
-    /**
-     * Gets the collection that was given during the initialization of the class
-     *
-     * @return the collection
-     * @throws IllegalArgumentException if collectionName is invalid
-     * @see com.mongodb.MongoNamespace#checkCollectionNameValidity(String)
-     * @deprecated for removal on feature release
-     */
-    @Deprecated(forRemoval = true)
-    public MongoCollection<Document> getCollection() {
-        return collection;
-    }
-
     public MongoDatabase getMongoDatabase() {
         return mongoDatabase;
     }
@@ -63,12 +49,12 @@ public class MongoDB {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MongoDB mongoDB)) return false;
-        return Objects.equals(mongoClient, mongoDB.mongoClient) && Objects.equals(mongoDatabase, mongoDB.mongoDatabase) && Objects.equals(collection, mongoDB.collection);
+        return Objects.equals(mongoClient, mongoDB.mongoClient) && Objects.equals(mongoDatabase, mongoDB.mongoDatabase);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mongoClient, mongoDatabase, collection);
+        return Objects.hash(mongoClient, mongoDatabase);
     }
 
     @Override

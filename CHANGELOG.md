@@ -1,3 +1,11 @@
+# [11.10.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.9.0...v11.10.0) (2024-03-15)
+
+
+### Features
+
+* **database:** add collectionName field to MongoDBEntityRepository ([56d900c](https://github.com/GeorgeV220/MartexLibrary/commit/56d900c13d8d1a7b6af835e0f873d1e801495fa9))
+* **database:** add tableName field to MySQLEntityRepository ([41d887e](https://github.com/GeorgeV220/MartexLibrary/commit/41d887e08d42e2d669cd1941235c539b25b48186))
+
 # [11.9.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.8.0...v11.9.0) (2024-03-12)
 
 

@@ -24,6 +24,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
     private final MongoDatabase mongoDatabase;
     private final Logger logger;
     private final Class<V> entityClass;
+    private final String collectionName;
 
     /**
      * Constructs a MongoDBEntityRepository with the specified MongoDB database, logger, and entity class.
@@ -33,9 +34,22 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entityClass   The class type of the entity managed by this repository.
      */
     public MongoDBEntityRepository(MongoDatabase mongoDatabase, Logger logger, Class<V> entityClass) {
+        this(mongoDatabase, logger, entityClass, entityClass.getSimpleName());
+    }
+
+    /**
+     * Constructs a MongoDBEntityRepository with the specified MongoDB database, logger, and entity class.
+     *
+     * @param mongoDatabase  The MongoDB database to be used.
+     * @param logger         The logger for handling log messages.
+     * @param entityClass    The class type of the entity managed by this repository.
+     * @param collectionName The name of the collection in the database.
+     */
+    public MongoDBEntityRepository(MongoDatabase mongoDatabase, Logger logger, Class<V> entityClass, String collectionName) {
         this.mongoDatabase = mongoDatabase;
         this.logger = logger;
         this.entityClass = entityClass;
+        this.collectionName = collectionName;
     }
 
     /**
@@ -48,10 +62,10 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
         Document document = new Document(getValuesMap(entity));
 
         if (exists(entity._id(), true, false)) {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
+            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
             collection.replaceOne(new Document("_id", entity._id()), document);
         } else {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
+            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
             collection.insertOne(document);
         }
         this.loadedEntities.append(entity._id(), entity);
@@ -65,7 +79,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      */
     @Override
     public V load(String entityId) {
-        MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
+        MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
         Document document = collection.find(new Document("_id", entityId)).first();
 
         if (document != null) {
@@ -114,7 +128,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
         }
 
         if (checkDb) {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
+            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
             Document document = collection.find(new Document("_id", entityId)).first();
 
             return forceLoad ? this.load(entityId) != null : document != null;
@@ -136,7 +150,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
             return;
         }
 
-        MongoCollection<Document> collection = mongoDatabase.getCollection(this.entityClass.getSimpleName());
+        MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
         collection.deleteOne(new Document("_id", entityId));
         loadedEntities.remove(entityId);
     }
@@ -146,7 +160,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      */
     @Override
     public void loadAll() {
-        FindIterable<Document> documents = mongoDatabase.getCollection(this.entityClass.getSimpleName()).find();
+        FindIterable<Document> documents = mongoDatabase.getCollection(this.collectionName).find();
 
         for (Document document : documents) {
             Object idValue = document.get("_id");

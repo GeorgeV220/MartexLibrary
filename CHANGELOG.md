@@ -1,3 +1,10 @@
+# [11.11.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.10.0...v11.11.0) (2024-03-15)
+
+
+### Features
+
+* **database:** add async operations to entity repositories ([adbdc24](https://github.com/GeorgeV220/MartexLibrary/commit/adbdc2478fe041139422bd334a8203c3209a034b))
+
 # [11.10.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.9.0...v11.10.0) (2024-03-15)
 
 

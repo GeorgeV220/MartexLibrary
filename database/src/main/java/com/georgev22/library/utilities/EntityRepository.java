@@ -5,11 +5,11 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.annotations.Column;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +26,7 @@ public interface EntityRepository<V extends Entity> {
      *
      * @param entity The entity to be saved.
      */
-    V save(V entity);
+    CompletableFuture<V> save(V entity);
 
     /**
      * Loads an entity based on the specified entity ID.
@@ -34,7 +34,7 @@ public interface EntityRepository<V extends Entity> {
      *
      * @param entityId The ID of the entity to be loaded.
      */
-    @Nullable V load(String entityId);
+    CompletableFuture<V> load(@NotNull String entityId);
 
     /**
      * Retrieves the loaded entity with the specified ID.
@@ -42,7 +42,7 @@ public interface EntityRepository<V extends Entity> {
      * @param entityId The ID of the entity to be retrieved.
      * @return The loaded entity, or null if not found (implementation-dependent).
      */
-    @Nullable V getEntity(String entityId);
+    CompletableFuture<V> getEntity(@NotNull String entityId);
 
     /**
      * Checks if an entity with the specified ID exists.
@@ -50,14 +50,14 @@ public interface EntityRepository<V extends Entity> {
      * @param entityId The ID of the entity to check for existence.
      * @return True if the entity exists, false otherwise.
      */
-    boolean exists(String entityId, boolean checkDb, boolean forceLoad);
+    CompletableFuture<Boolean> exists(@NotNull String entityId, boolean checkDb, boolean forceLoad);
 
     /**
      * Deletes the entity with the specified ID.
      *
      * @param entityId The ID of the entity to be deleted.
      */
-    void delete(String entityId);
+    CompletableFuture<Void> delete(@NotNull String entityId);
 
     /**
      * Loads all entities from the database.

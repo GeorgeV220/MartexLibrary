@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,22 +46,24 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @return The saved entity, or null if an error occurred.
      */
     @Override
-    public V save(@NotNull V entity) {
-        File file = new File(dataFolder, entity._id() + ".yml");
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+    public CompletableFuture<V> save(@NotNull V entity) {
+        return CompletableFuture.supplyAsync(() -> {
+            File file = new File(dataFolder, entity._id() + ".yml");
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-        for (Map.Entry<String, Object> entry : getValuesMap(entity).entrySet()) {
-            config.set(entry.getKey(), entry.getValue());
-        }
+            for (Map.Entry<String, Object> entry : getValuesMap(entity).entrySet()) {
+                config.set(entry.getKey(), entry.getValue());
+            }
 
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-            return null;
-        }
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                return null;
+            }
 
-        return entity;
+            return entity;
+        });
     }
 
     /**
@@ -70,30 +73,33 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @return The loaded entity, or null if the entity does not exist or an error occurred.
      */
     @Override
-    public V load(String entityId) {
-        File file = new File(dataFolder, entityId + ".yml");
-        if (!file.exists()) {
-            return null;
+    public CompletableFuture<V> load(@NotNull String entityId) {
+        if (loadedEntities.containsKey(entityId)) {
+            return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
-
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-        if (config == null) {
-            return null;
-        }
-
-        try {
-            this.checkForConstructorWithSingleVarargString(this.entityClass);
-            V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-            for (String key : config.getKeys(false)) {
-                entity.setValue(key, config.get(key));
+        return CompletableFuture.supplyAsync(() -> {
+            File file = new File(dataFolder, entityId + ".yml");
+            if (!file.exists()) {
+                return null;
             }
-            loadedEntities.put(entityId, entity);
-            return entity;
-        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException |
-                 NoSuchConstructorException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-            return null;
-        }
+
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+            try {
+                this.checkForConstructorWithSingleVarargString(this.entityClass);
+                V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
+                for (String key : config.getKeys(false)) {
+                    entity.setValue(key, config.get(key));
+                }
+                this.loadedEntities.put(entityId, entity);
+                return entity;
+            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+                     InvocationTargetException |
+                     NoSuchConstructorException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                return null;
+            }
+        });
     }
 
     /**
@@ -103,8 +109,11 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @return The loaded entity, or null if not found.
      */
     @Override
-    public V getEntity(String entityId) {
-        return loadedEntities.get(entityId);
+    public CompletableFuture<V> getEntity(@NotNull String entityId) {
+        if (loadedEntities.containsKey(entityId)) {
+            return CompletableFuture.completedFuture(loadedEntities.get(entityId));
+        }
+        return this.load(entityId);
     }
 
     /**
@@ -116,16 +125,18 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @return True if the entity is loaded, false otherwise.
      */
     @Override
-    public boolean exists(String entityId, boolean checkDb, boolean forceLoad) {
-        if (loadedEntities.containsKey(entityId)) {
-            return true;
-        }
+    public CompletableFuture<Boolean> exists(@NotNull String entityId, boolean checkDb, boolean forceLoad) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (loadedEntities.containsKey(entityId)) {
+                return true;
+            }
 
-        if (checkDb) {
-            File file = new File(dataFolder, entityId + ".yml");
-            return forceLoad ? this.load(entityId) != null : file.exists();
-        }
-        return false;
+            if (checkDb) {
+                File file = new File(dataFolder, entityId + ".yml");
+                return forceLoad ? this.load(entityId) != null : file.exists();
+            }
+            return false;
+        });
     }
 
     /**
@@ -134,13 +145,15 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @param entityId The ID of the entity to be deleted.
      */
     @Override
-    public void delete(String entityId) {
-        File file = new File(dataFolder, entityId + ".yml");
-        if (file.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            file.delete();
-        }
-        loadedEntities.remove(entityId);
+    public CompletableFuture<Void> delete(@NotNull String entityId) {
+        return CompletableFuture.runAsync(() -> {
+            File file = new File(dataFolder, entityId + ".yml");
+            if (file.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
+            }
+            this.loadedEntities.remove(entityId);
+        });
     }
 
     /**
@@ -162,7 +175,7 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      */
     @Override
     public void saveAll() {
-        for (V entity : loadedEntities.values()) {
+        for (V entity : this.loadedEntities.values()) {
             save(entity);
         }
     }

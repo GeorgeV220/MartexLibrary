@@ -7,9 +7,11 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,18 +60,18 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entity The entity to be saved.
      */
     @Override
-    public V save(V entity) {
-        Document document = new Document(getValuesMap(entity));
-
-        if (exists(entity._id(), true, false)) {
+    public CompletableFuture<V> save(V entity) {
+        return exists(entity._id(), true, false).thenApplyAsync(exists -> {
+            Document document = new Document(getValuesMap(entity));
             MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
-            collection.replaceOne(new Document("_id", entity._id()), document);
-        } else {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
-            collection.insertOne(document);
-        }
-        this.loadedEntities.append(entity._id(), entity);
-        return entity;
+            if (exists) {
+                collection.replaceOne(new Document("_id", entity._id()), document);
+            } else {
+                collection.insertOne(document);
+            }
+            this.loadedEntities.append(entity._id(), entity);
+            return entity;
+        });
     }
 
     /**
@@ -78,38 +80,47 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entityId The ID of the entity to be loaded.
      */
     @Override
-    public V load(String entityId) {
-        MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
-        Document document = collection.find(new Document("_id", entityId)).first();
-
-        if (document != null) {
-            try {
-                this.checkForConstructorWithSingleVarargString(this.entityClass);
-                V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-
-                for (Map.Entry<String, Object> key : document.entrySet()) {
-                    entity.setValue(key.getKey(), key.getValue());
-                }
-
-                loadedEntities.append(entityId, entity);
-                return entity;
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                     InvocationTargetException | NoSuchConstructorException e) {
-                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-            }
+    public CompletableFuture<V> load(@NotNull String entityId) {
+        if (this.loadedEntities.containsKey(entityId)) {
+            this.logger.log(Level.FINE, "Entity with ID " + entityId + " already loaded.");
+            return CompletableFuture.completedFuture(this.loadedEntities.get(entityId));
         }
-        return null;
+        return CompletableFuture.supplyAsync(() -> {
+            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
+            Document document = collection.find(new Document("_id", entityId)).first();
+
+            if (document != null) {
+                try {
+                    this.checkForConstructorWithSingleVarargString(this.entityClass);
+                    V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
+
+                    for (Map.Entry<String, Object> key : document.entrySet()) {
+                        entity.setValue(key.getKey(), key.getValue());
+                    }
+
+                    this.loadedEntities.append(entityId, entity);
+                    return entity;
+                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                         InvocationTargetException | NoSuchConstructorException e) {
+                    this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                }
+            }
+            return null;
+        });
     }
 
     /**
-     * Retrieves the loaded entity with the specified entity ID.
+     * Retrieves the loaded entity with the specified entity ID if cached or loads it from the database.
      *
      * @param entityId The ID of the entity to be retrieved.
      * @return The loaded entity, or null if not found.
      */
     @Override
-    public V getEntity(String entityId) {
-        return loadedEntities.get(entityId);
+    public CompletableFuture<V> getEntity(@NotNull String entityId) {
+        if (loadedEntities.containsKey(entityId)) {
+            return CompletableFuture.completedFuture(loadedEntities.get(entityId));
+        }
+        return this.load(entityId);
     }
 
     /**
@@ -122,19 +133,21 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @return True if the entity is loaded, false otherwise.
      */
     @Override
-    public boolean exists(String entityId, boolean checkDb, boolean forceLoad) {
-        if (loadedEntities.containsKey(entityId)) {
-            return true;
-        }
+    public CompletableFuture<Boolean> exists(@NotNull String entityId, boolean checkDb, boolean forceLoad) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (loadedEntities.containsKey(entityId)) {
+                return true;
+            }
 
-        if (checkDb) {
-            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
-            Document document = collection.find(new Document("_id", entityId)).first();
+            if (checkDb) {
+                MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
+                Document document = collection.find(new Document("_id", entityId)).first();
 
-            return forceLoad ? this.load(entityId) != null : document != null;
-        }
+                return forceLoad ? this.load(entityId) != null : document != null;
+            }
 
-        return false;
+            return false;
+        });
     }
 
 
@@ -144,15 +157,16 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entityId The ID of the entity to be deleted.
      */
     @Override
-    public void delete(String entityId) {
-        if (!exists(entityId, true, false)) {
-            this.logger.log(Level.WARNING, "[EntityRepository]: Entity with ID " + entityId + " does not exist.");
-            return;
-        }
-
-        MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
-        collection.deleteOne(new Document("_id", entityId));
-        loadedEntities.remove(entityId);
+    public CompletableFuture<Void> delete(@NotNull String entityId) {
+        return exists(entityId, true, false).thenComposeAsync(exists -> CompletableFuture.runAsync(() -> {
+            if (!exists) {
+                this.logger.log(Level.WARNING, "[EntityRepository]: Entity with ID " + entityId + " does not exist.");
+                return;
+            }
+            MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
+            collection.deleteOne(new Document("_id", entityId));
+            this.loadedEntities.remove(entityId);
+        }));
     }
 
     /**
@@ -176,7 +190,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      */
     @Override
     public void saveAll() {
-        for (V entity : loadedEntities.values()) {
+        for (V entity : this.loadedEntities.values()) {
             this.save(entity);
         }
     }

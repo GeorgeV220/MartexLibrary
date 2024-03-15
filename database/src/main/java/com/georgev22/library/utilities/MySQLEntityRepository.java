@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,22 +60,24 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @param entity The entity to be saved.
      */
     @Override
-    public V save(@NotNull V entity) {
-        ObjectMap<String, Object> values = getValuesMap(entity);
-        String statement;
-        if (exists(entity._id(), true, false)) {
-            statement = this.database.buildUpdateStatement(this.tableName, values, "_id = " + entity._id());
-        } else {
-            statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entity._id()).append(values));
-        }
+    public CompletableFuture<V> save(@NotNull V entity) {
+        return exists(entity._id(), true, false).thenApplyAsync(exists -> {
+            ObjectMap<String, Object> values = getValuesMap(entity);
+            String statement;
+            if (exists) {
+                statement = this.database.buildUpdateStatement(this.tableName, values, "_id = " + entity._id());
+            } else {
+                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entity._id()).append(values));
+            }
 
-        if (statement.isEmpty()) {
-            return null;
-        }
+            if (statement.isEmpty()) {
+                return null;
+            }
 
-        this.executeStatement(statement);
+            this.executeStatement(statement);
 
-        return entity;
+            return entity;
+        });
     }
 
     /**
@@ -117,35 +120,37 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @param entityId The ID of the entity to be loaded.
      */
     @Override
-    public V load(String entityId) {
+    public CompletableFuture<V> load(@NotNull String entityId) {
         if (loadedEntities.containsKey(entityId)) {
             this.logger.log(Level.FINE, "Entity with ID " + entityId + " already loaded.");
-            return loadedEntities.get(entityId);
+            return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
-        String statement = "SELECT * FROM " + this.tableName + " WHERE _id = " + entityId;
+        return CompletableFuture.supplyAsync(() -> {
+            String statement = "SELECT * FROM " + this.tableName + " WHERE _id = " + entityId;
 
-        try (ResultSet resultSet = this.querySQL(statement)) {
-            if (resultSet == null) {
-                this.logger.log(Level.SEVERE, "Failed to load entity with ID: " + entityId + " because the result set was null.");
-                return null;
-            }
-            if (resultSet.next()) {
-                this.checkForConstructorWithSingleVarargString(this.entityClass);
-                V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-                for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
-                    String columnName = resultSet.getMetaData().getColumnName(i + 1);
-                    Object columnValue = resultSet.getObject(i + 1);
-                    entity.setValue(columnName, columnValue);
+            try (ResultSet resultSet = this.querySQL(statement)) {
+                if (resultSet == null) {
+                    this.logger.log(Level.SEVERE, "Failed to load entity with ID: " + entityId + " because the result set was null.");
+                    return null;
                 }
-                loadedEntities.append(entityId, entity);
-                return entity;
+                if (resultSet.next()) {
+                    this.checkForConstructorWithSingleVarargString(this.entityClass);
+                    V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
+                    for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
+                        String columnName = resultSet.getMetaData().getColumnName(i + 1);
+                        Object columnValue = resultSet.getObject(i + 1);
+                        entity.setValue(columnName, columnValue);
+                    }
+                   this.loadedEntities.append(entityId, entity);
+                    return entity;
+                }
+            } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException | NoSuchConstructorException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
             }
-        } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException | NoSuchConstructorException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-        }
 
-        return null;
+            return null;
+        });
     }
 
     /**
@@ -155,8 +160,11 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @return The loaded entity, or null if not found.
      */
     @Override
-    public V getEntity(String entityId) {
-        return loadedEntities.get(entityId);
+    public CompletableFuture<V> getEntity(@NotNull String entityId) {
+        if (loadedEntities.containsKey(entityId)) {
+            return CompletableFuture.completedFuture(loadedEntities.get(entityId));
+        }
+        return this.load(entityId);
     }
 
     /**
@@ -168,25 +176,27 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @return True if the entity is loaded, false otherwise.
      */
     @Override
-    public boolean exists(String entityId, boolean checkDb, boolean forceLoad) {
-        if (loadedEntities.containsKey(entityId)) {
-            return true;
-        }
-        if (checkDb) {
-            String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = " + entityId;
-            try (ResultSet resultSet = this.querySQL(statement)) {
-                if (resultSet == null) {
-                    this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
-                    return false;
-                }
-                resultSet.next();
-                int count = resultSet.getInt(1);
-                return forceLoad ? this.load(entityId) != null : count > 0;
-            } catch (SQLException e) {
-                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+    public CompletableFuture<Boolean> exists(@NotNull String entityId, boolean checkDb, boolean forceLoad) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (loadedEntities.containsKey(entityId)) {
+                return true;
             }
-        }
-        return false;
+            if (checkDb) {
+                String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = " + entityId;
+                try (ResultSet resultSet = this.querySQL(statement)) {
+                    if (resultSet == null) {
+                        this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
+                        return false;
+                    }
+                    resultSet.next();
+                    int count = resultSet.getInt(1);
+                    return forceLoad ? this.load(entityId) != null : count > 0;
+                } catch (SQLException e) {
+                    this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                }
+            }
+            return false;
+        });
     }
 
     /**
@@ -195,19 +205,20 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @param entityId The ID of the entity to be deleted.
      */
     @Override
-    public void delete(String entityId) {
-        if (!exists(entityId, true, false)) {
-            this.logger.log(Level.WARNING, "[EntityRepository]: Entity with ID " + entityId + " does not exist.");
-            return;
-        }
+    public CompletableFuture<Void> delete(@NotNull String entityId) {
+        return exists(entityId, true, false).thenComposeAsync(exists -> CompletableFuture.runAsync(() -> {
+            if (!exists) {
+                this.logger.log(Level.WARNING, "[EntityRepository]: Entity with ID " + entityId + " does not exist.");
+                return;
+            }
+            String statement = this.database.buildDeleteStatement(
+                    this.tableName,
+                    "_id = " + entityId
+            );
 
-        String statement = this.database.buildDeleteStatement(
-                this.tableName,
-                "_id = " + entityId
-        );
-
-        this.executeStatement(statement);
-        loadedEntities.remove(entityId);
+            this.executeStatement(statement);
+           this.loadedEntities.remove(entityId);
+        }));
     }
 
     /**
@@ -234,7 +245,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      */
     @Override
     public void saveAll() {
-        for (V entity : loadedEntities.values()) {
+        for (V entity :this.loadedEntities.values()) {
             this.save(entity);
         }
     }

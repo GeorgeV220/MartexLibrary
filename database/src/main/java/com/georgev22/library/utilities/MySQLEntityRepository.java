@@ -25,6 +25,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     private final Database database;
     private final Logger logger;
     private final Class<V> entityClass;
+    private final String tableName;
 
     /**
      * Constructs a MySQLEntityRepository with the specified database, logger, and entity class.
@@ -34,9 +35,22 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * @param entityClass The class type of the entity managed by this repository.
      */
     public MySQLEntityRepository(Database database, Logger logger, Class<V> entityClass) {
+        this(database, logger, entityClass, entityClass.getSimpleName());
+    }
+
+    /**
+     * Constructs a MySQLEntityRepository with the specified database, logger, and entity class.
+     *
+     * @param database    The database to be used.
+     * @param logger      The logger for handling log messages.
+     * @param entityClass The class type of the entity managed by this repository.
+     * @param tableName   The name of the table in the database.
+     */
+    public MySQLEntityRepository(Database database, Logger logger, Class<V> entityClass, String tableName) {
         this.database = database;
         this.logger = logger;
         this.entityClass = entityClass;
+        this.tableName = tableName;
     }
 
     /**
@@ -49,9 +63,9 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         ObjectMap<String, Object> values = getValuesMap(entity);
         String statement;
         if (exists(entity._id(), true, false)) {
-            statement = this.database.buildUpdateStatement(this.entityClass.getSimpleName(), values, "_id = " + entity._id());
+            statement = this.database.buildUpdateStatement(this.tableName, values, "_id = " + entity._id());
         } else {
-            statement = this.database.buildInsertStatement(this.entityClass.getSimpleName(), new HashObjectMap<String, Object>().append("_id", entity._id()).append(values));
+            statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entity._id()).append(values));
         }
 
         if (statement.isEmpty()) {
@@ -108,7 +122,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             this.logger.log(Level.FINE, "Entity with ID " + entityId + " already loaded.");
             return loadedEntities.get(entityId);
         }
-        String statement = "SELECT * FROM " + this.entityClass.getSimpleName() + " WHERE _id = " + entityId;
+        String statement = "SELECT * FROM " + this.tableName + " WHERE _id = " + entityId;
 
         try (ResultSet resultSet = this.querySQL(statement)) {
             if (resultSet == null) {
@@ -159,7 +173,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             return true;
         }
         if (checkDb) {
-            String statement = "SELECT COUNT(*) FROM " + this.entityClass.getSimpleName() + " WHERE _id = " + entityId;
+            String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = " + entityId;
             try (ResultSet resultSet = this.querySQL(statement)) {
                 if (resultSet == null) {
                     this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
@@ -188,7 +202,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         }
 
         String statement = this.database.buildDeleteStatement(
-                this.entityClass.getSimpleName(),
+                this.tableName,
                 "_id = " + entityId
         );
 
@@ -201,7 +215,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      */
     @Override
     public void loadAll() {
-        String statement = "SELECT * FROM " + this.entityClass.getSimpleName();
+        String statement = "SELECT * FROM " + this.tableName;
         try (ResultSet resultSet = this.querySQL(statement)) {
             if (resultSet == null) {
                 this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");

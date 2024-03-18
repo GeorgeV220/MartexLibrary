@@ -6,7 +6,7 @@ import com.georgev22.library.database.sql.postgresql.PostgreSQL;
 import com.georgev22.library.database.sql.sqlite.SQLite;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
-import com.georgev22.library.maps.ObjectMap.Pair;
+import com.georgev22.library.maps.Pair;
 import com.georgev22.library.utilities.Utils;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;

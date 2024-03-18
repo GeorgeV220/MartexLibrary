@@ -2,6 +2,7 @@ package com.georgev22.library.database;
 
 import com.georgev22.library.database.sql.sqlite.SQLite;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -212,12 +213,12 @@ public abstract class Database {
      * @throws SQLException           if a database access error occurs
      * @throws ClassNotFoundException if the specified database driver class cannot be found
      */
-    public void createTable(@NotNull String tableName, @NotNull ObjectMap<String, ObjectMap.Pair<String, String>> columnsMap) throws SQLException, ClassNotFoundException {
+    public void createTable(@NotNull String tableName, @NotNull ObjectMap<String, Pair<String, String>> columnsMap) throws SQLException, ClassNotFoundException {
         StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS `" + tableName + "` (");
 
-        for (Map.Entry<String, ObjectMap.Pair<String, String>> entry : columnsMap.entrySet()) {
+        for (Map.Entry<String, Pair<String, String>> entry : columnsMap.entrySet()) {
             String columnName = entry.getKey();
-            ObjectMap.Pair<String, String> columnDetails = entry.getValue();
+            Pair<String, String> columnDetails = entry.getValue();
             String columnType = columnDetails.key();
             String defaultValue = columnDetails.value();
 
@@ -300,8 +301,8 @@ public abstract class Database {
     /**
      * Builds an SQL DELETE statement for the specified table name, column values, and condition.
      *
-     * @param tableName    the name of the table
-     * @param condition    the condition to apply for deleting the rows
+     * @param tableName the name of the table
+     * @param condition the condition to apply for deleting the rows
      * @return the SQL DELETE statement
      */
     public String buildDeleteStatement(String tableName, String condition) {

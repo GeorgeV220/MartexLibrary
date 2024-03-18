@@ -1,3 +1,10 @@
+# [11.12.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.11.0...v11.12.0) (2024-03-18)
+
+
+### Features
+
+* **maps:** add Pair and PairDocument classes ([1b2d557](https://github.com/GeorgeV220/MartexLibrary/commit/1b2d55770e6308d2f639dd935cd72793f4658a85))
+
 # [11.11.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.10.0...v11.11.0) (2024-03-15)
 
 

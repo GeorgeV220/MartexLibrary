@@ -1,3 +1,16 @@
+# [11.13.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.12.0...v11.13.0) (2024-04-29)
+
+
+### Bug Fixes
+
+* **ObjectMap:** Raw usage in static methods ([c32c6fd](https://github.com/GeorgeV220/MartexLibrary/commit/c32c6fd18724c5b79ba54524b1b8ef37ef52c768))
+* Return the correct ObjectMap type ([6ae469c](https://github.com/GeorgeV220/MartexLibrary/commit/6ae469cbb3153dd55f2b450f5e1f4491abac0b20))
+
+
+### Features
+
+* **minecraft:** add support for Minecraft version 1.20.5 ([ba10a37](https://github.com/GeorgeV220/MartexLibrary/commit/ba10a37b387da48619236d50e47ba4e93f2abb12))
+
 # [11.12.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.11.0...v11.12.0) (2024-03-18)
 
 

@@ -2,7 +2,6 @@ package com.georgev22.library.maps;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.TreeMap;
 
 import static java.lang.String.format;
 
-public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V>, Serializable {
+public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V> {
 
     /**
      * Creates an TreeObjectMap instance.
@@ -46,7 +45,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @param value value
      * @return this
      */
-    public ObjectMap<K, V> append(final K key, final V value) {
+    public TreeObjectMap<K, V> append(final K key, final V value) {
         if (containsKey(key)) {
             replace(key, value);
         } else {
@@ -56,7 +55,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
     }
 
     @Override
-    public ObjectMap<K, V> append(@NotNull Map<K, V> map) {
+    public TreeObjectMap<K, V> append(@NotNull Map<K, V> map) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             append(entry.getKey(), entry.getValue());
         }
@@ -64,7 +63,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
     }
 
     @Override
-    public ObjectMap<K, V> append(@NotNull ObjectMap<K, V> map) {
+    public TreeObjectMap<K, V> append(@NotNull ObjectMap<K, V> map) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             append(entry.getKey(), entry.getValue());
         }
@@ -82,7 +81,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @param ifTrue ifTrue
      * @return this
      */
-    public ObjectMap<K, V> appendIfTrue(final K key, final V value, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(final K key, final V value, boolean ifTrue) {
         if (ifTrue)
             append(key, value);
         return this;
@@ -100,7 +99,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @param ifTrue       ifTrue
      * @return this
      */
-    public ObjectMap<K, V> appendIfTrue(final K key, final V valueIfTrue, final V valueIfFalse, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(final K key, final V valueIfTrue, final V valueIfFalse, boolean ifTrue) {
         if (ifTrue) {
             append(key, valueIfTrue);
         } else {
@@ -120,7 +119,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return this
      */
     @Override
-    public ObjectMap<K, V> appendIfTrue(@NotNull Map<K, V> map, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(@NotNull Map<K, V> map, boolean ifTrue) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             appendIfTrue(entry.getKey(), entry.getValue(), ifTrue);
         }
@@ -139,7 +138,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return this
      */
     @Override
-    public ObjectMap<K, V> appendIfTrue(Map<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(Map<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
         if (ifTrue) {
             append(mapIfTrue);
         } else {
@@ -159,7 +158,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return this
      */
     @Override
-    public ObjectMap<K, V> appendIfTrue(@NotNull ObjectMap<K, V> map, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(@NotNull ObjectMap<K, V> map, boolean ifTrue) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             appendIfTrue(entry.getKey(), entry.getValue(), ifTrue);
         }
@@ -178,7 +177,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return this
      */
     @Override
-    public ObjectMap<K, V> appendIfTrue(ObjectMap<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
+    public TreeObjectMap<K, V> appendIfTrue(ObjectMap<K, V> mapIfTrue, Map<K, V> mapIfFalse, boolean ifTrue) {
         if (ifTrue) {
             append(mapIfTrue);
         } else {
@@ -194,7 +193,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the specified entry removed, or the original ObjectMap if the key was not found
      */
     @Override
-    public ObjectMap<K, V> removeEntry(K key) {
+    public TreeObjectMap<K, V> removeEntry(K key) {
         remove(key);
         return this;
     }
@@ -206,7 +205,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the entries corresponding to the specified keys removed
      */
     @Override
-    public ObjectMap<K, V> removeEntries(Map<K, V> map) {
+    public TreeObjectMap<K, V> removeEntries(Map<K, V> map) {
         for (Map.Entry<K, V> entry : map.entrySet()) {
             remove(entry.getKey());
         }
@@ -220,7 +219,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed
      */
     @Override
-    public ObjectMap<K, V> removeEntries(ObjectMap<K, V> map) {
+    public TreeObjectMap<K, V> removeEntries(ObjectMap<K, V> map) {
         for (ObjectMap.Entry<K, V> entry : map.entrySet()) {
             remove(entry.getKey());
         }
@@ -235,7 +234,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the specified entry removed if the condition is true, or the original ObjectMap otherwise
      */
     @Override
-    public ObjectMap<K, V> removeEntryIfTrue(K key, boolean ifTrue) {
+    public TreeObjectMap<K, V> removeEntryIfTrue(K key, boolean ifTrue) {
         if (ifTrue) {
             remove(key);
         }
@@ -250,7 +249,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the entries corresponding to the keys in the specified map removed if the condition is true, or the original ObjectMap otherwise
      */
     @Override
-    public ObjectMap<K, V> removeEntriesIfTrue(Map<K, V> map, boolean ifTrue) {
+    public TreeObjectMap<K, V> removeEntriesIfTrue(Map<K, V> map, boolean ifTrue) {
         if (ifTrue) {
             for (Map.Entry<K, V> entry : map.entrySet()) {
                 remove(entry.getKey());
@@ -267,7 +266,7 @@ public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V
      * @return the modified ObjectMap with the entries corresponding to the keys in the specified ObjectMap removed if the condition is true, or the original ObjectMap otherwise
      */
     @Override
-    public ObjectMap<K, V> removeEntriesIfTrue(ObjectMap<K, V> map, boolean ifTrue) {
+    public TreeObjectMap<K, V> removeEntriesIfTrue(ObjectMap<K, V> map, boolean ifTrue) {
         if (ifTrue) {
             for (ObjectMap.Entry<K, V> entry : map.entrySet()) {
                 remove(entry.getKey());

@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
-public class ObservableObjectMap<K, V> extends ConcurrentObjectMap<K, V> implements ObjectMap<K, V> {
+public class ObservableObjectMap<K, V> extends ConcurrentObjectMap<K, V> {
 
     private List<MapChangeListener<K, V>> listeners = new ArrayList<>();
 

@@ -1,3 +1,10 @@
+## [11.13.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.13.0...v11.13.1) (2024-04-29)
+
+
+### Bug Fixes
+
+* **minecraft:** handle unknown versions gracefully ([64a593f](https://github.com/GeorgeV220/MartexLibrary/commit/64a593ff818a067cb3e6d376dcbbe4d8c71773ae))
+
 # [11.13.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.12.0...v11.13.0) (2024-04-29)
 
 

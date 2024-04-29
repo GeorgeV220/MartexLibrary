@@ -877,7 +877,12 @@ public class BukkitMinecraftUtils {
                 versionNumber = Integer.parseInt(currentVersion.name().split("_")[1]);
                 releaseNumber = Integer.parseInt(currentVersion.name().split("R")[1]);
             } catch (Exception var2) {
-                currentVersion = UNKNOWN;
+                String bukkitVersion = Bukkit.getServer().getBukkitVersion();
+                if (bukkitVersion.contains("1.20.5")) {
+                    currentVersion = MinecraftVersion.V1_20_R4;
+                } else {
+                    currentVersion = UNKNOWN;
+                }
             }
 
         }

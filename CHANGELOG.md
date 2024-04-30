@@ -1,3 +1,10 @@
+# [11.14.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.13.1...v11.14.0) (2024-04-30)
+
+
+### Features
+
+* Refactor Minecraft version detection ([ae51039](https://github.com/GeorgeV220/MartexLibrary/commit/ae51039a51c42de1088be714fd30b05ad581e995))
+
 ## [11.13.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.13.0...v11.13.1) (2024-04-29)
 
 

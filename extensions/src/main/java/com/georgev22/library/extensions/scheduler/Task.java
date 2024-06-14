@@ -7,9 +7,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-class Task implements ExtensionTask, Runnable {
+public class Task implements ExtensionTask, Runnable {
 
-    private volatile Task next = null;
+    protected volatile Task next = null;
     public static final int ERROR = 0;
     public static final int NO_REPEATING = -1;
     public static final int CANCEL = -2;

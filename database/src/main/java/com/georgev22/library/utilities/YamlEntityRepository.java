@@ -37,6 +37,11 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
         this.dataFolder = dataFolder;
         this.logger = logger;
         this.entityClass = entityClass;
+        if (!this.dataFolder.exists()) {
+            if (this.dataFolder.mkdirs()) {
+                this.logger.log(Level.INFO, "[EntityRepository]: Created data folder: " + this.dataFolder.getAbsolutePath());
+            }
+        }
     }
 
     /**

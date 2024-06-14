@@ -6,6 +6,7 @@ dependencies {
     compileOnly project(path: ':yaml', configuration: 'shadow')
     compileOnly project(path: ':utilities', configuration: 'shadow')
     compileOnly project(path: ':maps', configuration: 'shadow')
+    compileOnly 'org.mongodb:mongodb-driver:3.12.14'
 }
 
 shadowJar {

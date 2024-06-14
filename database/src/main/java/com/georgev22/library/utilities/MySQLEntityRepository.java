@@ -1,6 +1,6 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.database.Database;
+import com.georgev22.library.database.sql.Database;
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;

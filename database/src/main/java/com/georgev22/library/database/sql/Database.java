@@ -1,4 +1,4 @@
-package com.georgev22.library.database;
+package com.georgev22.library.database.sql;
 
 import com.georgev22.library.database.sql.sqlite.SQLite;
 import com.georgev22.library.maps.ObjectMap;

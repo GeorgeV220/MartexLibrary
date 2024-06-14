@@ -1,6 +1,6 @@
 package com.georgev22.library.database.sql.sqlite;
 
-import com.georgev22.library.database.Database;
+import com.georgev22.library.database.sql.Database;
 
 import java.io.File;
 import java.sql.Connection;

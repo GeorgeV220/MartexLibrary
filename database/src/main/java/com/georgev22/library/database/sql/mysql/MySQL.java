@@ -1,6 +1,6 @@
 package com.georgev22.library.database.sql.mysql;
 
-import com.georgev22.library.database.Database;
+import com.georgev22.library.database.sql.Database;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;

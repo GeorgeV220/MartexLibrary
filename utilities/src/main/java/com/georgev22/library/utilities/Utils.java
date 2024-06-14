@@ -10,11 +10,6 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.gson.Gson;
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.codec.binary.Base64OutputStream;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +21,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -36,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public final class Utils {
 
@@ -111,7 +103,7 @@ public final class Utils {
      * <code>false</code> if it is not
      */
     public static boolean isLong(final String input) {
-        return Longs.tryParse(StringUtils.deleteWhitespace(input)) != null;
+        return Longs.tryParse(input.trim()) != null;
     }
 
     /**
@@ -122,7 +114,7 @@ public final class Utils {
      * <code>false</code> if it is not
      */
     public static boolean isDouble(final String input) {
-        return Doubles.tryParse(StringUtils.deleteWhitespace(input)) != null;
+        return Doubles.tryParse(input.trim()) != null;
     }
 
     /**
@@ -133,7 +125,7 @@ public final class Utils {
      * <code>false</code> if it is not
      */
     public static boolean isInt(final String input) {
-        return Ints.tryParse(StringUtils.deleteWhitespace(input)) != null;
+        return Ints.tryParse(input.trim()) != null;
     }
 
     /**
@@ -216,7 +208,7 @@ public final class Utils {
      * @return the new string with the placeholders replaced
      */
     public static String placeHolder(String str, final Map<String, String> map, final boolean ignoreCase) {
-        Validate.notNull(str, "The string can't be null!");
+        if (str == null) throw new IllegalArgumentException("str cannot be null");
         if (map == null) {
             return str;
         }
@@ -237,10 +229,10 @@ public final class Utils {
      */
     public static String replaceIgnoreCase(final String text, String searchString, final String replacement) {
 
-        if (text == null || text.length() == 0) {
+        if (text == null || text.isEmpty()) {
             return text;
         }
-        if (searchString == null || searchString.length() == 0) {
+        if (searchString == null || searchString.isEmpty()) {
             return text;
         }
         if (replacement == null) {
@@ -283,8 +275,10 @@ public final class Utils {
      * @return the new string array with the placeholders replaced
      */
     public static String @NotNull [] placeHolder(final String[] array, final Map<String, String> map, final boolean ignoreCase) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) throw new IllegalArgumentException("array cannot be null");
+        if (Arrays.stream(array).anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("array cannot have null elements");
+
         final String[] newArray = Arrays.copyOf(array, array.length);
         if (map == null) {
             return newArray;
@@ -306,8 +300,9 @@ public final class Utils {
      */
     public static List<String> placeHolder(final List<String> coll, final Map<String, String> map,
                                            final boolean ignoreCase) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) throw new IllegalArgumentException("coll cannot be null");
+        if (coll.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("coll cannot have null elements");
         return map == null ? coll
                 : coll.stream().map(str -> placeHolder(str, map, ignoreCase)).collect(Collectors.toList());
     }
@@ -320,7 +315,7 @@ public final class Utils {
      * @return the formatted String
      */
     public static String formatNumber(Locale lang, double input) {
-        Validate.notNull(lang);
+        if (lang == null) throw new IllegalArgumentException("lang cannot be null");
         return NumberFormat.getInstance(lang).format(input);
     }
 
@@ -358,7 +353,7 @@ public final class Utils {
         }
 
         List<Entry<K, V>> result = new ArrayList<>();
-        while (highest.size() > 0) {
+        while (!highest.isEmpty()) {
             result.add(highest.poll());
         }
         return result;
@@ -387,185 +382,6 @@ public final class Utils {
         List<String> list = Arrays.asList(a);
         Collections.reverse(list);
         return list.toArray(new String[0]);
-    }
-
-    /**
-     * Serialize Object to string using google Gson
-     *
-     * @param object object to serialize
-     * @return string output of the serialized object
-     * @since v5.0.1
-     */
-    public static <T> String serialize(Object object) {
-        ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
-        GZIPOutputStream gzipOut = null;
-        try {
-            gzipOut = new GZIPOutputStream(new Base64OutputStream(byteaOut));
-            gzipOut.write(new Gson().toJson(object).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (gzipOut != null) try {
-                gzipOut.close();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return byteaOut.toString();
-    }
-
-    /**
-     * Deserialize a string back to object
-     * see {@link #serialize(Object)}
-     *
-     * @param string serialized string
-     * @param <T>    the original object type (eg: {@code deserialize(stringToDeserialize, new TypeToken<ObjectMap<String, Integer>>(){}.getType())})
-     * @return the deserialized object
-     * @since v5.0.1
-     */
-    public static <T> T deserialize(@NotNull String string, @NotNull Type type) {
-        ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
-        GZIPInputStream gzipIn = null;
-        try {
-            gzipIn = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8))));
-            for (int data; (data = gzipIn.read()) > -1; ) {
-                byteaOut.write(data);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (gzipIn != null) try {
-                gzipIn.close();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
-        }
-
-        return new Gson().fromJson(byteaOut.toString(), type);
-    }
-
-    /**
-     * Serializes an object and saves it to the specified file path.
-     * <p>
-     * Serializes the specified object using the {@link ObjectOutputStream} and saves the serialized data to the file
-     * specified by the given file path.
-     * </p>
-     *
-     * @param obj      the object to be serialized
-     * @param filePath the file path where the serialized data will be saved
-     * @throws IOException if there is an error accessing or writing to the file
-     */
-    public static void serializeObject(@NotNull Object obj, @NotNull String filePath) throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(obj);
-        objectOutputStream.flush();
-        objectOutputStream.close();
-        fileOutputStream.close();
-    }
-
-    /**
-     * Serializes an object and returns the serialized data as a string.
-     * <p>
-     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a string.
-     *
-     * @param obj the object to be serialized
-     * @return the serialized data as a string
-     * @throws IOException if there is an error during serialization
-     */
-    @Contract("_ -> new")
-    public static @NotNull String serializeObjectToString(@NotNull Object obj) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(obj);
-        objectOutputStream.flush();
-        objectOutputStream.close();
-        byteArrayOutputStream.close();
-
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-        return Base64.getEncoder().encodeToString(bytes);
-    }
-
-    /**
-     * Serializes an object and returns the serialized data as a byte array.
-     * <p>
-     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a byte array.
-     *
-     * @param obj the object to be serialized
-     * @return the serialized data as a  byte array
-     * @throws IOException if there is an error during serialization
-     */
-    public static byte @NotNull [] serializeObjectToBytes(@NotNull Object obj) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(obj);
-        objectOutputStream.flush();
-        objectOutputStream.close();
-        byteArrayOutputStream.close();
-        return byteArrayOutputStream.toByteArray();
-    }
-
-    /**
-     * Deserializes an object from the specified file path.
-     * <p>
-     * Deserializes the object
-     * stored in the file specified by the given file path using the {@link ObjectInputStream} and
-     * returns the deserialized object.
-     *
-     * @param filePath the file path where the serialized object is stored
-     * @return the deserialized object
-     * @throws IOException            if there is an error accessing or reading from the file
-     * @throws ClassNotFoundException if the class of the serialized object cannot be found
-     */
-    public static Object deserializeObject(@NotNull String filePath) throws IOException, ClassNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream(filePath);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        Object obj = objectInputStream.readObject();
-        objectInputStream.close();
-        fileInputStream.close();
-        return obj;
-    }
-
-    /**
-     * Deserializes an object from the specified serialized data.
-     * <p>
-     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
-     * deserialized object.
-     *
-     * @param serializedData the serialized object data as a string
-     * @return the deserialized object
-     * @throws IOException            if there is an error accessing or reading from the serialized data
-     * @throws ClassNotFoundException if the class of the serialized object cannot be found
-     */
-    public static Object deserializeObjectFromString(@NotNull String serializedData) throws IOException, ClassNotFoundException {
-        byte[] bytes = Base64.getDecoder().decode(serializedData);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        Object obj = objectInputStream.readObject();
-        objectInputStream.close();
-        byteArrayInputStream.close();
-
-        return obj;
-    }
-
-    /**
-     * Deserializes an object from the specified serialized data.
-     * <p>
-     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
-     * deserialized object.
-     *
-     * @param byteArray the serialized object data as a byte array
-     * @return the deserialized object
-     * @throws IOException            if there is an error accessing or reading from the serialized data
-     * @throws ClassNotFoundException if the class of the serialized object cannot be found
-     */
-    public static Object deserializeObjectFromBytes(byte @NotNull [] byteArray) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        Object obj = objectInputStream.readObject();
-        objectInputStream.close();
-        byteArrayInputStream.close();
-        return obj;
     }
 
     /**
@@ -820,10 +636,11 @@ public final class Utils {
     }
 
     public static void saveResource(@NotNull String resourcePath, boolean replace, File dataFolder, Class<?> clazz) throws Exception {
-        if (resourcePath.equals("")) {
+        if (resourcePath.isEmpty()) {
             throw new Exception("ResourcePath cannot be null or empty");
         }
 
+        //noinspection DuplicatedCode
         resourcePath = resourcePath.replace('\\', '/');
         InputStream in = getResource(resourcePath, clazz);
         if (in == null) {
@@ -866,6 +683,7 @@ public final class Utils {
 
     @Nullable
     public static InputStream getResource(@NotNull String filename, @NotNull Class<?> clazz) {
+        //noinspection DuplicatedCode
         try {
             URL url = clazz.getClassLoader().getResource(filename);
 

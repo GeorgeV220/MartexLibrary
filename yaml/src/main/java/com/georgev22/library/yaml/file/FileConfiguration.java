@@ -5,7 +5,6 @@ import com.georgev22.library.yaml.InvalidConfigurationException;
 import com.georgev22.library.yaml.MemoryConfiguration;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +49,10 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      * @throws IllegalArgumentException Thrown when file is null.
      */
     public void save(@NotNull File file) throws IOException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
 
         Files.createParentDirs(file);
 
@@ -77,7 +79,10 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      * @throws IllegalArgumentException Thrown when file is null.
      */
     public void save(@NotNull String file) throws IOException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
 
         save(new File(file));
     }
@@ -109,7 +114,10 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      * @throws IllegalArgumentException      Thrown when file is null.
      */
     public void load(@NotNull File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
 
         final FileInputStream stream = new FileInputStream(file);
 
@@ -167,7 +175,10 @@ public abstract class FileConfiguration extends MemoryConfiguration {
      * @throws IllegalArgumentException      Thrown when file is null.
      */
     public void load(@NotNull String file) throws FileNotFoundException, IOException, InvalidConfigurationException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null");
+        }
 
         load(new File(file));
     }

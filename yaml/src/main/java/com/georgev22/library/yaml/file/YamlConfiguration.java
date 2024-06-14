@@ -4,7 +4,6 @@ import com.georgev22.library.yaml.Configuration;
 import com.georgev22.library.yaml.ConfigurationSection;
 import com.georgev22.library.yaml.InvalidConfigurationException;
 import com.georgev22.library.yaml.serialization.ConfigurationSerialization;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -74,7 +73,8 @@ public class YamlConfiguration extends FileConfiguration {
      */
     @NotNull
     public static YamlConfiguration loadConfiguration(@NotNull File file) {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) throw new IllegalArgumentException("File cannot be null");
 
         YamlConfiguration config = new YamlConfiguration();
 
@@ -101,7 +101,8 @@ public class YamlConfiguration extends FileConfiguration {
      */
     @NotNull
     public static YamlConfiguration loadConfiguration(@NotNull Reader reader) {
-        Validate.notNull(reader, "Stream cannot be null");
+        //noinspection ConstantValue
+        if (reader == null) throw new IllegalArgumentException("Stream cannot be null");
 
         YamlConfiguration config = new YamlConfiguration();
 
@@ -140,7 +141,8 @@ public class YamlConfiguration extends FileConfiguration {
 
     @Override
     public void loadFromString(@NotNull String contents) throws InvalidConfigurationException {
-        Validate.notNull(contents, "Contents cannot be null");
+        // noinspection ConstantValue
+        if (contents == null) throw new IllegalArgumentException("Contents cannot be null");
         yamlLoaderOptions.setProcessComments(options().parseComments());
 
         MappingNode node;

@@ -1,6 +1,5 @@
 package com.georgev22.library.yaml.file;
 
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,8 +95,12 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
      */
     @NotNull
     public YamlConfigurationOptions indent(int value) {
-        Validate.isTrue(value >= 2, "Indent must be at least 2 characters");
-        Validate.isTrue(value <= 9, "Indent cannot be greater than 9 characters");
+        if (value < 2) {
+            throw new IllegalArgumentException("Indent must be at least 2 characters");
+        }
+        if (value > 9) {
+            throw new IllegalArgumentException("Indent cannot be greater than 9 characters");
+        }
 
         this.indent = value;
         return this;

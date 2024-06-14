@@ -1,7 +1,6 @@
 package com.georgev22.library.yaml;
 
 import com.georgev22.library.yaml.serialization.ConfigurationSerializable;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,14 +48,23 @@ public class MemorySection implements ConfigurationSection {
      *                                  if parent contains no root Configuration.
      */
     protected MemorySection(@NotNull ConfigurationSection parent, @NotNull String path) {
-        Validate.notNull(parent, "Parent cannot be null");
-        Validate.notNull(path, "Path cannot be null");
+        //noinspection ConstantValue
+        if (parent == null) {
+            throw new IllegalArgumentException("parent cannot be null");
+        }
+
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("path cannot be null");
+        }
 
         this.path = path;
         this.parent = parent;
         this.root = parent.getRoot();
 
-        Validate.notNull(root, "Path cannot be orphaned");
+        if (root == null) {
+            throw new IllegalArgumentException("Path cannot be orphaned");
+        }
 
         this.fullPath = createPath(parent, path);
     }
@@ -91,7 +99,10 @@ public class MemorySection implements ConfigurationSection {
      */
     @NotNull
     public static String createPath(@NotNull ConfigurationSection section, @Nullable String key, @Nullable ConfigurationSection relativeTo) {
-        Validate.notNull(section, "Cannot create path without a section");
+        //noinspection ConstantValue
+        if (section == null) {
+            throw new IllegalArgumentException("Cannot create path without a section");
+        }
         Configuration root = section.getRoot();
         if (root == null) {
             throw new IllegalStateException("Cannot create path without a root");
@@ -100,14 +111,14 @@ public class MemorySection implements ConfigurationSection {
 
         StringBuilder builder = new StringBuilder();
         for (ConfigurationSection parent = section; (parent != null) && (parent != relativeTo); parent = parent.getParent()) {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.insert(0, separator);
             }
             builder.insert(0, parent.getName());
         }
 
-        if ((key != null) && (key.length() > 0)) {
-            if (builder.length() > 0) {
+        if ((key != null) && (!key.isEmpty())) {
+            if (!builder.isEmpty()) {
                 builder.append(separator);
             }
 
@@ -203,8 +214,10 @@ public class MemorySection implements ConfigurationSection {
 
     @Override
     public void addDefault(@NotNull String path, @Nullable Object value) {
-        Validate.notNull(path, "Path cannot be null");
-
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
         Configuration root = getRoot();
         if (root == null) {
             throw new IllegalStateException("Cannot add default without root");
@@ -232,8 +245,14 @@ public class MemorySection implements ConfigurationSection {
 
     @Override
     public void set(@NotNull String path, @Nullable Object value) {
-        Validate.notNull(path, "Cannot set to an empty path");
-        Validate.notEmpty(path, "Cannot set to an empty path");
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
+
+        if (path.isEmpty()) {
+            throw new IllegalArgumentException("Cannot set to an empty path");
+        }
 
         Configuration root = getRoot();
         if (root == null) {
@@ -286,9 +305,12 @@ public class MemorySection implements ConfigurationSection {
     @Contract("_, !null -> !null")
     @Nullable
     public Object get(@NotNull String path, @Nullable Object def) {
-        Validate.notNull(path, "Path cannot be null");
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
 
-        if (path.length() == 0) {
+        if (path.isEmpty()) {
             return this;
         }
 
@@ -324,8 +346,14 @@ public class MemorySection implements ConfigurationSection {
     @Override
     @NotNull
     public ConfigurationSection createSection(@NotNull String path) {
-        Validate.notNull(path, "Cannot create section at empty path");
-        Validate.notEmpty(path, "Cannot create section at empty path");
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
+
+        if (path.isEmpty()) {
+            throw new IllegalArgumentException("Cannot create section at empty path");
+        }
 
         Configuration root = getRoot();
         if (root == null) {
@@ -756,7 +784,10 @@ public class MemorySection implements ConfigurationSection {
     @Nullable
     @Override
     public <T> T getObject(@NotNull String path, @NotNull Class<T> clazz) {
-        Validate.notNull(clazz, "Class cannot be null");
+        //noinspection ConstantValue
+        if (clazz == null) {
+            throw new IllegalArgumentException("Class cannot be null");
+        }
         Object def = getDefault(path);
         return getObject(path, clazz, (clazz.isInstance(def)) ? clazz.cast(def) : null);
     }
@@ -765,7 +796,10 @@ public class MemorySection implements ConfigurationSection {
     @Nullable
     @Override
     public <T> T getObject(@NotNull String path, @NotNull Class<T> clazz, @Nullable T def) {
-        Validate.notNull(clazz, "Class cannot be null");
+        //noinspection ConstantValue
+        if (clazz == null) {
+            throw new IllegalArgumentException("Class cannot be null");
+        }
         Object val = get(path, def);
         return (clazz.isInstance(val)) ? clazz.cast(val) : def;
     }
@@ -810,8 +844,10 @@ public class MemorySection implements ConfigurationSection {
 
     @Nullable
     protected Object getDefault(@NotNull String path) {
-        Validate.notNull(path, "Path cannot be null");
-
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
         Configuration root = getRoot();
         Configuration defaults = root == null ? null : root.getDefaults();
         return (defaults == null) ? null : defaults.get(createPath(this, path));
@@ -891,7 +927,10 @@ public class MemorySection implements ConfigurationSection {
 
     @Nullable
     private SectionPathData getSectionPathData(@NotNull String path) {
-        Validate.notNull(path, "Path cannot be null");
+        //noinspection ConstantValue
+        if (path == null) {
+            throw new IllegalArgumentException("Path cannot be null");
+        }
 
         Configuration root = getRoot();
         if (root == null) {

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-final class SectionPathData {
+public final class SectionPathData {
 
     private Object data;
     private List<String> comments;

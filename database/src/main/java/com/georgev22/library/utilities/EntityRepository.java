@@ -75,12 +75,12 @@ public interface EntityRepository<V extends Entity> {
      * @param entityClass The class to check for the constructor.
      * @throws NoSuchConstructorException If no suitable constructor is found.
      */
-    default void checkForConstructorWithSingleVarargString(@NotNull Class<V> entityClass) throws NoSuchConstructorException {
+    default void checkForConstructorWithSingleString(@NotNull Class<V> entityClass) throws NoSuchConstructorException {
         Constructor<?>[] constructors = entityClass.getConstructors();
 
         for (Constructor<?> constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
-            if (parameters.length == 1 && parameters[0].getType().equals(String.class) && parameters[0].isVarArgs()) {
+            if (parameters.length == 1 && parameters[0].getType().equals(String.class)) {
                 return;
             }
         }

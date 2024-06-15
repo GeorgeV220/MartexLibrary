@@ -134,7 +134,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
                     return null;
                 }
                 if (resultSet.next()) {
-                    this.checkForConstructorWithSingleVarargString(this.entityClass);
+                    this.checkForConstructorWithSingleString(this.entityClass);
                     V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
                     for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
                         String columnName = resultSet.getMetaData().getColumnName(i + 1);

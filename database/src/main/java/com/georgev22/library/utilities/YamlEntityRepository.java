@@ -91,7 +91,7 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
             try {
-                this.checkForConstructorWithSingleVarargString(this.entityClass);
+                this.checkForConstructorWithSingleString(this.entityClass);
                 V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
                 for (String key : config.getKeys(false)) {
                     entity.setValue(key, config.get(key));

@@ -91,7 +91,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
 
             if (document != null) {
                 try {
-                    this.checkForConstructorWithSingleVarargString(this.entityClass);
+                    this.checkForConstructorWithSingleString(this.entityClass);
                     V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
 
                     for (Map.Entry<String, Object> key : document.entrySet()) {

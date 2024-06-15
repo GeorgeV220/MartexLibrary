@@ -80,7 +80,7 @@ public interface EntityRepository<V extends Entity> {
 
         for (Constructor<?> constructor : constructors) {
             Parameter[] parameters = constructor.getParameters();
-            if (parameters.length == 1 && parameters[0].getType().equals(String[].class) && parameters[0].isVarArgs()) {
+            if (parameters.length == 1 && parameters[0].getType().equals(String.class) && parameters[0].isVarArgs()) {
                 return;
             }
         }

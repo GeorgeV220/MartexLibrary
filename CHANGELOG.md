@@ -1,3 +1,10 @@
+# [11.16.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.2...v11.16.0) (2024-06-15)
+
+
+### Features
+
+* **database:** add JsonEntityRepository class ([7a31a80](https://github.com/GeorgeV220/MartexLibrary/commit/7a31a80be3f722ad25629c927db73796b9cf5071))
+
 ## [11.15.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.1...v11.15.2) (2024-06-15)
 
 

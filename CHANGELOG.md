@@ -1,3 +1,10 @@
+## [11.15.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.0...v11.15.1) (2024-06-15)
+
+
+### Bug Fixes
+
+* Correct parameter type in checkForConstructorWithSingleVarargString method. ([50c9a12](https://github.com/GeorgeV220/MartexLibrary/commit/50c9a12d2662f556929c1333ced5d2b3b8297124))
+
 # [11.15.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.14.0...v11.15.0) (2024-06-15)
 
 

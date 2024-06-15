@@ -59,7 +59,7 @@ public abstract class Entity {
                 field.setAccessible(true);
                 field.set(this, value);
             } catch (NoSuchFieldException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
+                throw new RuntimeException("No setter found for key '" + key + "'", ex);
             }
         }
     }

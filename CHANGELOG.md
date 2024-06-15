@@ -1,3 +1,10 @@
+## [11.15.2](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.1...v11.15.2) (2024-06-15)
+
+
+### Bug Fixes
+
+* **EntityRepository:** correct constructor check (again) ([b3f7ec1](https://github.com/GeorgeV220/MartexLibrary/commit/b3f7ec1f107b452ab47a30c6ac67f140f619a94f))
+
 ## [11.15.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.0...v11.15.1) (2024-06-15)
 
 

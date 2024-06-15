@@ -1,3 +1,17 @@
+# [11.15.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.14.0...v11.15.0) (2024-06-15)
+
+
+### Bug Fixes
+
+* **database:** create data folder if it doesn't exist ([53aba8c](https://github.com/GeorgeV220/MartexLibrary/commit/53aba8c9be8858087282baa5c14e69362862510b))
+* Fix build issues ([44f81bf](https://github.com/GeorgeV220/MartexLibrary/commit/44f81bfaf58b784434f50100f7c936fcd1ab89a6))
+
+
+### Features
+
+* **database:** add GenericEntity class ([05b2153](https://github.com/GeorgeV220/MartexLibrary/commit/05b2153bb5bc61fb465309d73becc5916f614c80))
+* Removed DatabaseWrapper and moved Database class to SQL package ([c6b4518](https://github.com/GeorgeV220/MartexLibrary/commit/c6b4518a98568e848d9d4d13f25f7f58c7fc7947))
+
 # [11.14.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.13.1...v11.14.0) (2024-04-30)
 
 

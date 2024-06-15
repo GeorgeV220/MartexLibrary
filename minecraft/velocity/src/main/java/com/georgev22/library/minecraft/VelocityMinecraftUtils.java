@@ -12,7 +12,6 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +21,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,8 +102,8 @@ public class VelocityMinecraftUtils {
 
     public static void msg(final Audience target, final FileConfiguration file, final String path,
                            final Map<String, String> map, final boolean replace) {
-        Validate.notNull(file, "The file can't be null");
-        Validate.notNull(file, "The path can't be null");
+        if (file == null) throw new IllegalArgumentException("The file can't be null");
+        if (path == null) throw new IllegalArgumentException("The path can't be null");
 
         if (!file.contains(path)) {
             throw new IllegalArgumentException("The path: " + path + " doesn't exist.");
@@ -117,7 +117,7 @@ public class VelocityMinecraftUtils {
     }
 
     public static void msg(final Audience target, final String message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) throw new IllegalArgumentException("The target can't be null");
         if (message == null) {
             return;
         }
@@ -125,21 +125,25 @@ public class VelocityMinecraftUtils {
     }
 
     public static void msg(final Audience target, final String... messages) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) throw new IllegalArgumentException("The target can't be null");
         if (messages == null || messages.length == 0) {
             return;
         }
-        Validate.noNullElements(messages, "The string array can't have null elements.");
+        if (Arrays.stream(messages).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements.");
+        }
         for (String message : messages)
             target.sendMessage(textComponent(colorize(message)));
     }
 
     public static void msg(final Audience target, final List<String> message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) throw new IllegalArgumentException("The target can't be null");
         if (message == null || message.isEmpty()) {
             return;
         }
-        Validate.noNullElements(message, "The list can't have null elements.");
+        if (message.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The list can't have null elements.");
+        }
         msg(target, message.toArray(new String[0]));
     }
 
@@ -152,7 +156,7 @@ public class VelocityMinecraftUtils {
      */
     public static @NotNull String colorize(final String msg) {
         String unEditedMessage = msg;
-        Validate.notNull(unEditedMessage, "The string can't be null!");
+        if (unEditedMessage == null) throw new IllegalArgumentException("The message can't be null!");
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
         Matcher matcher = pattern.matcher(unEditedMessage);
         while (matcher.find()) {
@@ -178,8 +182,12 @@ public class VelocityMinecraftUtils {
      * @return A translated message array
      */
     public static String @NotNull [] colorize(final String... array) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) {
+            throw new IllegalArgumentException("The string array can't be null!");
+        }
+        if (Arrays.stream(array).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements!");
+        }
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
             newarr[i] = colorize(newarr[i]);
@@ -195,8 +203,9 @@ public class VelocityMinecraftUtils {
      * @return A translated message
      */
     public static @NotNull List<String> colorize(final List<String> coll) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) throw new IllegalArgumentException("The string collection can't be null!");
+        if (coll.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The string collection can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(VelocityMinecraftUtils::colorize);
         return newColl;

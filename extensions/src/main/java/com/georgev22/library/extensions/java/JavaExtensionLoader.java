@@ -7,7 +7,6 @@ import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.UnmodifiableObjectMap;
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +44,10 @@ public final class JavaExtensionLoader implements ExtensionLoader {
     @Override
     @NotNull
     public JavaExtension loadExtension(@NotNull final File file) throws InvalidExtensionException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new InvalidExtensionException("File cannot be null");
+        }
 
         if (!file.exists()) {
             throw new InvalidExtensionException(new FileNotFoundException(file.getPath() + " does not exist"));
@@ -127,7 +129,10 @@ public final class JavaExtensionLoader implements ExtensionLoader {
     @Override
     @NotNull
     public ExtensionDescriptionFile getExtensionDescription(@NotNull File file) throws InvalidDescriptionException {
-        Validate.notNull(file, "File cannot be null");
+        //noinspection ConstantValue
+        if (file == null) {
+            throw new InvalidDescriptionException("File cannot be null");
+        }
 
         JarFile jar = null;
         InputStream stream = null;

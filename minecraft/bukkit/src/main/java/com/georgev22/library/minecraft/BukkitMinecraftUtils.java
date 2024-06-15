@@ -5,8 +5,6 @@ import com.georgev22.library.utilities.Color;
 import com.georgev22.library.utilities.DiscordWebHook;
 import com.georgev22.library.utilities.Utils;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -29,6 +27,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -100,8 +99,12 @@ public class BukkitMinecraftUtils {
 
     public static void msg(final CommandSender target, final FileConfiguration file, final String path,
                            final Map<String, String> map, final boolean replace) {
-        Validate.notNull(file, "The file can't be null");
-        Validate.notNull(file, "The path can't be null");
+        if (file == null) {
+            throw new IllegalArgumentException("The file can't be null");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("The path can't be null");
+        }
 
         if (!file.isSet(path)) {
             throw new IllegalArgumentException("The path: " + path + " doesn't exist.");
@@ -115,7 +118,9 @@ public class BukkitMinecraftUtils {
     }
 
     public static void msg(final CommandSender target, final String message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null) {
             return;
         }
@@ -123,20 +128,28 @@ public class BukkitMinecraftUtils {
     }
 
     public static void msg(final CommandSender target, final String... message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null || message.length == 0) {
             return;
         }
-        Validate.noNullElements(message, "The string array can't have null elements.");
+        if (Arrays.stream(message).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements");
+        }
         target.sendMessage(colorize(message));
     }
 
     public static void msg(final CommandSender target, final List<String> message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null || message.isEmpty()) {
             return;
         }
-        Validate.noNullElements(message, "The list can't have null elements.");
+        if (message.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The list can't have null elements");
+        }
         msg(target, message.toArray(new String[0]));
     }
 
@@ -149,7 +162,9 @@ public class BukkitMinecraftUtils {
      */
     public static @NotNull String colorize(final String msg) {
         String unEditedMessage = msg;
-        Validate.notNull(unEditedMessage, "The string can't be null!");
+        if (unEditedMessage == null) {
+            throw new IllegalArgumentException("The string can't be null!");
+        }
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
         Matcher matcher = pattern.matcher(unEditedMessage);
         while (matcher.find()) {
@@ -169,7 +184,9 @@ public class BukkitMinecraftUtils {
     }
 
     public static String stripColor(final String msg) {
-        Validate.notNull(msg, "The string can't be null!");
+        if (msg == null) {
+            throw new IllegalArgumentException("The string can't be null!");
+        }
         return ChatColor.stripColor(msg);
     }
 
@@ -180,8 +197,12 @@ public class BukkitMinecraftUtils {
      * @return A translated message array
      */
     public static String @NotNull [] colorize(final String... array) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) {
+            throw new IllegalArgumentException("The string array can't be null!");
+        }
+        if (Arrays.stream(array).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements!");
+        }
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
             newarr[i] = colorize(newarr[i]);
@@ -190,8 +211,12 @@ public class BukkitMinecraftUtils {
     }
 
     public static String @NotNull [] stripColor(final String... array) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) {
+            throw new IllegalArgumentException("The string array can't be null!");
+        }
+        if (Arrays.stream(array).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements!");
+        }
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
             newarr[i] = stripColor(newarr[i]);
@@ -206,8 +231,12 @@ public class BukkitMinecraftUtils {
      * @return A translated message
      */
     public static @NotNull List<String> colorize(final List<String> coll) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) {
+            throw new IllegalArgumentException("The string collection can't be null!");
+        }
+        if (coll.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string collection can't have null elements!");
+        }
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(BukkitMinecraftUtils::colorize);
         return newColl;
@@ -238,8 +267,12 @@ public class BukkitMinecraftUtils {
     }
 
     public static @NotNull List<String> stripColor(final List<String> coll) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) {
+            throw new IllegalArgumentException("The string collection can't be null!");
+        }
+        if (coll.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string collection can't have null elements!");
+        }
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(BukkitMinecraftUtils::stripColor);
         return newColl;
@@ -693,8 +726,12 @@ public class BukkitMinecraftUtils {
      * @return the new string with the placeholders replaced
      */
     public static String placeholderAPI(final ServerOperator target, String str, final Map<String, String> map, final boolean ignoreCase) {
-        Validate.notNull(target, "The target can't be null!");
-        Validate.notNull(str, "The string can't be null!");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
+        if (str == null) {
+            throw new IllegalArgumentException("The string can't be null!");
+        }
         if (map == null) {
             try {
                 if (target instanceof OfflinePlayer offlinePlayer) {
@@ -730,8 +767,9 @@ public class BukkitMinecraftUtils {
      * @return the new string array with the placeholders replaced
      */
     public static String @NotNull [] placeholderAPI(final ServerOperator target, final String[] array, final Map<String, String> map, final boolean ignoreCase) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) throw new IllegalArgumentException("The string array can't be null!");
+        if (Arrays.stream(array).anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The string array can't have null elements!");
         final String[] newArray = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newArray.length; i++) {
             newArray[i] = placeholderAPI(target, newArray[i], map, ignoreCase);
@@ -751,8 +789,9 @@ public class BukkitMinecraftUtils {
      */
     public static List<String> placeholderAPI(final ServerOperator target, final List<String> coll, final Map<String, String> map,
                                               final boolean ignoreCase) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) throw new IllegalArgumentException("The string collection can't be null!");
+        if (coll.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The string collection can't have null elements!");
         return coll.stream().map(str -> placeholderAPI(target, str, map, ignoreCase)).collect(Collectors.toList());
     }
 

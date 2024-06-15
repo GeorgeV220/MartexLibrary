@@ -5,7 +5,6 @@ import com.georgev22.library.maps.ConcurrentObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -209,8 +208,13 @@ public final class ExtensionClassLoader extends URLClassLoader {
     }
 
     synchronized void initialize(@NotNull JavaExtension javaExtension) {
-        Validate.notNull(javaExtension, "Initializing JavaExtension cannot be null");
-        Validate.isTrue(javaExtension.getClass().getClassLoader() == this, "Cannot initialize JavaExtension outside of this class loader");
+        //noinspection ConstantValue
+        if (javaExtension == null) {
+            throw new IllegalArgumentException("JavaExtension cannot be null!", extensionState);
+        }
+        if (javaExtension.getClass().getClassLoader() != this) {
+            throw new IllegalArgumentException("Cannot initialize JavaExtension outside of this class loader", extensionState);
+        }
         if (this.javaExtension != null || this.javaExtensionInit != null) {
             throw new IllegalArgumentException("JavaExtension already initialized!", extensionState);
         }

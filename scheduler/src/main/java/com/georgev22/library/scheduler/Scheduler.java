@@ -3,7 +3,6 @@ package com.georgev22.library.scheduler;
 import com.georgev22.library.scheduler.interfaces.Task;
 import com.georgev22.library.scheduler.interfaces.Worker;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -269,7 +268,10 @@ public class Scheduler implements com.georgev22.library.scheduler.interfaces.Sch
 
     @Override
     public void cancelTasks(final @NotNull Class<?> clazz) {
-        Validate.notNull(clazz, "Cannot cancel tasks of null class");
+        //noinspection ConstantValue
+        if (clazz == null) {
+            throw new IllegalArgumentException("Cannot cancel tasks of null class");
+        }
         final com.georgev22.library.scheduler.Task task = new com.georgev22.library.scheduler.Task(
                 new Runnable() {
                     @Override
@@ -445,13 +447,18 @@ public class Scheduler implements com.georgev22.library.scheduler.interfaces.Sch
     }
 
     private static void validate(final Class<?> clazz, final Object task) {
-        Validate.notNull(clazz, "Class cannot be null");
-        Validate.notNull(task, "Task cannot be null");
-        Validate.isTrue(task instanceof Runnable || task instanceof Consumer || task instanceof Callable, "Task must be Runnable, Consumer, or Callable");
+        if (clazz == null || task == null) {
+            throw new IllegalArgumentException("Class and task cannot be null");
+        }
+        if (!(task instanceof Runnable) || !(task instanceof Consumer) || !(task instanceof Callable)) {
+            throw new IllegalArgumentException("Task must be Runnable, Consumer or Callable");
+        }
     }
 
     private int nextId() {
-        Validate.isTrue(runners.size() < Integer.MAX_VALUE, "There are already " + Integer.MAX_VALUE + " tasks scheduled! Cannot schedule more.");
+        if (runners.size() == Integer.MAX_VALUE) {
+            throw new IllegalStateException("Cannot schedule more than " + Integer.MAX_VALUE + " tasks!");
+        }
         int id;
         do {
             id = ids.updateAndGet(INCREMENT_IDS);

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import com.google.gson.Gson;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public final class Utils {
 
@@ -382,6 +386,185 @@ public final class Utils {
         List<String> list = Arrays.asList(a);
         Collections.reverse(list);
         return list.toArray(new String[0]);
+    }
+
+    /**
+     * Serialize Object to string using google Gson
+     *
+     * @param object object to serialize
+     * @return string output of the serialized object
+     * @since v5.0.1
+     */
+    public static <T> String serialize(Object object) {
+        ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOut = null;
+        try {
+            gzipOut = new GZIPOutputStream(byteaOut);
+            gzipOut.write(new Gson().toJson(object).getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (gzipOut != null) try {
+                gzipOut.close();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+        return byteaOut.toString();
+    }
+
+    /**
+     * Deserialize a string back to object
+     * see {@link #serialize(Object)}
+     *
+     * @param string serialized string
+     * @param <T>    the original object type (eg: {@code deserialize(stringToDeserialize, new TypeToken<ObjectMap<String, Integer>>(){}.getType())})
+     * @return the deserialized object
+     * @since v5.0.1
+     */
+    public static <T> T deserialize(@NotNull String string, @NotNull Type type) {
+        ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
+        GZIPInputStream gzipIn = null;
+        try {
+            gzipIn = new GZIPInputStream(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
+            for (int data; (data = gzipIn.read()) > -1; ) {
+                byteaOut.write(data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (gzipIn != null) try {
+                gzipIn.close();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        }
+
+        return new Gson().fromJson(byteaOut.toString(), type);
+    }
+
+    /**
+     * Serializes an object and saves it to the specified file path.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and saves the serialized data to the file
+     * specified by the given file path.
+     * </p>
+     *
+     * @param obj      the object to be serialized
+     * @param filePath the file path where the serialized data will be saved
+     * @throws IOException if there is an error accessing or writing to the file
+     */
+    public static void serializeObject(@NotNull Object obj, @NotNull String filePath) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        fileOutputStream.close();
+    }
+
+    /**
+     * Serializes an object and returns the serialized data as a string.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a string.
+     *
+     * @param obj the object to be serialized
+     * @return the serialized data as a string
+     * @throws IOException if there is an error during serialization
+     */
+    @Contract("_ -> new")
+    public static @NotNull String serializeObjectToString(@NotNull Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        byteArrayOutputStream.close();
+
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * Serializes an object and returns the serialized data as a byte array.
+     * <p>
+     * Serializes the specified object using the {@link ObjectOutputStream} and returns the serialized data as a byte array.
+     *
+     * @param obj the object to be serialized
+     * @return the serialized data as a  byte array
+     * @throws IOException if there is an error during serialization
+     */
+    public static byte @NotNull [] serializeObjectToBytes(@NotNull Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(obj);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        byteArrayOutputStream.close();
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    /**
+     * Deserializes an object from the specified file path.
+     * <p>
+     * Deserializes the object
+     * stored in the file specified by the given file path using the {@link ObjectInputStream} and
+     * returns the deserialized object.
+     *
+     * @param filePath the file path where the serialized object is stored
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the file
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObject(@NotNull String filePath) throws IOException, ClassNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        fileInputStream.close();
+        return obj;
+    }
+
+    /**
+     * Deserializes an object from the specified serialized data.
+     * <p>
+     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
+     * deserialized object.
+     *
+     * @param serializedData the serialized object data as a string
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the serialized data
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObjectFromString(@NotNull String serializedData) throws IOException, ClassNotFoundException {
+        byte[] bytes = Base64.getDecoder().decode(serializedData);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        byteArrayInputStream.close();
+
+        return obj;
+    }
+
+    /**
+     * Deserializes an object from the specified serialized data.
+     * <p>
+     * Deserializes the object from the specified serialized data using the {@link ObjectInputStream} and returns the
+     * deserialized object.
+     *
+     * @param byteArray the serialized object data as a byte array
+     * @return the deserialized object
+     * @throws IOException            if there is an error accessing or reading from the serialized data
+     * @throws ClassNotFoundException if the class of the serialized object cannot be found
+     */
+    public static Object deserializeObjectFromBytes(byte @NotNull [] byteArray) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        Object obj = objectInputStream.readObject();
+        objectInputStream.close();
+        byteArrayInputStream.close();
+        return obj;
     }
 
     /**

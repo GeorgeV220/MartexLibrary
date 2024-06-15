@@ -14,7 +14,6 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +23,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,8 +91,12 @@ public class BungeeMinecraftUtils {
 
     public static void msg(final CommandSender target, final Configuration file, final String path,
                            final Map<String, String> map, final boolean replace) {
-        Validate.notNull(file, "The file can't be null");
-        Validate.notNull(file, "The path can't be null");
+        if (file == null) {
+            throw new IllegalArgumentException("The file can't be null.");
+        }
+        if (path == null) {
+            throw new IllegalArgumentException("The file can't be null.");
+        }
 
         if (!file.contains(path)) {
             throw new IllegalArgumentException("The path: " + path + " doesn't exist.");
@@ -106,7 +110,9 @@ public class BungeeMinecraftUtils {
     }
 
     public static void msg(final CommandSender target, final String message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null) {
             return;
         }
@@ -114,20 +120,28 @@ public class BungeeMinecraftUtils {
     }
 
     public static void msg(final CommandSender target, final String... message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null || message.length == 0) {
             return;
         }
-        Validate.noNullElements(message, "The string array can't have null elements.");
+        if (Arrays.stream(message).anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string array can't have null elements.");
+        }
         target.sendMessages(colorize(message));
     }
 
     public static void msg(final CommandSender target, final List<String> message) {
-        Validate.notNull(target, "The target can't be null");
+        if (target == null) {
+            throw new IllegalArgumentException("The target can't be null");
+        }
         if (message == null || message.isEmpty()) {
             return;
         }
-        Validate.noNullElements(message, "The list can't have null elements.");
+        if (message.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("The string list can't have null elements.");
+        }
         msg(target, message.toArray(new String[0]));
     }
 
@@ -140,7 +154,9 @@ public class BungeeMinecraftUtils {
      */
     public static @NotNull String colorize(final String msg) {
         String unEditedMessage = msg;
-        Validate.notNull(unEditedMessage, "The string can't be null!");
+        if (unEditedMessage == null) {
+            throw new IllegalArgumentException("The string can't be null!");
+        }
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
         Matcher matcher = pattern.matcher(unEditedMessage);
         while (matcher.find()) {
@@ -160,7 +176,9 @@ public class BungeeMinecraftUtils {
     }
 
     public static String stripColor(final String msg) {
-        Validate.notNull(msg, "The string can't be null!");
+        if (msg == null) {
+            throw new IllegalArgumentException("The string can't be null!");
+        }
         return ChatColor.stripColor(msg);
     }
 
@@ -171,8 +189,9 @@ public class BungeeMinecraftUtils {
      * @return A translated message array
      */
     public static String @NotNull [] colorize(final String... array) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) throw new IllegalArgumentException("The string array can't be null!");
+        if (Arrays.stream(array).anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The string array can't have null elements!");
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
             newarr[i] = colorize(newarr[i]);
@@ -181,8 +200,9 @@ public class BungeeMinecraftUtils {
     }
 
     public static String @NotNull [] stripColor(final String... array) {
-        Validate.notNull(array, "The string array can't be null!");
-        Validate.noNullElements(array, "The string array can't have null elements!");
+        if (array == null) throw new IllegalArgumentException("The string array can't be null!");
+        if (Arrays.stream(array).anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The string array can't have null elements!");
         final String[] newarr = Arrays.copyOf(array, array.length);
         for (int i = 0; i < newarr.length; i++) {
             newarr[i] = stripColor(newarr[i]);
@@ -197,8 +217,9 @@ public class BungeeMinecraftUtils {
      * @return A translated message
      */
     public static @NotNull List<String> colorize(final List<String> coll) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) throw new IllegalArgumentException("The list can't be null!");
+        if (coll.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The list can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(BungeeMinecraftUtils::colorize);
         return newColl;
@@ -229,8 +250,9 @@ public class BungeeMinecraftUtils {
     }
 
     public static @NotNull List<String> stripColor(final List<String> coll) {
-        Validate.notNull(coll, "The string collection can't be null!");
-        Validate.noNullElements(coll, "The string collection can't have null elements!");
+        if (coll == null) throw new IllegalArgumentException("The list can't be null!");
+        if (coll.stream().anyMatch(Objects::isNull))
+            throw new IllegalArgumentException("The list can't have null elements!");
         final List<String> newColl = Lists.newArrayList(coll);
         newColl.replaceAll(BungeeMinecraftUtils::stripColor);
         return newColl;

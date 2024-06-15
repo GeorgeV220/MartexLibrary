@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
 import java.util.logging.Level;
 
-import org.apache.commons.lang.Validate;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -285,7 +284,10 @@ public class Scheduler implements ExtensionScheduler {
 
     @Override
     public void cancelTasks(final @NotNull Extension extension) {
-        Validate.notNull(extension, "Cannot cancel tasks of null extension");
+        //noinspection ConstantValue
+        if (extension == null) {
+            throw new IllegalArgumentException("Cannot cancel tasks of null extension");
+        }
         final Task task = new Task(
                 new Runnable() {
                     @Override
@@ -462,16 +464,24 @@ public class Scheduler implements ExtensionScheduler {
     }
 
     private static void validate(final Extension extension, final Object task) {
-        Validate.notNull(extension, "Extension cannot be null");
-        Validate.notNull(task, "Task cannot be null");
-        Validate.isTrue(task instanceof Runnable || task instanceof Consumer || task instanceof Callable, "Task must be Runnable, Consumer, or Callable");
+        if (extension == null) {
+            throw new IllegalExtensionAccessException("Extension cannot be null");
+        }
+        if (task == null) {
+            throw new IllegalExtensionAccessException("Task cannot be null");
+        }
+        if (!(task instanceof Runnable) && !(task instanceof Consumer) && !(task instanceof Callable)) {
+            throw new IllegalExtensionAccessException("Task must be Runnable, Consumer, or Callable");
+        }
         if (!extension.isEnabled()) {
             throw new IllegalExtensionAccessException("Extension attempted to register task while disabled");
         }
     }
 
     private int nextId() {
-        Validate.isTrue(runners.size() < Integer.MAX_VALUE, "There are already " + Integer.MAX_VALUE + " tasks scheduled! Cannot schedule more.");
+        if (runners.size() == Integer.MAX_VALUE) {
+            throw new IllegalStateException("There are already " + Integer.MAX_VALUE + " tasks scheduled! Cannot schedule more.");
+        }
         int id;
         do {
             id = ids.updateAndGet(INCREMENT_IDS);

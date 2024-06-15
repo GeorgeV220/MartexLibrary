@@ -1,9 +1,9 @@
 package com.georgev22.library.minecraft.inventory;
 
 import com.georgev22.library.maps.HashObjectMap;
+import com.georgev22.library.minecraft.BukkitMinecraftUtils;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion;
 import lombok.Getter;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -46,7 +46,9 @@ public final class InventoryMap extends HashObjectMap<Integer, ItemStack> {
      * @throws IllegalArgumentException If attempting to set the title in unsupported versions.
      */
     public void setTitle(String title) {
-        Validate.isTrue(MinecraftVersion.getVersionNumber() > 13, "Title cannot be changed in 1.8-1.13");
+        if (MinecraftVersion.getVersionNumber() < 14) {
+            throw new IllegalArgumentException("Title cannot be changed in 1.8-1.13");
+        }
         this.title = title;
     }
 

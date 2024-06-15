@@ -3,7 +3,6 @@ package com.georgev22.library.minecraft.inventory;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftReflection;
 import com.georgev22.library.minecraft.BukkitMinecraftUtils.MinecraftVersion;
 import com.georgev22.library.minecraft.exceptions.DeserializationException;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
@@ -24,7 +23,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 
 /**
@@ -150,7 +151,9 @@ public final class ItemStackSerializer {
      * @return An array of deserialized ItemStacks.
      */
     public static ItemStack @NotNull [] deserializeItemStack(String[] data) {
-        Validate.notNull(data, "Data cannot be null");
+        if (data == null) {
+            throw new IllegalArgumentException("Data cannot be null");
+        }
         ItemStack[] arr = new ItemStack[data.length];
         for (int i = 0; i < data.length; i++) {
             arr[i] = deserializeItemStack(data[i]);
@@ -165,7 +168,9 @@ public final class ItemStackSerializer {
      * @return A list of deserialized ItemStacks.
      */
     public static @NotNull List<ItemStack> deserializeItemStack(List<String> data) {
-        Validate.notNull(data, "Data cannot be null");
+        if (data == null) {
+            throw new IllegalArgumentException("Data cannot be null");
+        }
         List<ItemStack> l = new ArrayList<>(data.size());
         for (String s : data) {
             l.add(deserializeItemStack(s));
@@ -204,7 +209,7 @@ public final class ItemStackSerializer {
      * @return An array of serialized string representations of ItemStacks.
      */
     public static String @NotNull [] serializeItemStack(ItemStack[] items) {
-        Validate.notNull(items, "Items cannot be null");
+        if (Arrays.stream(items).anyMatch(Objects::isNull)) throw new IllegalArgumentException("Items cannot be null");
         String[] arr = new String[items.length];
         for (int i = 0; i < items.length; i++) {
             arr[i] = serializeItemStack(items[i]);
@@ -219,7 +224,7 @@ public final class ItemStackSerializer {
      * @return A list of serialized string representations of ItemStacks.
      */
     public static @NotNull List<String> serializeItemStack(List<ItemStack> items) {
-        Validate.notNull(items, "Items cannot be null");
+        if (items.stream().anyMatch(Objects::isNull)) throw new IllegalArgumentException("Items cannot be null");
         List<String> l = new ArrayList<>(items.size());
         for (ItemStack s : items) {
             l.add(serializeItemStack(s));
@@ -234,9 +239,12 @@ public final class ItemStackSerializer {
      * @return The serialized string representation of the Inventory.
      */
     public static @Nullable String serializeInventory(Inventory inv) {
-        Validate.notNull(inv, "Inventory cannot be null");
-        Validate.isTrue(inv.getType() == InventoryType.CHEST,
-                "Illegal inventory type " + inv.getType() + "(expected CHEST).");
+        if (inv == null) {
+            throw new IllegalArgumentException("Inventory cannot be null");
+        }
+        if (inv.getType() != InventoryType.CHEST) {
+            throw new IllegalArgumentException("Illegal inventory type " + inv.getType() + "(expected CHEST).");
+        }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              DataOutputStream dataOutput = new DataOutputStream(outputStream)) {
@@ -284,8 +292,12 @@ public final class ItemStackSerializer {
      * @return The deserialized InventoryMap, or null if deserialization fails.
      */
     public static @Nullable InventoryMap deserializeInventory(String data) {
-        Validate.notNull(data, "Data cannot be null");
-        Validate.isTrue(!data.isEmpty(), "Data cannot be empty");
+        if (data == null) {
+            throw new IllegalArgumentException("Data cannot be null");
+        }
+        if (data.isEmpty()) {
+            throw new IllegalArgumentException("Data cannot be empty");
+        }
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(data, 32).toByteArray());
              DataInputStream dataInputStream = new DataInputStream(inputStream)) {

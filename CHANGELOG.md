@@ -1,3 +1,10 @@
+# [11.17.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.16.0...v11.17.0) (2024-06-19)
+
+
+### Features
+
+* **Minecraft:** Add 1.21 in MinecraftVersion ([21731f4](https://github.com/GeorgeV220/MartexLibrary/commit/21731f40a92ee072a0b803dd62a6401b375c57aa))
+
 # [11.16.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.15.2...v11.16.0) (2024-06-15)
 
 

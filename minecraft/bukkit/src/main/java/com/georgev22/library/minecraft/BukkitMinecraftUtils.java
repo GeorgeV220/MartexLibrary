@@ -825,6 +825,7 @@ public class BukkitMinecraftUtils {
         V1_20_R2(new SubVersionRange("1.20", 2, 2)),
         V1_20_R3(new SubVersionRange("1.20", 3, 4)),
         V1_20_R4(new SubVersionRange("1.20", 5, 6)),
+        V1_21_R1(new SubVersionRange("1.21", 0, 1)),
         UNKNOWN(new SubVersionRange("UNKNOWN", 0, 0)),
         ;
 

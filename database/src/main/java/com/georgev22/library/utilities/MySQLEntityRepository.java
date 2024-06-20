@@ -10,6 +10,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -102,15 +103,13 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         }
     }
 
-    private @Nullable ResultSet querySQL(String statement) {
-        try (Connection connection = this.database.getConnection()) {
+    private @Nullable PreparedStatement querySQL(String statement) {
+        try {
+            Connection connection = this.database.getConnection();
             if (connection == null || connection.isClosed()) {
-                try (Connection newConnection = this.database.openConnection()) {
-                    return newConnection.createStatement().executeQuery(statement);
-                }
-            } else {
-                return connection.createStatement().executeQuery(statement);
+                connection = this.database.openConnection();
             }
+            return connection.prepareStatement(statement);
         } catch (SQLException | ClassNotFoundException e) {
             this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
             return null;
@@ -130,22 +129,27 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         }
         return CompletableFuture.supplyAsync(() -> {
             String statement = "SELECT * FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
-
-            try (ResultSet resultSet = this.querySQL(statement)) {
-                if (resultSet == null) {
-                    this.logger.log(Level.SEVERE, "Failed to load entity with ID: " + entityId + " because the result set was null.");
+            try (PreparedStatement stmt = querySQL(statement)) {
+                if (stmt == null) {
+                    this.logger.log(Level.SEVERE, "Failed to create statement for entity ID: " + entityId);
                     return null;
                 }
-                if (resultSet.next()) {
-                    this.checkForConstructorWithSingleString(this.entityClass);
-                    V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-                    for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
-                        String columnName = resultSet.getMetaData().getColumnName(i + 1);
-                        Object columnValue = resultSet.getObject(i + 1);
-                        entity.setValue(columnName, columnValue);
+                try (ResultSet resultSet = stmt.executeQuery()) {
+                    if (resultSet == null) {
+                        this.logger.log(Level.SEVERE, "Failed to load entity with ID: " + entityId + " because the result set was null.");
+                        return null;
                     }
-                    this.loadedEntities.append(entityId, entity);
-                    return entity;
+                    if (resultSet.next()) {
+                        this.checkForConstructorWithSingleString(this.entityClass);
+                        V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
+                        for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
+                            String columnName = resultSet.getMetaData().getColumnName(i + 1);
+                            Object columnValue = resultSet.getObject(i + 1);
+                            entity.setValue(columnName, columnValue);
+                        }
+                        this.loadedEntities.append(entityId, entity);
+                        return entity;
+                    }
                 }
             } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException | NoSuchConstructorException e) {
@@ -186,16 +190,23 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             }
             if (checkDb) {
                 String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
-                try (ResultSet resultSet = this.querySQL(statement)) {
-                    if (resultSet == null) {
-                        this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
+                try (PreparedStatement stmt = querySQL(statement)) {
+                    if (stmt == null) {
+                        this.logger.log(Level.SEVERE, "Failed to create statement for entity ID: " + entityId);
                         return false;
                     }
-                    resultSet.next();
-                    int count = resultSet.getInt(1);
-                    return forceLoad ? this.load(entityId) != null : count > 0;
+                    try (ResultSet resultSet = stmt.executeQuery()) {
+                        if (resultSet == null) {
+                            this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
+                            return false;
+                        }
+                        resultSet.next();
+                        int count = resultSet.getInt(1);
+                        return forceLoad ? this.load(entityId) != null : count > 0;
+                    }
                 } catch (SQLException e) {
                     this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                    return false;
                 }
             }
             return false;
@@ -230,13 +241,19 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     @Override
     public void loadAll() {
         String statement = "SELECT * FROM " + this.tableName;
-        try (ResultSet resultSet = this.querySQL(statement)) {
-            if (resultSet == null) {
-                this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");
+        try (PreparedStatement preparedStatement = this.querySQL(statement)) {
+            if (preparedStatement == null) {
+                this.logger.log(Level.SEVERE, "Failed to create statement for loading all entities.");
                 return;
             }
-            while (resultSet.next()) {
-                this.load(resultSet.getString("_id"));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet == null) {
+                    this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");
+                    return;
+                }
+                while (resultSet.next()) {
+                    this.load(resultSet.getString("_id"));
+                }
             }
         } catch (SQLException e) {
             this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
@@ -248,7 +265,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      */
     @Override
     public void saveAll() {
-        for (V entity :this.loadedEntities.values()) {
+        for (V entity : this.loadedEntities.values()) {
             this.save(entity);
         }
     }

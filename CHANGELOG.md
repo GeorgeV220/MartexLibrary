@@ -1,3 +1,10 @@
+## [11.20.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.20.0...v11.20.1) (2024-06-20)
+
+
+### Bug Fixes
+
+* **database:** improve method access in EntityRepository ([7ecda5c](https://github.com/GeorgeV220/MartexLibrary/commit/7ecda5c383ce5e7172987952ecfb470a6a0d66f9))
+
 # [11.20.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.19.0...v11.20.0) (2024-06-20)
 
 

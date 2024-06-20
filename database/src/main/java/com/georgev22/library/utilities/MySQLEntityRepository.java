@@ -66,10 +66,11 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         return exists(entity._id(), true, false).thenApplyAsync(exists -> {
             ObjectMap<String, Object> values = getValuesMap(entity);
             String statement;
+            String entityId = escapeSql(entity._id());
             if (exists) {
-                statement = this.database.buildUpdateStatement(this.tableName, values, "_id = " + entity._id());
+                statement = this.database.buildUpdateStatement(this.tableName, values, "_id = '" + entityId + "'");
             } else {
-                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entity._id()).append(values));
+                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entityId).append(values));
             }
 
             if (statement.isEmpty()) {
@@ -128,7 +129,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
         return CompletableFuture.supplyAsync(() -> {
-            String statement = "SELECT * FROM " + this.tableName + " WHERE _id = " + entityId;
+            String statement = "SELECT * FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
 
             try (ResultSet resultSet = this.querySQL(statement)) {
                 if (resultSet == null) {
@@ -143,7 +144,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
                         Object columnValue = resultSet.getObject(i + 1);
                         entity.setValue(columnName, columnValue);
                     }
-                   this.loadedEntities.append(entityId, entity);
+                    this.loadedEntities.append(entityId, entity);
                     return entity;
                 }
             } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
@@ -184,7 +185,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
                 return true;
             }
             if (checkDb) {
-                String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = " + entityId;
+                String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
                 try (ResultSet resultSet = this.querySQL(statement)) {
                     if (resultSet == null) {
                         this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
@@ -215,11 +216,11 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             }
             String statement = this.database.buildDeleteStatement(
                     this.tableName,
-                    "_id = " + entityId
+                    "_id = '" + escapeSql(entityId) + "'"
             );
 
             this.executeStatement(statement);
-           this.loadedEntities.remove(entityId);
+            this.loadedEntities.remove(entityId);
         }));
     }
 
@@ -277,5 +278,9 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      */
     @UnmodifiableView @Override public List<V> getLoadedEntities() {
         return this.loadedEntities.values().stream().toList();
+    }
+
+    private String escapeSql(String input) {
+        return input.replace("'", "''");
     }
 }

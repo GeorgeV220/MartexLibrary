@@ -1,3 +1,10 @@
+# [11.19.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.18.1...v11.19.0) (2024-06-20)
+
+
+### Features
+
+* **database:** optimize querySQL method ([c427ec5](https://github.com/GeorgeV220/MartexLibrary/commit/c427ec57402b017d05e3f8f52bcf1a819cdc8c3a))
+
 ## [11.18.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.18.0...v11.18.1) (2024-06-20)
 
 

@@ -90,19 +90,28 @@ public interface EntityRepository<V extends Entity> {
 
     default List<Method> getMethods(@NotNull Class<?> entityClass) {
         return Arrays.stream(entityClass.getDeclaredMethods()).filter(
-                method -> method.getAnnotation(Column.class) != null
-                        && method.getParameterCount() == 0
-                        && method.getReturnType() != void.class
-                        && !method.getName().startsWith("set")
-                        && !method.getName().equalsIgnoreCase("_id")
-        ).toList();
+                        method -> method.getAnnotation(Column.class) != null
+                                && method.getParameterCount() == 0
+                                && method.getReturnType() != void.class
+                                && !method.getName().startsWith("set")
+                                && !method.getName().equalsIgnoreCase("_id")
+                ).peek(method -> {
+                    if (!method.canAccess(this.getClass())) {
+                        method.trySetAccessible();
+                    }
+                })
+                .toList();
     }
 
     default List<Field> getFields(@NotNull Class<?> entityClass) {
         return Arrays.stream(entityClass.getDeclaredFields()).filter(
                 field -> field.getAnnotation(Column.class) != null
                         && !field.getName().equalsIgnoreCase("_id")
-        ).toList();
+        ).peek(field -> {
+            if (!field.canAccess(this.getClass())) {
+                field.trySetAccessible();
+            }
+        }).toList();
     }
 
     default ObjectMap<String, Object> getValuesMap(@NotNull V entity) {

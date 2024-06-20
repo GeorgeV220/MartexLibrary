@@ -89,29 +89,33 @@ public interface EntityRepository<V extends Entity> {
     }
 
     default List<Method> getMethods(@NotNull Class<?> entityClass) {
-        return Arrays.stream(entityClass.getDeclaredMethods()).filter(
+        return Arrays.stream(entityClass.getDeclaredMethods())
+                .filter(
                         method -> method.getAnnotation(Column.class) != null
                                 && method.getParameterCount() == 0
                                 && method.getReturnType() != void.class
                                 && !method.getName().startsWith("set")
                                 && !method.getName().equalsIgnoreCase("_id")
-                ).peek(method -> {
-                    if (!method.canAccess(this.getClass())) {
-                        method.trySetAccessible();
+                ).filter(method -> !Modifier.isStatic(method.getModifiers()))
+                .peek(method -> {
+                    if (!Modifier.isPublic(method.getModifiers())) {
+                        method.setAccessible(true);
                     }
                 })
                 .toList();
     }
 
     default List<Field> getFields(@NotNull Class<?> entityClass) {
-        return Arrays.stream(entityClass.getDeclaredFields()).filter(
-                field -> field.getAnnotation(Column.class) != null
-                        && !field.getName().equalsIgnoreCase("_id")
-        ).peek(field -> {
-            if (!field.canAccess(this.getClass())) {
-                field.trySetAccessible();
-            }
-        }).toList();
+        return Arrays.stream(entityClass.getDeclaredFields())
+                .filter(
+                        field -> field.getAnnotation(Column.class) != null
+                                && !field.getName().equalsIgnoreCase("_id")
+                ).filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .peek(field -> {
+                    if (!Modifier.isPublic(field.getModifiers())) {
+                        field.setAccessible(true);
+                    }
+                }).toList();
     }
 
     default ObjectMap<String, Object> getValuesMap(@NotNull V entity) {

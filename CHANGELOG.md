@@ -1,3 +1,10 @@
+# [11.18.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.17.0...v11.18.0) (2024-06-20)
+
+
+### Features
+
+* **database:** add method to get loaded entities ([190b593](https://github.com/GeorgeV220/MartexLibrary/commit/190b593598687dbd65d830e6bebc656c4a9e8794))
+
 # [11.17.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.16.0...v11.17.0) (2024-06-19)
 
 

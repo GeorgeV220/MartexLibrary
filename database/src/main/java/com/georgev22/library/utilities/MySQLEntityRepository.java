@@ -6,11 +6,13 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -266,5 +268,14 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns a list of all loaded entities
+     *
+     * @return The list of loaded entities
+     */
+    @UnmodifiableView @Override public List<V> getLoadedEntities() {
+        return this.loadedEntities.values().stream().toList();
     }
 }

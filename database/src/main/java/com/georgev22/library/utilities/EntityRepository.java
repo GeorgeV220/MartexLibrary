@@ -142,4 +142,6 @@ public interface EntityRepository<V extends Entity> {
     }
 
     Logger getLogger();
+
+    List<V> getLoadedEntities();
 }

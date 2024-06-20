@@ -5,10 +5,12 @@ import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import com.georgev22.library.yaml.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -201,5 +203,14 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns a list of all loaded entities
+     *
+     * @return The list of loaded entities
+     */
+    @UnmodifiableView @Override public List<V> getLoadedEntities() {
+        return this.loadedEntities.values().stream().toList();
     }
 }

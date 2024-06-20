@@ -4,8 +4,10 @@ import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
 import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.*;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,5 +190,14 @@ public class JsonEntityRepository<V extends Entity> implements EntityRepository<
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns a list of all loaded entities
+     *
+     * @return The list of loaded entities
+     */
+    @UnmodifiableView @Override public List<V> getLoadedEntities() {
+        return this.loadedEntities.values().stream().toList();
     }
 }

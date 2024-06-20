@@ -8,8 +8,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -211,5 +213,14 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns a list of all loaded entities
+     *
+     * @return The list of loaded entities
+     */
+    @UnmodifiableView @Override public List<V> getLoadedEntities() {
+        return this.loadedEntities.values().stream().toList();
     }
 }

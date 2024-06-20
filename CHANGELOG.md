@@ -1,3 +1,15 @@
+# [11.20.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.19.0...v11.20.0) (2024-06-20)
+
+
+### Bug Fixes
+
+* **database:** adjust buildInsertStatement for new entities ([ca003db](https://github.com/GeorgeV220/MartexLibrary/commit/ca003db49691ee9bd9259e120ca22c5cace80d31))
+
+
+### Features
+
+* **database:** improve reflection access in EntityRepository ([b2547c3](https://github.com/GeorgeV220/MartexLibrary/commit/b2547c37847b784e8b7965781a36476c4dc074ba))
+
 # [11.19.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.18.1...v11.19.0) (2024-06-20)
 
 

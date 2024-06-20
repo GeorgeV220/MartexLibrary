@@ -71,7 +71,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             if (exists) {
                 statement = this.database.buildUpdateStatement(this.tableName, values, "_id = '" + entityId + "'");
             } else {
-                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", entityId).append(values));
+                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", "'" + entityId + "'").append(values));
             }
 
             if (statement.isEmpty()) {

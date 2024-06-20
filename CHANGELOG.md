@@ -1,3 +1,10 @@
+## [11.18.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.18.0...v11.18.1) (2024-06-20)
+
+
+### Bug Fixes
+
+* **database:** handle entity ID escaping in MySQL repository ([935eec6](https://github.com/GeorgeV220/MartexLibrary/commit/935eec67a49243b59a551df9e93a5bf656f6746d))
+
 # [11.18.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.17.0...v11.18.0) (2024-06-20)
 
 

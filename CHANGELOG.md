@@ -1,3 +1,10 @@
+# [11.21.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.20.1...v11.21.0) (2024-06-22)
+
+
+### Features
+
+* **database:** loadAll() method now returns the number of loaded entities ([8d1359f](https://github.com/GeorgeV220/MartexLibrary/commit/8d1359f7cc0b4974d1cc36ed3e906e23dbe5aefd))
+
 ## [11.20.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.20.0...v11.20.1) (2024-06-20)
 
 

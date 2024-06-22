@@ -10,9 +10,12 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -167,14 +170,29 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * Loads all entities from the data folder.
      */
     @Override
-    public void loadAll() {
-        File[] files = dataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
-        if (files != null) {
+    public CompletableFuture<BigInteger> loadAll() {
+        return CompletableFuture.supplyAsync(() -> {
+            File[] files = dataFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+            if (files == null) {
+                return CompletableFuture.completedFuture(BigInteger.ZERO);
+            }
+
+            AtomicReference<BigInteger> atomicCount = new AtomicReference<>(BigInteger.ZERO);
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+
             for (File file : files) {
                 String entityId = file.getName().replace(".yml", "");
-                load(entityId);
+                CompletableFuture<Void> future = load(entityId).thenAccept(v -> {
+                    if (v != null) {
+                        atomicCount.updateAndGet(current -> current.add(BigInteger.ONE));
+                    }
+                });
+                futures.add(future);
             }
-        }
+
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            return allOf.thenApply(v -> atomicCount.get());
+        }).thenCompose(countFuture -> countFuture);
     }
 
     /**

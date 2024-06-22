@@ -9,12 +9,15 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -239,25 +242,40 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
      * Loads all entities from the database.
      */
     @Override
-    public void loadAll() {
-        String statement = "SELECT * FROM " + this.tableName;
-        try (PreparedStatement preparedStatement = this.querySQL(statement)) {
-            if (preparedStatement == null) {
-                this.logger.log(Level.SEVERE, "Failed to create statement for loading all entities.");
-                return;
-            }
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet == null) {
-                    this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");
-                    return;
+    public CompletableFuture<BigInteger> loadAll() {
+        return CompletableFuture.supplyAsync(() -> {
+            String statement = "SELECT * FROM " + this.tableName;
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            AtomicReference<BigInteger> count = new AtomicReference<>(BigInteger.ZERO);
+
+            try (PreparedStatement preparedStatement = this.querySQL(statement)) {
+                if (preparedStatement == null) {
+                    this.logger.log(Level.SEVERE, "Failed to create statement for loading all entities.");
+                    return CompletableFuture.completedFuture(BigInteger.ZERO);
                 }
-                while (resultSet.next()) {
-                    this.load(resultSet.getString("_id"));
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet == null) {
+                        this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");
+                        return CompletableFuture.completedFuture(BigInteger.ZERO);
+                    }
+                    while (resultSet.next()) {
+                        String id = resultSet.getString("_id");
+                        CompletableFuture<Void> future = load(id).thenAccept(v -> {
+                            if (v != null) {
+                                count.updateAndGet(current -> current.add(BigInteger.ONE));
+                            }
+                        });
+                        futures.add(future);
+                    }
                 }
+            } catch (SQLException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+                return CompletableFuture.completedFuture(BigInteger.ZERO);
             }
-        } catch (SQLException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-        }
+
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            return allOf.thenApply(v -> count.get());
+        }).thenCompose(countFuture -> countFuture);
     }
 
     /**

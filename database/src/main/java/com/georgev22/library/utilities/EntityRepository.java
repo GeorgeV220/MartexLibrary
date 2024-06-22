@@ -7,6 +7,7 @@ import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -61,8 +62,10 @@ public interface EntityRepository<V extends Entity> {
 
     /**
      * Loads all entities from the database.
+     *
+     * @return The number of loaded entities.
      */
-    void loadAll();
+    CompletableFuture<BigInteger> loadAll();
 
     /**
      * Saves all loaded entities to the database.

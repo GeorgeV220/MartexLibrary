@@ -11,9 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -175,16 +178,27 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * Loads all entities from the database.
      */
     @Override
-    public void loadAll() {
-        FindIterable<Document> documents = mongoDatabase.getCollection(this.collectionName).find();
+    public CompletableFuture<BigInteger> loadAll() {
+        return CompletableFuture.supplyAsync(() -> {
+            FindIterable<Document> documents = mongoDatabase.getCollection(this.collectionName).find();
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            AtomicReference<BigInteger> count = new AtomicReference<>(BigInteger.ZERO);
 
-        for (Document document : documents) {
-            Object idValue = document.get("_id");
-
-            if (idValue != null) {
-                this.load(idValue.toString());
+            for (Document document : documents) {
+                Object idValue = document.get("_id");
+                if (idValue != null) {
+                    CompletableFuture<Void> future = load(idValue.toString()).thenAccept(v -> {
+                        if (v != null) {
+                            count.updateAndGet(current -> current.add(BigInteger.ONE));
+                        }
+                    });
+                    futures.add(future);
+                }
             }
-        }
+
+            CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            return allOf.thenApply(v -> count.get());
+        }).thenCompose(countFuture -> countFuture);
     }
 
     /**

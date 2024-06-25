@@ -1,3 +1,11 @@
+# [11.22.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.21.0...v11.22.0) (2024-06-25)
+
+
+### Features
+
+* **database:** Change getLoadedEntities to ObservableObjectMap (and correct some javadocs) ([d68db5a](https://github.com/GeorgeV220/MartexLibrary/commit/d68db5ab6068d0ebd7455bc105da6089f4bf0eca))
+* **list:** Add ObservableList and ListChangeListener ([135ed52](https://github.com/GeorgeV220/MartexLibrary/commit/135ed5217f7032c6d8d9c84219bd297e9d5b8c59))
+
 # [11.21.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.20.1...v11.21.0) (2024-06-22)
 
 

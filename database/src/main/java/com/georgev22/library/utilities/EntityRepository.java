@@ -2,6 +2,7 @@ package com.georgev22.library.utilities;
 
 import com.georgev22.library.maps.HashObjectMap;
 import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.utilities.annotations.Column;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
@@ -23,47 +24,56 @@ public interface EntityRepository<V extends Entity> {
 
     /**
      * Saves the given entity.
-     * Returns the saved entity or null if an error occurs.
+     * Returns a CompletableFuture containing the saved entity, or completing with null if an error occurs.
      *
      * @param entity The entity to be saved.
+     * @return a CompletableFuture containing the saved entity, or completing with null if an error occurs
      */
     CompletableFuture<V> save(V entity);
 
     /**
      * Loads an entity based on the specified entity ID.
-     * Returns the loaded entity or null if the entity does not exist or if an error occurs.
+     * Returns a CompletableFuture containing the loaded entity, or completing with null if the entity does not exist or if an error occurs.
      *
      * @param entityId The ID of the entity to be loaded.
+     * @return a CompletableFuture containing the loaded entity, or completing with null if the entity does not exist or if an error occurs
      */
     CompletableFuture<V> load(@NotNull String entityId);
 
     /**
      * Retrieves the loaded entity with the specified ID.
+     * Returns a CompletableFuture containing the loaded entity, or completing with null if not found (implementation-dependent).
      *
      * @param entityId The ID of the entity to be retrieved.
-     * @return The loaded entity, or null if not found (implementation-dependent).
+     * @return a CompletableFuture containing the loaded entity, or completing with null if not found
      */
     CompletableFuture<V> getEntity(@NotNull String entityId);
 
     /**
      * Checks if an entity with the specified ID exists.
+     * Returns a CompletableFuture containing true if the entity exists, false otherwise.
      *
-     * @param entityId The ID of the entity to check for existence.
-     * @return True if the entity exists, false otherwise.
+     * @param entityId  The ID of the entity to check for existence.
+     * @param checkDb   Whether to check the database for the entity's existence.
+     * @param forceLoad Whether to force loading the entity from the database.
+     * @return a CompletableFuture containing true if the entity exists, false otherwise
      */
     CompletableFuture<Boolean> exists(@NotNull String entityId, boolean checkDb, boolean forceLoad);
 
     /**
      * Deletes the entity with the specified ID.
+     * Returns a CompletableFuture that completes when the deletion is done.
      *
      * @param entityId The ID of the entity to be deleted.
+     * @return a CompletableFuture that completes when the deletion is done
      */
     CompletableFuture<Void> delete(@NotNull String entityId);
 
     /**
      * Loads all entities from the database.
+     * Returns a CompletableFuture containing the number of loaded entities.
      *
-     * @return The number of loaded entities.
+     * @return a CompletableFuture containing the number of loaded entities
      */
     CompletableFuture<BigInteger> loadAll();
 
@@ -91,6 +101,13 @@ public interface EntityRepository<V extends Entity> {
         throw new NoSuchConstructorException("No constructor with a single vararg String parameter found in class " + entityClass.getSimpleName());
     }
 
+    /**
+     * Retrieves a list of methods in the specified class that are annotated with {@link Column},
+     * have no parameters, return a non-void type, do not start with "set", and are not named "_id".
+     *
+     * @param entityClass The class to retrieve the methods from.
+     * @return a list of methods that match the criteria
+     */
     default List<Method> getMethods(@NotNull Class<?> entityClass) {
         return Arrays.stream(entityClass.getDeclaredMethods())
                 .filter(
@@ -108,6 +125,13 @@ public interface EntityRepository<V extends Entity> {
                 .toList();
     }
 
+    /**
+     * Retrieves a list of fields in the specified class that are annotated with {@link Column}
+     * and are not named "_id".
+     *
+     * @param entityClass The class to retrieve the fields from.
+     * @return a list of fields that match the criteria
+     */
     default List<Field> getFields(@NotNull Class<?> entityClass) {
         return Arrays.stream(entityClass.getDeclaredFields())
                 .filter(
@@ -121,6 +145,12 @@ public interface EntityRepository<V extends Entity> {
                 }).toList();
     }
 
+    /**
+     * Creates an ObjectMap containing the values of the specified entity's annotated fields and methods.
+     *
+     * @param entity The entity to extract values from.
+     * @return an ObjectMap containing the values of the entity's annotated fields and methods
+     */
     default ObjectMap<String, Object> getValuesMap(@NotNull V entity) {
         ObjectMap<String, Object> values = new HashObjectMap<>();
 
@@ -157,7 +187,17 @@ public interface EntityRepository<V extends Entity> {
         return values;
     }
 
+    /**
+     * Gets the logger associated with this repository.
+     *
+     * @return The logger.
+     */
     Logger getLogger();
 
-    List<V> getLoadedEntities();
+    /**
+     * Returns an observable map of all loaded entities.
+     *
+     * @return an ObservableObjectMap containing all loaded entities
+     */
+    ObservableObjectMap<String, V> getLoadedEntities();
 }

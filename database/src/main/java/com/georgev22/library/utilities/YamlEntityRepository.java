@@ -1,11 +1,9 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.maps.ObjectMap;
+import com.georgev22.library.maps.ObservableObjectMap;
 import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import com.georgev22.library.yaml.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class YamlEntityRepository<V extends Entity> implements EntityRepository<V> {
 
-    private final ObjectMap<String, V> loadedEntities = new HashObjectMap<>();
+    private final ObservableObjectMap<String, V> loadedEntities = new ObservableObjectMap<>();
     private final File dataFolder;
     private final Logger logger;
     private final Class<V> entityClass;
@@ -224,11 +222,12 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
     }
 
     /**
-     * Returns a list of all loaded entities
+     * Returns an observable map of all loaded entities.
      *
-     * @return The list of loaded entities
+     * @return an ObservableObjectMap containing all loaded entities
      */
-    @UnmodifiableView @Override public List<V> getLoadedEntities() {
-        return this.loadedEntities.values().stream().toList();
+    @Override
+    public ObservableObjectMap<String, V> getLoadedEntities() {
+        return this.loadedEntities;
     }
 }

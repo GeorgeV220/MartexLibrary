@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
  */
 public class ObservableObjectMap<K, V> extends ConcurrentObjectMap<K, V> {
 
-    private List<MapChangeListener<K, V>> listeners = new ArrayList<>();
+    private final List<MapChangeListener<K, V>> listeners = new ArrayList<>();
 
     /**
      * Adds a {@link MapChangeListener} to this map.

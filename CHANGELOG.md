@@ -1,3 +1,10 @@
+# [11.23.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.22.0...v11.23.0) (2024-06-26)
+
+
+### Features
+
+* **TreeObjectMap:** add constructors with comparator parameters ([97adbbb](https://github.com/GeorgeV220/MartexLibrary/commit/97adbbbb52935dbed914e18e5ce93373242aff5f))
+
 # [11.22.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.21.0...v11.22.0) (2024-06-25)
 
 

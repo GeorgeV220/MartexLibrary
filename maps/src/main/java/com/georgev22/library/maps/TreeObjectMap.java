@@ -2,36 +2,64 @@ package com.georgev22.library.maps;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static java.lang.String.format;
 
 public class TreeObjectMap<K, V> extends TreeMap<K, V> implements ObjectMap<K, V> {
 
     /**
-     * Creates an TreeObjectMap instance.
+     * Creates a TreeObjectMap instance.
      */
     public TreeObjectMap() {
     }
 
     /**
-     * Creates a TreeObjectMap instance initialized with the given map.
+     * Creates a TreeObjectMap instance with the specified comparator.
      *
-     * @param map initial map
+     * @param comparator the comparator to order the keys
+     */
+    public TreeObjectMap(Comparator<? super K> comparator) {
+        super(comparator);
+    }
+
+    /**
+     * Creates a TreeObjectMap instance initialized with the given ObjectMap.
+     *
+     * @param map the initial ObjectMap
      */
     public TreeObjectMap(final ObjectMap<K, V> map) {
         putAll(map);
     }
 
     /**
-     * Creates a TreeObjectMap instance initialized with the given map.
+     * Creates a TreeObjectMap instance initialized with the given Map.
      *
-     * @param map initial map
+     * @param map the initial Map
      */
     public TreeObjectMap(final Map<K, V> map) {
+        putAll(map);
+    }
+
+    /**
+     * Creates a TreeObjectMap instance with the specified comparator and initialized with the given ObjectMap.
+     *
+     * @param comparator the comparator to order the keys
+     * @param map the initial ObjectMap
+     */
+    public TreeObjectMap(Comparator<? super K> comparator, final ObjectMap<K, V> map) {
+        super(comparator);
+        putAll(map);
+    }
+
+    /**
+     * Creates a TreeObjectMap instance with the specified comparator and initialized with the given Map.
+     *
+     * @param comparator the comparator to order the keys
+     * @param map the initial Map
+     */
+    public TreeObjectMap(Comparator<? super K> comparator, final Map<K, V> map) {
+        super(comparator);
         putAll(map);
     }
 

@@ -1,3 +1,11 @@
+## [11.23.1](https://github.com/GeorgeV220/MartexLibrary/compare/v11.23.0...v11.23.1) (2024-07-27)
+
+
+### Bug Fixes
+
+* **database:** Ensure connection is valid in getConnection method ([d24d826](https://github.com/GeorgeV220/MartexLibrary/commit/d24d826a7fbf18e26e5af994b9cae626a13080f6))
+* **database:** update MongoDBEntityRepository with Gson initialization ([2548a43](https://github.com/GeorgeV220/MartexLibrary/commit/2548a430ed4f108d56a2fcd2ed1ef20b7261f067))
+
 # [11.23.0](https://github.com/GeorgeV220/MartexLibrary/compare/v11.22.0...v11.23.0) (2024-06-26)
 
 

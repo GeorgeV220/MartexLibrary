@@ -1,18 +1,10 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObservableObjectMap;
-import com.georgev22.library.utilities.annotations.Column;
-import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -81,111 +73,6 @@ public interface EntityRepository<V extends Entity> {
      * Saves all loaded entities to the database.
      */
     void saveAll();
-
-    /**
-     * Checks for a constructor with a single vararg String parameter in the specified class.
-     *
-     * @param entityClass The class to check for the constructor.
-     * @throws NoSuchConstructorException If no suitable constructor is found.
-     */
-    default void checkForConstructorWithSingleString(@NotNull Class<V> entityClass) throws NoSuchConstructorException {
-        Constructor<?>[] constructors = entityClass.getConstructors();
-
-        for (Constructor<?> constructor : constructors) {
-            Parameter[] parameters = constructor.getParameters();
-            if (parameters.length == 1 && parameters[0].getType().equals(String.class)) {
-                return;
-            }
-        }
-
-        throw new NoSuchConstructorException("No constructor with a single vararg String parameter found in class " + entityClass.getSimpleName());
-    }
-
-    /**
-     * Retrieves a list of methods in the specified class that are annotated with {@link Column},
-     * have no parameters, return a non-void type, do not start with "set", and are not named "_id".
-     *
-     * @param entityClass The class to retrieve the methods from.
-     * @return a list of methods that match the criteria
-     */
-    default List<Method> getMethods(@NotNull Class<?> entityClass) {
-        return Arrays.stream(entityClass.getDeclaredMethods())
-                .filter(
-                        method -> method.getAnnotation(Column.class) != null
-                                && method.getParameterCount() == 0
-                                && method.getReturnType() != void.class
-                                && !method.getName().startsWith("set")
-                                && !method.getName().equalsIgnoreCase("_id")
-                ).filter(method -> !Modifier.isStatic(method.getModifiers()))
-                .peek(method -> {
-                    if (!Modifier.isPublic(method.getModifiers())) {
-                        method.setAccessible(true);
-                    }
-                })
-                .toList();
-    }
-
-    /**
-     * Retrieves a list of fields in the specified class that are annotated with {@link Column}
-     * and are not named "_id".
-     *
-     * @param entityClass The class to retrieve the fields from.
-     * @return a list of fields that match the criteria
-     */
-    default List<Field> getFields(@NotNull Class<?> entityClass) {
-        return Arrays.stream(entityClass.getDeclaredFields())
-                .filter(
-                        field -> field.getAnnotation(Column.class) != null
-                                && !field.getName().equalsIgnoreCase("_id")
-                ).filter(field -> !Modifier.isStatic(field.getModifiers()))
-                .peek(field -> {
-                    if (!Modifier.isPublic(field.getModifiers())) {
-                        field.setAccessible(true);
-                    }
-                }).toList();
-    }
-
-    /**
-     * Creates an ObjectMap containing the values of the specified entity's annotated fields and methods.
-     *
-     * @param entity The entity to extract values from.
-     * @return an ObjectMap containing the values of the entity's annotated fields and methods
-     */
-    default ObjectMap<String, Object> getValuesMap(@NotNull V entity) {
-        ObjectMap<String, Object> values = new HashObjectMap<>();
-
-        for (Method method : getMethods(entity.getClass())) {
-            Column columnAnnotation = method.getAnnotation(Column.class);
-
-            if (columnAnnotation != null) {
-                Object result;
-                try {
-                    result = method.invoke(entity);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    this.getLogger().log(Level.SEVERE, "[EntityRepository]:", e);
-                    return null;
-                }
-                values.append(columnAnnotation.name(), result);
-                entity.setValue(columnAnnotation.name(), result);
-            }
-        }
-
-        for (Field field : getFields(entity.getClass())) {
-            Column columnAnnotation = field.getAnnotation(Column.class);
-            if (columnAnnotation != null) {
-                Object result;
-                try {
-                    result = field.get(entity);
-                } catch (IllegalAccessException e) {
-                    this.getLogger().log(Level.SEVERE, "[EntityRepository]:", e);
-                    return null;
-                }
-                values.append(columnAnnotation.name(), result);
-                entity.setValue(columnAnnotation.name(), result);
-            }
-        }
-        return values;
-    }
 
     /**
      * Gets the logger associated with this repository.

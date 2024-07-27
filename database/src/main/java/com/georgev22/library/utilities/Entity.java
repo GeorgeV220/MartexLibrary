@@ -1,6 +1,5 @@
 package com.georgev22.library.utilities;
 
-import com.georgev22.library.utilities.annotations.Column;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -24,7 +23,6 @@ public abstract class Entity {
      *
      * @return the ID of the entity
      */
-    @Column(name = "_id", type = "VARCHAR(32)", unique = true)
     public String _id() {
         return this._id;
     }

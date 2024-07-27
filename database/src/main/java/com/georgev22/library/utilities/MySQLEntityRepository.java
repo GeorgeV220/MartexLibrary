@@ -1,14 +1,11 @@
 package com.georgev22.library.utilities;
 
 import com.georgev22.library.database.sql.Database;
-import com.georgev22.library.maps.HashObjectMap;
-import com.georgev22.library.maps.ObjectMap;
 import com.georgev22.library.maps.ObservableObjectMap;
-import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +30,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     private final Logger logger;
     private final Class<V> entityClass;
     private final String tableName;
+    private final Gson gson;
 
     /**
      * Constructs a MySQLEntityRepository with the specified database, logger, and entity class.
@@ -46,7 +44,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     }
 
     /**
-     * Constructs a MySQLEntityRepository with the specified database, logger, and entity class.
+     * Constructs a MySQLEntityRepository with the specified database, logger, entity class, and table name.
      *
      * @param database    The database to be used.
      * @param logger      The logger for handling log messages.
@@ -58,6 +56,7 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
         this.logger = logger;
         this.entityClass = entityClass;
         this.tableName = tableName;
+        this.gson = new GsonBuilder().create();
     }
 
     /**
@@ -68,55 +67,28 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     @Override
     public CompletableFuture<V> save(@NotNull V entity) {
         return exists(entity._id(), true, false).thenApplyAsync(exists -> {
-            ObjectMap<String, Object> values = getValuesMap(entity);
-            String statement;
             String entityId = escapeSql(entity._id());
+            String json = gson.toJson(entity);
+            String statement;
             if (exists) {
-                statement = this.database.buildUpdateStatement(this.tableName, values, "_id = '" + entityId + "'");
+                statement = "UPDATE " + tableName + " SET data = ? WHERE _id = ?";
             } else {
-                statement = this.database.buildInsertStatement(this.tableName, new HashObjectMap<String, Object>().append("_id", "'" + entityId + "'").append(values));
+                statement = "INSERT INTO " + tableName + " (_id, data) VALUES (?, ?)";
             }
 
-            if (statement.isEmpty()) {
+            try (Connection connection = this.database.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.setString(1, json);
+                preparedStatement.setString(2, entityId);
+                preparedStatement.executeUpdate();
+            } catch (SQLException | ClassNotFoundException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
                 return null;
             }
 
-            this.executeStatement(statement);
-
+            this.loadedEntities.append(entity._id(), entity);
             return entity;
         });
-    }
-
-    /**
-     * Executes the provided SQL statement using the repository's database connection.
-     *
-     * @param statement The SQL statement to be executed.
-     */
-    private void executeStatement(String statement) {
-        try (Connection connection = this.database.getConnection()) {
-            if (connection == null || connection.isClosed()) {
-                try (Connection newConnection = this.database.openConnection()) {
-                    newConnection.prepareStatement(statement).executeUpdate();
-                }
-            } else {
-                connection.prepareStatement(statement).executeUpdate();
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-        }
-    }
-
-    private @Nullable PreparedStatement querySQL(String statement) {
-        try {
-            Connection connection = this.database.getConnection();
-            if (connection == null || connection.isClosed()) {
-                connection = this.database.openConnection();
-            }
-            return connection.prepareStatement(statement);
-        } catch (SQLException | ClassNotFoundException e) {
-            this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-            return null;
-        }
     }
 
     /**
@@ -131,31 +103,18 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             return CompletableFuture.completedFuture(loadedEntities.get(entityId));
         }
         return CompletableFuture.supplyAsync(() -> {
-            String statement = "SELECT * FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
-            try (PreparedStatement stmt = querySQL(statement)) {
-                if (stmt == null) {
-                    this.logger.log(Level.SEVERE, "Failed to create statement for entity ID: " + entityId);
-                    return null;
-                }
-                try (ResultSet resultSet = stmt.executeQuery()) {
-                    if (resultSet == null) {
-                        this.logger.log(Level.SEVERE, "Failed to load entity with ID: " + entityId + " because the result set was null.");
-                        return null;
-                    }
+            String statement = "SELECT data FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
+            try (Connection connection = this.database.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        this.checkForConstructorWithSingleString(this.entityClass);
-                        V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-                        for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
-                            String columnName = resultSet.getMetaData().getColumnName(i + 1);
-                            Object columnValue = resultSet.getObject(i + 1);
-                            entity.setValue(columnName, columnValue);
-                        }
+                        String json = resultSet.getString("data");
+                        V entity = gson.fromJson(json, entityClass);
                         this.loadedEntities.append(entityId, entity);
                         return entity;
                     }
                 }
-            } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
-                     IllegalAccessException | NoSuchConstructorException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
             }
 
@@ -193,21 +152,13 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
             }
             if (checkDb) {
                 String statement = "SELECT COUNT(*) FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
-                try (PreparedStatement stmt = querySQL(statement)) {
-                    if (stmt == null) {
-                        this.logger.log(Level.SEVERE, "Failed to create statement for entity ID: " + entityId);
-                        return false;
-                    }
-                    try (ResultSet resultSet = stmt.executeQuery()) {
-                        if (resultSet == null) {
-                            this.logger.log(Level.SEVERE, "Failed to check if entity with ID: " + entityId + " exists because the result set was null.");
-                            return false;
-                        }
-                        resultSet.next();
-                        int count = resultSet.getInt(1);
-                        return forceLoad ? this.load(entityId) != null : count > 0;
-                    }
-                } catch (SQLException e) {
+                try (Connection connection = this.database.getConnection();
+                     PreparedStatement preparedStatement = connection.prepareStatement(statement);
+                     ResultSet resultSet = preparedStatement.executeQuery()) {
+                    resultSet.next();
+                    int count = resultSet.getInt(1);
+                    return forceLoad ? this.load(entityId) != null : count > 0;
+                } catch (SQLException | ClassNotFoundException e) {
                     this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
                     return false;
                 }
@@ -228,12 +179,14 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
                 this.logger.log(Level.WARNING, "[EntityRepository]: Entity with ID " + entityId + " does not exist.");
                 return;
             }
-            String statement = this.database.buildDeleteStatement(
-                    this.tableName,
-                    "_id = '" + escapeSql(entityId) + "'"
-            );
+            String statement = "DELETE FROM " + this.tableName + " WHERE _id = '" + escapeSql(entityId) + "'";
 
-            this.executeStatement(statement);
+            try (Connection connection = this.database.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException | ClassNotFoundException e) {
+                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+            }
             this.loadedEntities.remove(entityId);
         }));
     }
@@ -244,33 +197,27 @@ public class MySQLEntityRepository<V extends Entity> implements EntityRepository
     @Override
     public CompletableFuture<BigInteger> loadAll() {
         return CompletableFuture.supplyAsync(() -> {
-            String statement = "SELECT * FROM " + this.tableName;
+            String statement = "SELECT _id, data FROM " + this.tableName;
             List<CompletableFuture<Void>> futures = new ArrayList<>();
             AtomicReference<BigInteger> count = new AtomicReference<>(BigInteger.ZERO);
 
-            try (PreparedStatement preparedStatement = this.querySQL(statement)) {
-                if (preparedStatement == null) {
-                    this.logger.log(Level.SEVERE, "Failed to create statement for loading all entities.");
-                    return CompletableFuture.completedFuture(BigInteger.ZERO);
+            try (Connection connection = this.database.getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(statement);
+                 ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String id = resultSet.getString("_id");
+                    String json = resultSet.getString("data");
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                        V entity = gson.fromJson(json, entityClass);
+                        if (entity != null) {
+                            this.loadedEntities.append(id, entity);
+                            count.updateAndGet(current -> current.add(BigInteger.ONE));
+                        }
+                    });
+                    futures.add(future);
                 }
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet == null) {
-                        this.logger.log(Level.SEVERE, "Failed to load all entities because the result set was null.");
-                        return CompletableFuture.completedFuture(BigInteger.ZERO);
-                    }
-                    while (resultSet.next()) {
-                        String id = resultSet.getString("_id");
-                        CompletableFuture<Void> future = load(id).thenAccept(v -> {
-                            if (v != null) {
-                                count.updateAndGet(current -> current.add(BigInteger.ONE));
-                            }
-                        });
-                        futures.add(future);
-                    }
-                }
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
-                return CompletableFuture.completedFuture(BigInteger.ZERO);
             }
 
             CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));

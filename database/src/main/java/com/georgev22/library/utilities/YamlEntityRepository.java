@@ -1,17 +1,15 @@
 package com.georgev22.library.utilities;
 
 import com.georgev22.library.maps.ObservableObjectMap;
-import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
 import com.georgev22.library.yaml.file.YamlConfiguration;
+import com.georgev22.library.yaml.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -37,6 +35,9 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
      * @param entityClass The class type of the entity managed by this repository.
      */
     public YamlEntityRepository(File dataFolder, Logger logger, Class<V> entityClass) {
+        if (!ConfigurationSerializable.class.isAssignableFrom(entityClass)) {
+            throw new RuntimeException("Entity is not a ConfigurationSerializable");
+        }
         this.dataFolder = dataFolder;
         this.logger = logger;
         this.entityClass = entityClass;
@@ -59,9 +60,7 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
             File file = new File(dataFolder, entity._id() + ".yml");
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-            for (Map.Entry<String, Object> entry : getValuesMap(entity).entrySet()) {
-                config.set(entry.getKey(), entry.getValue());
-            }
+            config.set("entity", entity);
 
             try {
                 config.save(file);
@@ -93,20 +92,13 @@ public class YamlEntityRepository<V extends Entity> implements EntityRepository<
 
             YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-            try {
-                this.checkForConstructorWithSingleString(this.entityClass);
-                V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-                for (String key : config.getKeys(false)) {
-                    entity.setValue(key, config.get(key));
-                }
-                this.loadedEntities.put(entityId, entity);
-                return entity;
-            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
-                     InvocationTargetException |
-                     NoSuchConstructorException e) {
-                this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
+            V entity = config.getObject("entity", this.entityClass);
+            if (entity == null) {
+                this.logger.log(Level.SEVERE, "[EntityRepository] Error loading entity from file: " + file.getPath());
                 return null;
             }
+            this.loadedEntities.put(entityId, entity);
+            return entity;
         });
     }
 

@@ -49,8 +49,8 @@ public abstract class Database {
      *
      * @return if the connection is valid
      */
-    public boolean isConnectionValid() {
-        return connection != null;
+    public boolean isConnectionValid() throws SQLException {
+        return connection != null && !connection.isClosed();
     }
 
     /**
@@ -82,9 +82,12 @@ public abstract class Database {
      * @return the <code>Connection</code> to the database or null
      * if the connection is not valid.
      */
-    @Nullable
-    public Connection getConnection() {
-        return connection;
+    @NotNull
+    public Connection getConnection() throws SQLException, ClassNotFoundException {
+        if (!isConnectionValid()) {
+            this.connection = this.openConnection();
+        }
+        return this.connection;
     }
 
     /**

@@ -1,19 +1,18 @@
 package com.georgev22.library.utilities;
 
 import com.georgev22.library.maps.ObservableObjectMap;
-import com.georgev22.library.utilities.exceptions.NoSuchConstructorException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -31,6 +30,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
     private final Logger logger;
     private final Class<V> entityClass;
     private final String collectionName;
+    private final Gson gson;
 
     /**
      * Constructs a MongoDBEntityRepository with the specified MongoDB database, logger, and entity class.
@@ -40,7 +40,7 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entityClass   The class type of the entity managed by this repository.
      */
     public MongoDBEntityRepository(MongoDatabase mongoDatabase, Logger logger, Class<V> entityClass) {
-        this(mongoDatabase, logger, entityClass, entityClass.getSimpleName());
+        this(mongoDatabase, logger, entityClass, entityClass.getSimpleName(), new Gson());
     }
 
     /**
@@ -51,11 +51,17 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
      * @param entityClass    The class type of the entity managed by this repository.
      * @param collectionName The name of the collection in the database.
      */
-    public MongoDBEntityRepository(MongoDatabase mongoDatabase, Logger logger, Class<V> entityClass, String collectionName) {
+    public MongoDBEntityRepository(
+            MongoDatabase mongoDatabase,
+            Logger logger,
+            Class<V> entityClass, String collectionName,
+            Gson gson
+    ) {
         this.mongoDatabase = mongoDatabase;
         this.logger = logger;
         this.entityClass = entityClass;
         this.collectionName = collectionName;
+        this.gson = gson;
     }
 
     /**
@@ -66,7 +72,8 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
     @Override
     public CompletableFuture<V> save(V entity) {
         return exists(entity._id(), true, false).thenApplyAsync(exists -> {
-            Document document = new Document(getValuesMap(entity));
+            JsonObject jsonObject = JsonParser.parseString(gson.toJson(entity)).getAsJsonObject();
+            Document document = Document.parse(jsonObject.toString());
             MongoCollection<Document> collection = mongoDatabase.getCollection(this.collectionName);
             if (exists) {
                 collection.replaceOne(new Document("_id", entity._id()), document);
@@ -95,17 +102,10 @@ public class MongoDBEntityRepository<V extends Entity> implements EntityReposito
 
             if (document != null) {
                 try {
-                    this.checkForConstructorWithSingleString(this.entityClass);
-                    V entity = this.entityClass.getConstructor(String.class).newInstance(entityId);
-
-                    for (Map.Entry<String, Object> key : document.entrySet()) {
-                        entity.setValue(key.getKey(), key.getValue());
-                    }
-
+                    V entity = gson.fromJson(document.toJson(), entityClass);
                     this.loadedEntities.append(entityId, entity);
                     return entity;
-                } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                         InvocationTargetException | NoSuchConstructorException e) {
+                } catch (Exception e) {
                     this.logger.log(Level.SEVERE, "[EntityRepository]:", e);
                 }
             }
